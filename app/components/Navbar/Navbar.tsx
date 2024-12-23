@@ -24,24 +24,22 @@ const Navbar = () => {
 
   return (
     <>
-      {/* AppBar for desktop and mobile */}
       <AppBar position='sticky' sx={{ backgroundColor: '#1e1e1e' }}>
         <Toolbar sx={{ minHeight: 80 }}>
-          {/* Container Box with padding for larger screens */}
           <Box
             display='flex'
             alignItems='center'
             sx={{
               width: '100%',
               height: 90,
-              paddingX: { xs: 2, sm: 4, md: 8, lg: 12, xl: 40 } // here increasing padding for navbar
+              paddingX: { xs: 2, sm: 4, md: 8, lg: 12, xl: 40 }
             }}
           >
-            {/* Logo (on the left side) */}
+            {/* Logo  */}
             <Box
               sx={{
-                width: { xs: 90, sm: 100, md: 120, lg: 140, xl: 150 }, 
-                height: { xs: 54, sm: 60, md: 70, lg: 80, xl: 90 } 
+                width: { xs: 90, sm: 100, md: 120, lg: 140, xl: 150 },
+                height: { xs: 54, sm: 60, md: 70, lg: 80, xl: 90 }
               }}
             >
               <Image
@@ -49,7 +47,7 @@ const Navbar = () => {
                 alt='Logo'
                 width={100}
                 height={100}
-                layout='responsive' 
+                layout='responsive'
               />
             </Box>
 
@@ -81,7 +79,7 @@ const Navbar = () => {
                   '&:hover': {
                     color: 'skyblue',
                     '&::after': {
-                      width: '80%' 
+                      width: '80%'
                     }
                   },
                   '&::after': {
@@ -92,8 +90,8 @@ const Navbar = () => {
                     width: '0%',
                     height: '1px',
                     backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease', 
-                    transform: 'translateX(-50%)' 
+                    transition: 'width 0.3s ease, left 0.3s ease',
+                    transform: 'translateX(-50%)'
                   }
                 }}
               >
@@ -107,9 +105,9 @@ const Navbar = () => {
                   textTransform: 'none',
                   fontSize: '16px',
                   '&:hover': {
-                    color: 'skyblue', 
+                    color: 'skyblue',
                     '&::after': {
-                      width: '80%' 
+                      width: '80%'
                     }
                   },
                   '&::after': {
@@ -119,9 +117,9 @@ const Navbar = () => {
                     left: '50%',
                     width: '0%',
                     height: '1px',
-                    backgroundColor: 'skyblue', 
-                    transition: 'width 0.3s ease, left 0.3s ease', 
-                    transform: 'translateX(-50%)' 
+                    backgroundColor: 'skyblue',
+                    transition: 'width 0.3s ease, left 0.3s ease',
+                    transform: 'translateX(-50%)'
                   }
                 }}
               >
@@ -135,9 +133,9 @@ const Navbar = () => {
                   textTransform: 'none',
                   fontSize: '16px',
                   '&:hover': {
-                    color: 'skyblue', 
+                    color: 'skyblue',
                     '&::after': {
-                      width: '80%' 
+                      width: '80%'
                     }
                   },
                   '&::after': {
@@ -147,9 +145,9 @@ const Navbar = () => {
                     left: '50%',
                     width: '0%',
                     height: '1px',
-                    backgroundColor: 'skyblue', 
-                    transition: 'width 0.3s ease, left 0.3s ease', 
-                    transform: 'translateX(-50%)' 
+                    backgroundColor: 'skyblue',
+                    transition: 'width 0.3s ease, left 0.3s ease',
+                    transform: 'translateX(-50%)'
                   }
                 }}
               >
@@ -165,7 +163,7 @@ const Navbar = () => {
                   '&:hover': {
                     color: 'skyblue',
                     '&::after': {
-                      width: '80%' 
+                      width: '80%'
                     }
                   },
                   '&::after': {
@@ -175,9 +173,9 @@ const Navbar = () => {
                     left: '50%',
                     width: '0%',
                     height: '1px',
-                    backgroundColor: 'skyblue', 
+                    backgroundColor: 'skyblue',
                     transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)' 
+                    transform: 'translateX(-50%)'
                   }
                 }}
               >
@@ -193,7 +191,7 @@ const Navbar = () => {
                   '&:hover': {
                     color: 'skyblue',
                     '&::after': {
-                      width: '80%' 
+                      width: '80%'
                     }
                   },
                   '&::after': {
@@ -203,9 +201,9 @@ const Navbar = () => {
                     left: '50%',
                     width: '0%',
                     height: '1px',
-                    backgroundColor: 'skyblue', 
-                    transition: 'width 0.3s ease, left 0.3s ease', 
-                    transform: 'translateX(-50%)' 
+                    backgroundColor: 'skyblue',
+                    transition: 'width 0.3s ease, left 0.3s ease',
+                    transform: 'translateX(-50%)'
                   }
                 }}
               >
@@ -222,10 +220,10 @@ const Navbar = () => {
         open={drawerOpen}
         onClose={toggleDrawer}
         sx={{
-          display: { sm: 'none' }, 
-          width: '180px', 
+          display: { sm: 'none' },
+          width: '180px',
           '& .MuiDrawer-paper': {
-            width: '180px' 
+            width: '180px'
           }
         }}
       >
@@ -236,7 +234,7 @@ const Navbar = () => {
             href='#'
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 transform: 'scale(1.05)',
                 transition: 'all 0.3s ease-in-out'
               }
@@ -249,7 +247,7 @@ const Navbar = () => {
             href='#'
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 transform: 'scale(1.05)',
                 transition: 'all 0.3s ease-in-out'
               }
@@ -262,7 +260,7 @@ const Navbar = () => {
             href='#'
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 transform: 'scale(1.05)',
                 transition: 'all 0.3s ease-in-out'
               }
@@ -275,7 +273,7 @@ const Navbar = () => {
             href='#'
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 transform: 'scale(1.05)',
                 transition: 'all 0.3s ease-in-out'
               }
@@ -288,7 +286,7 @@ const Navbar = () => {
             href='#'
             sx={{
               '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)', 
+                backgroundColor: 'rgba(0, 0, 0, 0.1)',
                 transform: 'scale(1.05)',
                 transition: 'all 0.3s ease-in-out'
               }
