@@ -73,7 +73,7 @@ const JobList = () => {
       <Typography variant="h4" gutterBottom>Job Management</Typography>
 
       {/* Previous Jobs Section */}
-      <Box sx={{ marginBottom: 4 }}>
+      <Box >
         <Typography variant="h6" gutterBottom>Previous Jobs</Typography>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {previousJobs.map((job) => (

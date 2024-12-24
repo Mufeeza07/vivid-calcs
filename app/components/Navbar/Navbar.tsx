@@ -13,6 +13,7 @@ import {
   Toolbar
 } from '@mui/material'
 import Image from 'next/image'
+import Link from 'next/link'
 import { useState } from 'react'
 
 const Navbar = () => {
@@ -20,6 +21,30 @@ const Navbar = () => {
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen)
+  }
+
+  const buttonStyles = {
+    marginRight: 2,
+    position: 'relative',
+    textTransform: 'none',
+    fontSize: '16px',
+    '&:hover': {
+      color: '#1bbaf5',
+      '&::after': {
+        width: '80%'
+      }
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      bottom: 0,
+      left: '50%',
+      width: '0%',
+      height: '1px',
+      backgroundColor: '#1bbaf5',
+      transition: 'width 0.3s ease, left 0.3s ease',
+      transform: 'translateX(-50%)'
+    }
   }
 
   return (
@@ -35,7 +60,7 @@ const Navbar = () => {
               paddingX: { xs: 2, sm: 4, md: 8, lg: 12, xl: 40 }
             }}
           >
-            {/* Logo  */}
+            {/* Logo */}
             <Box
               sx={{
                 width: { xs: 90, sm: 100, md: 120, lg: 140, xl: 150 },
@@ -69,146 +94,31 @@ const Navbar = () => {
                 alignItems: 'center'
               }}
             >
-              <Button
-                color='inherit'
-                sx={{
-                  marginRight: 2,
-                  position: 'relative',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: 'skyblue',
-                    '&::after': {
-                      width: '80%'
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    width: '0%',
-                    height: '1px',
-                    backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)'
-                  }
-                }}
-              >
-                Home
-              </Button>
-              <Button
-                color='inherit'
-                sx={{
-                  marginRight: 2,
-                  position: 'relative',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: 'skyblue',
-                    '&::after': {
-                      width: '80%'
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    width: '0%',
-                    height: '1px',
-                    backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)'
-                  }
-                }}
-              >
-                About
-              </Button>
-              <Button
-                color='inherit'
-                sx={{
-                  marginRight: 2,
-                  position: 'relative',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: 'skyblue',
-                    '&::after': {
-                      width: '80%'
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    width: '0%',
-                    height: '1px',
-                    backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)'
-                  }
-                }}
-              >
-                Contact
-              </Button>
-              <Button
-                color='inherit'
-                sx={{
-                  marginRight: 2,
-                  position: 'relative',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: 'skyblue',
-                    '&::after': {
-                      width: '80%'
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    width: '0%',
-                    height: '1px',
-                    backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)'
-                  }
-                }}
-              >
-                Login
-              </Button>
-              <Button
-                color='inherit'
-                sx={{
-                  marginRight: 2,
-                  position: 'relative',
-                  textTransform: 'none',
-                  fontSize: '16px',
-                  '&:hover': {
-                    color: 'skyblue',
-                    '&::after': {
-                      width: '80%'
-                    }
-                  },
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    bottom: 0,
-                    left: '50%',
-                    width: '0%',
-                    height: '1px',
-                    backgroundColor: 'skyblue',
-                    transition: 'width 0.3s ease, left 0.3s ease',
-                    transform: 'translateX(-50%)'
-                  }
-                }}
-              >
-                Signup
-              </Button>
+              <Link href='/' passHref>
+                <Button color='inherit' sx={buttonStyles}>
+                  Home
+                </Button>
+              </Link>
+              <Link href='/about' passHref>
+                <Button color='inherit' sx={buttonStyles}>
+                  About
+                </Button>
+              </Link>
+              <Link href='/contact' passHref>
+                <Button color='inherit' sx={buttonStyles}>
+                  Contact
+                </Button>
+              </Link>
+              <Link href='/login' passHref>
+                <Button color='inherit' sx={buttonStyles}>
+                  Login
+                </Button>
+              </Link>
+              <Link href='/signup' passHref>
+                <Button color='inherit' sx={buttonStyles}>
+                  Signup
+                </Button>
+              </Link>
             </Box>
           </Box>
         </Toolbar>
@@ -228,70 +138,19 @@ const Navbar = () => {
         }}
       >
         <List>
-          {/* Link-style ListItem */}
-          <ListItem
-            component='a'
-            href='#'
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                transform: 'scale(1.05)',
-                transition: 'all 0.3s ease-in-out'
-              }
-            }}
-          >
+          <ListItem component='a' href='/'>
             <ListItemText primary='Home' />
           </ListItem>
-          <ListItem
-            component='a'
-            href='#'
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                transform: 'scale(1.05)',
-                transition: 'all 0.3s ease-in-out'
-              }
-            }}
-          >
+          <ListItem component='a' href='/about'>
             <ListItemText primary='About' />
           </ListItem>
-          <ListItem
-            component='a'
-            href='#'
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                transform: 'scale(1.05)',
-                transition: 'all 0.3s ease-in-out'
-              }
-            }}
-          >
+          <ListItem component='a' href='/contact'>
             <ListItemText primary='Contact' />
           </ListItem>
-          <ListItem
-            component='a'
-            href='#'
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                transform: 'scale(1.05)',
-                transition: 'all 0.3s ease-in-out'
-              }
-            }}
-          >
+          <ListItem component='a' href='/login'>
             <ListItemText primary='Login' />
           </ListItem>
-          <ListItem
-            component='a'
-            href='#'
-            sx={{
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.1)',
-                transform: 'scale(1.05)',
-                transition: 'all 0.3s ease-in-out'
-              }
-            }}
-          >
+          <ListItem component='a' href='/signup'>
             <ListItemText primary='Signup' />
           </ListItem>
         </List>

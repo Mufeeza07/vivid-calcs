@@ -7,7 +7,7 @@ const HeroSection = () => {
   const router = useRouter()
 
   const handleNavigate = () => {
-    router.push('/modules') // Navigate to Nails Calculator page
+    router.push('/jobs')
   }
 
   return (
@@ -53,7 +53,7 @@ const HeroSection = () => {
           sx={{
             marginBottom: { xs: 4, sm: 6 },
             fontWeight: 'bold',
-            fontSize: 'h6' 
+            fontSize: 'h6'
           }}
         >
           WELCOME TO VIVID CALCULATIONS
