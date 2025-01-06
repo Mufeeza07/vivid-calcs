@@ -1,13 +1,18 @@
 'use client'
 
-import { Container, Typography, Button, Box } from '@mui/material'
+import { isLoggedIn } from '@/utils/auth'
+import { Box, Button, Container, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
 
 const HeroSection = () => {
   const router = useRouter()
 
   const handleNavigate = () => {
-    router.push('/jobs')
+    if (isLoggedIn()) {
+      router.push('/jobs')
+    } else {
+      router.push('/login')
+    }
   }
 
   return (
@@ -21,13 +26,12 @@ const HeroSection = () => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        textAlign: { xs: 'center', sm: 'left' }, // Center text for small screens
+        textAlign: { xs: 'center', sm: 'left' },
         color: 'white',
         position: 'relative',
         zIndex: 0
       }}
     >
-      {/* Optional Overlay to Improve Text Visibility */}
       <Box
         sx={{
           position: 'absolute',
@@ -35,12 +39,11 @@ const HeroSection = () => {
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: 'rgba(0, 0, 0, 0.6)', // Darker overlay
+          backgroundColor: 'rgba(0, 0, 0, 0.6)',
           zIndex: 0
         }}
       />
 
-      {/* Overlay Content */}
       <Container
         sx={{
           zIndex: 1,
@@ -59,7 +62,6 @@ const HeroSection = () => {
           WELCOME TO VIVID CALCULATIONS
         </Typography>
 
-        {/* Larger Marketing Text */}
         <Typography
           variant='h2'
           sx={{
@@ -71,24 +73,23 @@ const HeroSection = () => {
               sm: 'h3.fontSize',
               lg: 'h2.fontSize'
             },
-            maxWidth: { xs: '100%', sm: '50%' }, // Full width for small screens
-            marginX: { xs: 'auto', sm: 0 } // Center align for smaller screens
+            maxWidth: { xs: '100%', sm: '50%' },
+            marginX: { xs: 'auto', sm: 0 }
           }}
         >
           Precision and innovation in every calculation.
         </Typography>
 
-        {/* Expanded Marketing Text */}
         <Typography
           variant='h6'
           sx={{
             marginBottom: 4,
             marginTop: 4,
-            maxWidth: { xs: '90%', sm: '60%' }, // Adjust width for different screen sizes
-            marginX: { xs: 'auto', sm: 0 }, // Center align for smaller screens
+            maxWidth: { xs: '90%', sm: '60%' },
+            marginX: { xs: 'auto', sm: 0 },
             wordWrap: 'break-word',
-            lineHeight: 1.2, // Improved spacing for readability
-            fontSize: { xs: 'body1.fontSize', sm: 'h6.fontSize' } // Responsive font size
+            lineHeight: 1.2,
+            fontSize: { xs: 'body1.fontSize', sm: 'h6.fontSize' }
           }}
         >
           We provide accurate, reliable, and cost-effective designs for any
@@ -102,8 +103,8 @@ const HeroSection = () => {
           onClick={handleNavigate}
           sx={{
             marginTop: 2,
-            fontSize: { xs: '14px', sm: '16px' }, // Adjust button font size
-            paddingX: { xs: 2, sm: 4 } // Adjust button padding
+            fontSize: { xs: '14px', sm: '16px' },
+            paddingX: { xs: 2, sm: 4 }
           }}
         >
           GET STARTED

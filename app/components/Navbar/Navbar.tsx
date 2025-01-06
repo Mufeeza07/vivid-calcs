@@ -14,13 +14,25 @@ import {
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen)
+  }
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    setIsLoggedIn(!!token)
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    setIsLoggedIn(false)
   }
 
   const buttonStyles = {
@@ -86,7 +98,6 @@ const Navbar = () => {
               <MenuIcon />
             </IconButton>
 
-            {/* Desktop Navigation links */}
             <Box
               sx={{
                 ml: 'auto',
@@ -109,16 +120,29 @@ const Navbar = () => {
                   Contact
                 </Button>
               </Link>
-              <Link href='/login' passHref>
-                <Button color='inherit' sx={buttonStyles}>
-                  Login
+
+              {!isLoggedIn ? (
+                <>
+                  <Link href='/login' passHref>
+                    <Button color='inherit' sx={buttonStyles}>
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href='/signup' passHref>
+                    <Button color='inherit' sx={buttonStyles}>
+                      Signup
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <Button
+                  color='inherit'
+                  sx={buttonStyles}
+                  onClick={handleLogout}
+                >
+                  Logout
                 </Button>
-              </Link>
-              <Link href='/signup' passHref>
-                <Button color='inherit' sx={buttonStyles}>
-                  Signup
-                </Button>
-              </Link>
+              )}
             </Box>
           </Box>
         </Toolbar>
@@ -147,12 +171,20 @@ const Navbar = () => {
           <ListItem component='a' href='/contact'>
             <ListItemText primary='Contact' />
           </ListItem>
-          <ListItem component='a' href='/login'>
-            <ListItemText primary='Login' />
-          </ListItem>
-          <ListItem component='a' href='/signup'>
-            <ListItemText primary='Signup' />
-          </ListItem>
+          {!isLoggedIn ? (
+            <>
+              <ListItem component='a' href='/login'>
+                <ListItemText primary='Login' />
+              </ListItem>
+              <ListItem component='a' href='/signup'>
+                <ListItemText primary='Signup' />
+              </ListItem>
+            </>
+          ) : (
+            <ListItem component='div' onClick={handleLogout}>
+              <ListItemText primary='Logout' />
+            </ListItem>
+          )}
         </List>
       </Drawer>
     </>

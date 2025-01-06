@@ -1,46 +1,51 @@
 'use client'
 
+import { isLoggedIn } from '@/utils/auth'
+import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
   Box,
   Button,
   Container,
-  TextField,
-  Typography,
+  IconButton,
   InputAdornment,
-  IconButton
+  TextField,
+  Typography
 } from '@mui/material'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { Visibility, VisibilityOff } from '@mui/icons-material'
 
 const Login = () => {
   const router = useRouter()
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
-  // States for form input and visibility toggle
+  useEffect(() => {
+    if (isLoggedIn()) {
+      setIsAuthenticated(true)
+      router.push('/')
+    }
+  }, [router])
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({ email: '', password: '' })
+  const [loading, setLoading] = useState(false)
 
-  // Initialize AOS animations
   useEffect(() => {
     AOS.init()
   }, [])
 
-  // Handle form validation
   const validateForm = () => {
-    let formErrors = { email: '', password: '' }
+    const formErrors = { email: '', password: '' }
     let isValid = true
 
-    // Email validation
     if (!email) {
       formErrors.email = 'Email is required'
       isValid = false
     }
 
-    // Password validation
     if (!password) {
       formErrors.password = 'Password is required'
       isValid = false
@@ -50,12 +55,46 @@ const Login = () => {
     return isValid
   }
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (validateForm()) {
-      // Handle login logic
-      alert('Login Successful')
-      router.push('/') // Redirect to homepage after login
+      setLoading(true)
+
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ email, password })
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          localStorage.setItem('token', data.token)
+          localStorage.setItem('user', JSON.stringify(data.user))
+
+          router.push('/')
+        } else {
+          setErrors({
+            email: '',
+            password: data.error || 'Something went wrong, please try again.'
+          })
+        }
+      } catch (error) {
+        console.error(error)
+        setErrors({
+          email: '',
+          password: 'Something went wrong. Please try again later.'
+        })
+      } finally {
+        setLoading(false)
+      }
     }
+  }
+
+  if (isAuthenticated) {
+    return null
   }
 
   return (
@@ -68,7 +107,6 @@ const Login = () => {
         position: 'relative'
       }}
     >
-      {/* Background Image with Blur */}
       <Box
         sx={{
           position: 'absolute',
@@ -79,18 +117,17 @@ const Login = () => {
           backgroundImage: 'url("/images/home.jpg")',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          filter: 'blur(8px)', // Apply blur only to the background
-          zIndex: -1 // Send the background behind the form
+          filter: 'blur(8px)',
+          zIndex: -1
         }}
       />
 
-      {/* Login Form */}
       <Container
         maxWidth='sm'
         sx={{
           position: 'relative',
-          zIndex: 10, // Ensure the form is above the background
-          paddingBottom: '10vh' // To avoid overlap with the bottom of the screen
+          zIndex: 10,
+          paddingBottom: '10vh'
         }}
       >
         <Box
@@ -104,7 +141,6 @@ const Login = () => {
             boxShadow: 3,
             backgroundColor: '#edf3f5'
           }}
-          className='rounded-xl p-8 shadow-lg backdrop-blur-md'
           data-aos='fade-up'
           data-aos-delay='100'
         >
@@ -112,7 +148,6 @@ const Login = () => {
             variant='h4'
             align='center'
             gutterBottom
-            className='text-primary-500 mb-6 text-3xl font-bold'
             data-aos='fade-up'
             data-aos-delay='200'
           >
@@ -135,7 +170,6 @@ const Login = () => {
                 backgroundColor: '#f4f4f4'
               }
             }}
-            className='mb-4'
             data-aos='fade-up'
             data-aos-delay='300'
           />
@@ -156,7 +190,6 @@ const Login = () => {
                 backgroundColor: '#f4f4f4'
               }
             }}
-            className='mb-6'
             data-aos='fade-up'
             data-aos-delay='400'
             InputProps={{
@@ -181,30 +214,20 @@ const Login = () => {
               padding: 1.5,
               borderRadius: '10px',
               textTransform: 'none',
-              fontSize: '16px',
-              '&:hover': {
-                backgroundColor: '#003366'
-              }
+              fontSize: '16px'
             }}
             onClick={handleLogin}
-            className='transition-all duration-300 ease-in-out hover:bg-blue-700'
             data-aos='fade-up'
             data-aos-delay='500'
           >
-            Login
+            {loading ? 'Logging in...' : 'Login'}
           </Button>
 
-          <Typography
-            align='center'
-            className='mt-4 text-gray-700'
-            data-aos='fade-up'
-            data-aos-delay='600'
-          >
+          <Typography align='center' data-aos='fade-up' data-aos-delay='600'>
             Don't have an account?{' '}
             <Button
               onClick={() => router.push('/signup')}
               sx={{ textTransform: 'none', padding: 0 }}
-              className='text-blue-600 hover:text-blue-800'
             >
               SignUp
             </Button>

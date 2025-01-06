@@ -10,13 +10,11 @@ export default async function handler(
   if (req.method === 'POST') {
     const { name, email, password, role } = req.body
 
-    // Validate inputs
     if (!name || !email || !password || !role) {
       return res.status(400).json({ error: 'All fields are required' })
     }
 
     try {
-      // Check if the email already exists
       const existingUser = await prisma.user.findUnique({
         where: { email }
       })
@@ -25,10 +23,8 @@ export default async function handler(
         return res.status(400).json({ error: 'Email already exists' })
       }
 
-      // Hash the password
       const hashedPassword = await bcrypt.hash(password, 12)
 
-      // Create the new user
       const newUser = await prisma.user.create({
         data: {
           name,
@@ -38,13 +34,24 @@ export default async function handler(
         }
       })
 
-      // Generate a JWT token (optional)
-      const token = jwt.sign({ userId: newUser.id }, process.env.JWT_SECRET!, {
-        expiresIn: '1h'
-      })
+      const token = jwt.sign(
+        { userId: newUser.id, name: newUser.name, email: newUser.email },
+        process.env.JWT_SECRET!,
+        {
+          expiresIn: '1h'
+        }
+      )
 
-      // Send a success response
-      res.status(201).json({ message: 'User created successfully', token })
+      res.status(201).json({
+        message: 'User created successfully',
+        user: {
+          userId: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role
+        },
+        token
+      })
     } catch (error) {
       console.error('Signup error:', error)
       res.status(500).json({ error: 'Something went wrong. Please try again.' })
