@@ -14,11 +14,13 @@ import {
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const router = useRouter() // Initialize useRouter
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen)
@@ -33,6 +35,7 @@ const Navbar = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setIsLoggedIn(false)
+    router.push('/') // Redirect to home page after logout
   }
 
   const buttonStyles = {

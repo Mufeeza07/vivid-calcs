@@ -1,13 +1,17 @@
 'use client'
 
-import { isLoggedIn } from '@/utils/auth'
+import { isLoggedIn } from '@/utils/session'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
   Box,
   Button,
   Container,
+  FormControl,
   IconButton,
   InputAdornment,
+  InputLabel,
+  MenuItem,
+  Select,
   TextField,
   Typography
 } from '@mui/material'
@@ -16,21 +20,29 @@ import 'aos/dist/aos.css'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
-const Login = () => {
+const SignUp = () => {
   const router = useRouter()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [loadingAuth, setLoadingAuth] = useState(true)
 
   useEffect(() => {
     if (isLoggedIn()) {
-      setIsAuthenticated(true)
       router.push('/')
+    } else {
+      setLoadingAuth(false)
     }
   }, [router])
 
+  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [role, setRole] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [errors, setErrors] = useState({ email: '', password: '' })
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    role: ''
+  })
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -38,11 +50,19 @@ const Login = () => {
   }, [])
 
   const validateForm = () => {
-    const formErrors = { email: '', password: '' }
+    const formErrors = { name: '', email: '', password: '', role: '' }
     let isValid = true
+
+    if (!name) {
+      formErrors.name = 'Name is required'
+      isValid = false
+    }
 
     if (!email) {
       formErrors.email = 'Email is required'
+      isValid = false
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      formErrors.email = 'Email is invalid'
       isValid = false
     }
 
@@ -51,21 +71,30 @@ const Login = () => {
       isValid = false
     }
 
+    if (!role) {
+      formErrors.role = 'Role is required'
+      isValid = false
+    }
+
     setErrors(formErrors)
     return isValid
   }
 
-  const handleLogin = async () => {
+  const handleSignUp = async () => {
     if (validateForm()) {
       setLoading(true)
-
       try {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch('/api/auth/signup', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
           },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+            role
+          })
         })
 
         const data = await response.json()
@@ -73,27 +102,24 @@ const Login = () => {
         if (response.ok) {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user', JSON.stringify(data.user))
-
           router.push('/')
         } else {
-          setErrors({
-            email: '',
-            password: data.error || 'Something went wrong, please try again.'
-          })
+          alert(data.error || 'Something went wrong')
         }
       } catch (error) {
         console.error(error)
-        setErrors({
-          email: '',
-          password: 'Something went wrong. Please try again later.'
-        })
+        alert('Something went wrong. Please try again.')
       } finally {
         setLoading(false)
       }
     }
   }
 
-  if (isAuthenticated) {
+  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setRole(event.target.value as string)
+  }
+
+  if (loadingAuth) {
     return null
   }
 
@@ -122,12 +148,14 @@ const Login = () => {
         }}
       />
 
+      {/* SignUp Form */}
       <Container
         maxWidth='sm'
         sx={{
           position: 'relative',
           zIndex: 10,
-          paddingBottom: '10vh'
+          paddingBottom: '10vh',
+          paddingTop: '2vh'
         }}
       >
         <Box
@@ -141,18 +169,35 @@ const Login = () => {
             boxShadow: 3,
             backgroundColor: '#edf3f5'
           }}
-          data-aos='fade-up'
-          data-aos-delay='100'
+          className='rounded-xl p-8 shadow-lg backdrop-blur-md'
         >
           <Typography
             variant='h4'
             align='center'
             gutterBottom
-            data-aos='fade-up'
-            data-aos-delay='200'
+            className='text-primary-500 mb-6 text-3xl font-bold'
           >
-            Login
+            Sign Up
           </Typography>
+
+          <TextField
+            label='Name'
+            type='text'
+            fullWidth
+            required
+            variant='outlined'
+            value={name}
+            onChange={e => setName(e.target.value)}
+            error={!!errors.name}
+            helperText={errors.name}
+            sx={{
+              '& .MuiInputBase-root': {
+                borderRadius: '10px',
+                backgroundColor: '#f4f4f4'
+              }
+            }}
+            className='mb-4'
+          />
 
           <TextField
             label='Email'
@@ -170,8 +215,7 @@ const Login = () => {
                 backgroundColor: '#f4f4f4'
               }
             }}
-            data-aos='fade-up'
-            data-aos-delay='300'
+            className='mb-4'
           />
 
           <TextField
@@ -190,8 +234,7 @@ const Login = () => {
                 backgroundColor: '#f4f4f4'
               }
             }}
-            data-aos='fade-up'
-            data-aos-delay='400'
+            className='mb-4'
             InputProps={{
               endAdornment: (
                 <InputAdornment position='end'>
@@ -206,6 +249,25 @@ const Login = () => {
             }}
           />
 
+          <FormControl fullWidth required sx={{ marginBottom: 3 }}>
+            <InputLabel>Role</InputLabel>
+            <Select
+              value={role}
+              label='Role'
+              onChange={handleRoleChange}
+              error={!!errors.role}
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  borderRadius: '10px',
+                  backgroundColor: '#f4f4f4'
+                }
+              }}
+            >
+              <MenuItem value='user'>User</MenuItem>
+              <MenuItem value='admin'>Admin</MenuItem>
+            </Select>
+          </FormControl>
+
           <Button
             variant='contained'
             color='primary'
@@ -214,22 +276,26 @@ const Login = () => {
               padding: 1.5,
               borderRadius: '10px',
               textTransform: 'none',
-              fontSize: '16px'
+              fontSize: '16px',
+              '&:hover': {
+                backgroundColor: '#003366'
+              }
             }}
-            onClick={handleLogin}
-            data-aos='fade-up'
-            data-aos-delay='500'
+            onClick={handleSignUp}
+            className='transition-all duration-300 ease-in-out hover:bg-blue-700'
+            disabled={loading}
           >
-            {loading ? 'Logging in...' : 'Login'}
+            {loading ? 'Signing Up...' : 'Sign Up'}
           </Button>
 
-          <Typography align='center' data-aos='fade-up' data-aos-delay='600'>
-            Don't have an account?{' '}
+          <Typography align='center' className='mt-4 text-gray-700'>
+            Already have an account?{' '}
             <Button
-              onClick={() => router.push('/signup')}
+              onClick={() => router.push('/login')}
               sx={{ textTransform: 'none', padding: 0 }}
+              className='text-blue-600 hover:text-blue-800'
             >
-              SignUp
+              Login here
             </Button>
           </Typography>
         </Box>
@@ -238,4 +304,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default SignUp

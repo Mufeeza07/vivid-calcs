@@ -1,5 +1,13 @@
-import HomePage from './components/HomePage/HomePage'
+import Footer from './components/Footer/Footer'
+import HeroSection from './components/HeroSection/HeroSection'
+import Navbar from './components/Navbar/Navbar'
 
 export default function page() {
-  return <HomePage />
+  return (
+    <div>
+      <Navbar />
+      <HeroSection />
+      <Footer />
+    </div>
+  )
 }

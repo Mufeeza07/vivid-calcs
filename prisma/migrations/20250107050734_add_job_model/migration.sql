@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Job" ALTER COLUMN "windSpeed" SET DATA TYPE TEXT;

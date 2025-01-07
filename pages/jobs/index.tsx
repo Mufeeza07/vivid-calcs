@@ -1,9 +1,9 @@
 'use client'
 
 import { Container } from '@mui/material'
-import JobsList from '../components/JobsList/JobsList'
-import Navbar from '../components/Navbar/Navbar'
-import ModulesTab from '../components/ModuleTab/ModulesTab'
+import JobsList from '../../app/components/JobsList/JobsList'
+import Navbar from '../../app/components/Navbar/Navbar'
+//import ModulesTab from '../../app/components/ModuleTab/ModulesTab'
 
 const JobPage = () => {
   return (
@@ -16,7 +16,7 @@ const JobPage = () => {
     >
       <Navbar />
       <Container maxWidth='lg' sx={{ paddingTop: 8 }}>
-        <ModulesTab />
+        {/* <ModulesTab /> */}
         <JobsList />
       </Container>
     </div>

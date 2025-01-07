@@ -21,7 +21,7 @@ model User {
 model Job {
   jobId                 String   @id @default(uuid()) 
   address               String
-  windSpeed             Float    
+  windSpeed             String    
   locationFromCoastline String  
   councilName           String
   userId                String   

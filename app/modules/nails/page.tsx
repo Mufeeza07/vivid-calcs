@@ -1,6 +1,6 @@
 'use client'
 
-import NailsCalculator from '@/app/components/NailsCalculator/NailsCalculator'
+import NailsCalculator from '@/app/components/Calculators/NailsCalculator'
 
 const NailsPage = () => {
   return (
