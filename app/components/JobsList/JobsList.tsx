@@ -1,3 +1,4 @@
+import CloseIcon from '@mui/icons-material/Close' // Importing the close icon
 import {
   Backdrop,
   Box,
@@ -9,12 +10,16 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Drawer,
   Fade,
   FormControlLabel,
   Modal,
   Paper,
+  TextField,
   Typography
 } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
+import DescriptionIcon from '@mui/icons-material/Description'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { useEffect, useState } from 'react'
@@ -27,7 +32,8 @@ const JobList = () => {
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set())
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [jobToDelete, setJobToDelete] = useState<string | null>(null)
-  const [isMultipleDelete, setIsMultipleDelete] = useState(false)
+  const [openJobDetails, setOpenJobDetails] = useState(false)
+  const [currentJobDetails, setCurrentJobDetails] = useState<any>(null)
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
@@ -63,24 +69,29 @@ const JobList = () => {
     }
   }
 
-  const handleDeleteJob = async () => {
+  const handleDeleteJobs = async () => {
     const token = localStorage.getItem('token')
-    if (!token || !jobToDelete) {
-      alert('Authorization token is missing or no job selected')
+    const jobIdsToDelete = jobToDelete
+      ? [jobToDelete]
+      : Array.from(selectedJobs)
+
+    if (!token || jobIdsToDelete.length === 0) {
+      alert('Authorization token is missing or no jobs selected')
       return
     }
 
     try {
-      const response = await fetch(`/api/job/delete-job/${jobToDelete}`, {
+      const response = await fetch('/api/job/delete-jobs', {
         method: 'DELETE',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
-        }
+        },
+        body: JSON.stringify({ jobIds: jobIdsToDelete })
       })
 
       if (response.ok) {
-        setJobs(jobs.filter(job => job.jobId !== jobToDelete))
-        alert('Job deleted successfully')
+        setJobs(jobs.filter(job => !jobIdsToDelete.includes(job.jobId)))
       } else {
         alert('Failed to delete job')
       }
@@ -90,39 +101,7 @@ const JobList = () => {
     } finally {
       setOpenDeleteDialog(false)
       setJobToDelete(null)
-    }
-  }
-
-  const handleDeleteSelectedJobs = async () => {
-    const token = localStorage.getItem('token')
-    if (!token || selectedJobs.size === 0) {
-      alert('Authorization token is missing or no jobs selected')
-      return
-    }
-
-    try {
-      for (const jobId of selectedJobs) {
-        const response = await fetch(`/api/job/delete-job/${jobId}`, {
-          method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-
-        if (response.ok) {
-          setJobs(jobs.filter(job => job.jobId !== jobId))
-        } else {
-          alert(`Failed to delete job ${jobId}`)
-        }
-      }
       setSelectedJobs(new Set())
-      alert('Selected jobs deleted successfully')
-    } catch (error) {
-      console.error('Error deleting selected jobs:', error)
-      alert('Error deleting selected jobs')
-    } finally {
-      setOpenDeleteDialog(false)
-      setIsMultipleDelete(false)
     }
   }
 
@@ -140,21 +119,26 @@ const JobList = () => {
     setJobs(prevJobs => [newJob, ...prevJobs])
   }
 
-  const handleOpenDeleteDialog = (jobId: string) => {
-    setJobToDelete(jobId)
-    setIsMultipleDelete(false)
-    setOpenDeleteDialog(true)
-  }
-
-  const handleOpenMultipleDeleteDialog = () => {
-    setIsMultipleDelete(true)
+  const handleOpenDeleteDialog = (jobId?: string) => {
+    if (jobId) {
+      setJobToDelete(jobId)
+    }
     setOpenDeleteDialog(true)
   }
 
   const handleCloseDeleteDialog = () => {
     setOpenDeleteDialog(false)
     setJobToDelete(null)
-    setIsMultipleDelete(false)
+  }
+
+  const handleViewJobDetails = (job: any) => {
+    setCurrentJobDetails(job)
+    setOpenJobDetails(true)
+  }
+
+  const handleCloseJobDetails = () => {
+    setOpenJobDetails(false)
+    setCurrentJobDetails(null)
   }
 
   return (
@@ -165,14 +149,14 @@ const JobList = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 2,
+            marginBottom: 4,
             backgroundColor: '#1976d2',
-            padding: '8px 34px',
+            padding: '8px 14px',
             borderRadius: '4px',
             color: '#fff'
           }}
         >
-          <Typography variant='h6' gutterBottom>
+          <Typography variant='h6' gutterBottom sx={{ marginBottom: 0 }}>
             Previous Jobs
           </Typography>
           <Button
@@ -189,7 +173,7 @@ const JobList = () => {
               boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
             }}
           >
-            + New Job
+            + Job
           </Button>
         </Box>
 
@@ -213,31 +197,56 @@ const JobList = () => {
                   key={job.jobId}
                   sx={{
                     display: 'flex',
-                    justifyContent: 'center',
+                    justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: 1,
                     borderBottom: '1px solid #ddd',
-                    gap: 2
+                    gap: 2,
+                    paddingX: 2
                   }}
                 >
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={selectedJobs.has(job.jobId)}
-                        onChange={() => handleSelectJob(job.jobId)}
-                      />
-                    }
-                    label=''
-                  />
-                  <Typography sx={{ width: '30%' }}>{job.address}</Typography>
-                  <Typography sx={{ width: '30%' }}>
-                    {job.createdDate}
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={selectedJobs.has(job.jobId)}
+                          onChange={() => handleSelectJob(job.jobId)}
+                          sx={{ color: 'rgba(128, 128, 128, 0.6)' }}
+                        />
+                      }
+                      label=''
+                    />
+                    <Typography sx={{ width: '100%' }}>
+                      {job.address}
+                    </Typography>
+                  </Box>
+
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', md: 'row' },
+                      gap: 1
+                    }}
+                  >
                     <Button
                       variant='outlined'
                       size='small'
-                      onClick={() => alert(`Viewing details for ${job.jobId}`)}
+                      onClick={() => handleViewJobDetails(job)}
+                      sx={{
+                        display: { xs: 'flex', md: 'none' },
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <DescriptionIcon fontSize='small' />
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      color='primary'
+                      size='small'
+                      onClick={() => handleViewJobDetails(job)}
+                      sx={{
+                        display: { xs: 'none', md: 'flex' }
+                      }}
                     >
                       View Details
                     </Button>
@@ -246,6 +255,21 @@ const JobList = () => {
                       color='error'
                       size='small'
                       onClick={() => handleOpenDeleteDialog(job.jobId)}
+                      sx={{
+                        display: { xs: 'flex', md: 'none' },
+                        justifyContent: 'center'
+                      }}
+                    >
+                      <DeleteIcon fontSize='small' />
+                    </Button>
+                    <Button
+                      variant='outlined'
+                      color='error'
+                      size='small'
+                      onClick={() => handleOpenDeleteDialog(job.jobId)}
+                      sx={{
+                        display: { xs: 'none', md: 'flex' }
+                      }}
                     >
                       Delete
                     </Button>
@@ -262,7 +286,7 @@ const JobList = () => {
             <Button
               variant='contained'
               color='error'
-              onClick={handleOpenMultipleDeleteDialog}
+              onClick={() => handleOpenDeleteDialog()}
             >
               Delete Selected Jobs
             </Button>
@@ -307,22 +331,15 @@ const JobList = () => {
       <Dialog
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
-        //fullWidth
         maxWidth='sm'
       >
         <DialogTitle
           sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.25rem' }}
         >
-          {isMultipleDelete
-            ? 'Are you sure you want to delete these jobs?'
-            : 'Are you sure you want to delete this job?'}
+          Are you sure you want to delete the selected job(s)?
         </DialogTitle>
         <DialogContent sx={{ padding: '16px', textAlign: 'center' }}>
-          <Typography>
-            {isMultipleDelete
-              ? 'Once deleted,This action cannot be undone.'
-              : 'Once deleted, this action cannot be undone.'}
-          </Typography>
+          <Typography>Once deleted, this action cannot be undone.</Typography>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>
           <Button
@@ -332,17 +349,111 @@ const JobList = () => {
           >
             Cancel
           </Button>
-          <Button
-            onClick={
-              isMultipleDelete ? handleDeleteSelectedJobs : handleDeleteJob
-            }
-            color='error'
-            variant='contained'
-          >
+          <Button onClick={handleDeleteJobs} color='error' variant='contained'>
             Delete
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Job details slider */}
+      <Drawer
+        anchor='right'
+        open={openJobDetails}
+        onClose={handleCloseJobDetails}
+        PaperProps={{
+          sx: {
+            width: '100%',
+            maxWidth: 600,
+            padding: 3,
+            backgroundColor: '#f5f5f5',
+            boxShadow: 24
+          }
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            width: '100%',
+            borderBottom: '1px solid #ccc',
+            paddingBottom: 2,
+            marginBottom: 4
+          }}
+        >
+          <Typography variant='h6'>Job Details</Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+            <Button
+              variant='contained'
+              color='error'
+              size='small'
+              onClick={handleCloseJobDetails}
+              sx={{ display: { xs: 'flex', md: 'none' } }}
+            >
+              <CloseIcon />
+            </Button>
+          </Box>
+        </Box>
+        {currentJobDetails ? (
+          <Box
+            component='form'
+            noValidate
+            autoComplete='off'
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 3
+            }}
+          >
+            <TextField
+              label='Address'
+              value={currentJobDetails.address}
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <TextField
+              label='Wind Speed'
+              value={currentJobDetails.windSpeed}
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <TextField
+              label='Location From Coastline'
+              value={currentJobDetails.locationFromCoastline}
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <TextField
+              label='Council Name'
+              value={currentJobDetails.councilName}
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <TextField
+              label='Created At'
+              value={
+                currentJobDetails?.createdAt
+                  ? new Date(currentJobDetails.createdAt).toLocaleDateString()
+                  : 'N/A'
+              }
+              fullWidth
+              InputProps={{ readOnly: true }}
+            />
+            <Button
+              variant='contained'
+              color='primary'
+              onClick={() => {
+                console.log('Edit button clicked')
+              }}
+              sx={{ alignSelf: 'flex-center' }}
+            >
+              Edit
+            </Button>
+          </Box>
+        ) : (
+          <Typography>No job details to display.</Typography>
+        )}
+      </Drawer>
     </Container>
   )
 }

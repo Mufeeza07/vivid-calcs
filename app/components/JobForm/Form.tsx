@@ -178,7 +178,7 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
   variant="contained"
   onClick={handleCreateJob}
   sx={{
-    alignSelf: 'center',
+    alignSelf: 'flex-center',
     padding: '10px 20px',
     fontSize: '16px',
     borderRadius: '8px',
