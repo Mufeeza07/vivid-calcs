@@ -1,6 +1,7 @@
+import prisma from '@/prisma/client'
 import { getUserFromToken } from '@/utils/auth'
 import { NextApiRequest, NextApiResponse } from 'next'
-import prisma from '../../../prisma/client'
+
 
 export default async function handler(
   req: NextApiRequest,

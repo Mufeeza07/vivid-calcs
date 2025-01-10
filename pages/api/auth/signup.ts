@@ -8,9 +8,9 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === 'POST') {
-    const { name, email, password, role } = req.body
+    const { name, email, password } = req.body
 
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
       return res.status(400).json({ error: 'All fields are required' })
     }
 
@@ -25,14 +25,16 @@ export default async function handler(
 
       const hashedPassword = await bcrypt.hash(password, 12)
 
+
       const newUser = await prisma.user.create({
         data: {
           name,
           email,
           password: hashedPassword,
-          role
+          role: 'USER',
         }
       })
+
 
       const token = jwt.sign(
         { userId: newUser.id, name: newUser.name, email: newUser.email },
@@ -45,7 +47,6 @@ export default async function handler(
           userId: newUser.id,
           name: newUser.name,
           email: newUser.email,
-          role: newUser.role
         },
         token
       })

@@ -1,4 +1,5 @@
-import CloseIcon from '@mui/icons-material/Close' // Importing the close icon
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import CloseIcon from '@mui/icons-material/Close'
 import {
   Backdrop,
   Box,
@@ -12,9 +13,13 @@ import {
   DialogTitle,
   Drawer,
   Fade,
+  FormControl,
   FormControlLabel,
+  InputLabel,
+  MenuItem,
   Modal,
   Paper,
+  Select,
   TextField,
   Typography
 } from '@mui/material'
@@ -34,6 +39,8 @@ const JobList = () => {
   const [jobToDelete, setJobToDelete] = useState<string | null>(null)
   const [openJobDetails, setOpenJobDetails] = useState(false)
   const [currentJobDetails, setCurrentJobDetails] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editableJobDetails, setEditableJobDetails] = useState<any>(null)
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
@@ -141,8 +148,65 @@ const JobList = () => {
     setCurrentJobDetails(null)
   }
 
+  const handleEditJobDetails = () => {
+    setIsEditing(true)
+    setEditableJobDetails(currentJobDetails)
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditing(false)
+    setEditableJobDetails(null)
+    setCurrentJobDetails(currentJobDetails)
+  }
+
+  const handleFieldChange = (field: string, value: string) => {
+    setEditableJobDetails(prev => ({
+      ...prev,
+      [field]: value
+    }))
+  }
+
+  const handleSaveJobDetails = async () => {
+    const token = localStorage.getItem('token')
+    if (!token || !editableJobDetails || !editableJobDetails.jobId) {
+      alert('Authorization token is missing or invalid job details.')
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `/api/job/update-job-detail?jobId=${editableJobDetails.jobId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify(editableJobDetails)
+        }
+      )
+
+      if (response.ok) {
+        const updatedJob = await response.json()
+        setJobs(prevJobs =>
+          prevJobs.map(job =>
+            job.jobId === updatedJob.job.jobId ? updatedJob.job : job
+          )
+        )
+        setIsEditing(false)
+        setCurrentJobDetails(updatedJob.job)
+      } else {
+        const errorData = await response.json()
+        alert(errorData.message || 'Failed to update job details')
+      }
+    } catch (error) {
+      console.error('Error updating job details:', error)
+      alert('Error updating job details')
+    }
+  }
+
   return (
-    <Container sx={{ marginTop: 4 }}>
+    <Container>
       <Box>
         <Box
           sx={{
@@ -177,7 +241,6 @@ const JobList = () => {
           </Button>
         </Box>
 
-        {/* Loader */}
         {loading ? (
           <Box
             sx={{
@@ -190,99 +253,114 @@ const JobList = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <>
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-              {jobs.map(job => (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            {jobs.map(job => (
+              <Box
+                key={job.jobId}
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: 1,
+                  borderBottom: '1px solid #ddd',
+                  gap: 2,
+                  paddingX: 2,
+                  flexWrap: 'wrap'
+                }}
+              >
                 <Box
-                  key={job.jobId}
                   sx={{
                     display: 'flex',
-                    justifyContent: 'space-between',
                     alignItems: 'center',
-                    padding: 1,
-                    borderBottom: '1px solid #ddd',
                     gap: 2,
-                    paddingX: 2
+                    flex: 1,
+                    minWidth: 0
                   }}
                 >
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                    <FormControlLabel
-                      control={
-                        <Checkbox
-                          checked={selectedJobs.has(job.jobId)}
-                          onChange={() => handleSelectJob(job.jobId)}
-                          sx={{ color: 'rgba(128, 128, 128, 0.6)' }}
-                        />
-                      }
-                      label=''
-                    />
-                    <Typography sx={{ width: '100%' }}>
-                      {job.address}
-                    </Typography>
-                  </Box>
-
-                  <Box
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={selectedJobs.has(job.jobId)}
+                        onChange={() => handleSelectJob(job.jobId)}
+                        sx={{ color: 'rgba(128, 128, 128, 0.6)' }}
+                      />
+                    }
+                    label=''
+                  />
+                  <Typography
                     sx={{
-                      display: 'flex',
-                      flexDirection: { xs: 'column', md: 'row' },
-                      gap: 1
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      flex: 1
                     }}
                   >
-                    <Button
-                      variant='outlined'
-                      size='small'
-                      onClick={() => handleViewJobDetails(job)}
-                      sx={{
-                        display: { xs: 'flex', md: 'none' },
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <DescriptionIcon fontSize='small' />
-                    </Button>
-                    <Button
-                      variant='outlined'
-                      color='primary'
-                      size='small'
-                      onClick={() => handleViewJobDetails(job)}
-                      sx={{
-                        display: { xs: 'none', md: 'flex' }
-                      }}
-                    >
-                      View Details
-                    </Button>
-                    <Button
-                      variant='outlined'
-                      color='error'
-                      size='small'
-                      onClick={() => handleOpenDeleteDialog(job.jobId)}
-                      sx={{
-                        display: { xs: 'flex', md: 'none' },
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <DeleteIcon fontSize='small' />
-                    </Button>
-                    <Button
-                      variant='outlined'
-                      color='error'
-                      size='small'
-                      onClick={() => handleOpenDeleteDialog(job.jobId)}
-                      sx={{
-                        display: { xs: 'none', md: 'flex' }
-                      }}
-                    >
-                      Delete
-                    </Button>
-                  </Box>
+                    {job.address}
+                  </Typography>
                 </Box>
-              ))}
-            </Box>
-          </>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    gap: 1,
+                    justifyContent: { xs: 'flex-end', md: 'space-between' },
+                    flexWrap: 'wrap'
+                  }}
+                >
+                  <Button
+                    variant='outlined'
+                    size='small'
+                    onClick={() => handleViewJobDetails(job)}
+                    sx={{
+                      display: { xs: 'flex', md: 'none' },
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <DescriptionIcon fontSize='small' />
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    color='primary'
+                    size='small'
+                    onClick={() => handleViewJobDetails(job)}
+                    sx={{
+                      display: { xs: 'none', md: 'flex' }
+                    }}
+                  >
+                    View Details
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    color='error'
+                    size='small'
+                    onClick={() => handleOpenDeleteDialog(job.jobId)}
+                    sx={{
+                      display: { xs: 'flex', md: 'none' },
+                      justifyContent: 'center'
+                    }}
+                  >
+                    <DeleteIcon fontSize='small' />
+                  </Button>
+                  <Button
+                    variant='outlined'
+                    color='error'
+                    size='small'
+                    onClick={() => handleOpenDeleteDialog(job.jobId)}
+                    sx={{
+                      display: { xs: 'none', md: 'flex' }
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Box>
+              </Box>
+            ))}
+          </Box>
         )}
 
-        {/* Button to delete selected jobs */}
         {selectedJobs.size > 0 && (
-          <Box sx={{ marginTop: 2 }}>
+          <Box sx={{ marginTop: 4, marginRight: 2, display: 'flex', justifyContent: 'center' }}>
             <Button
               variant='contained'
               color='error'
@@ -294,7 +372,6 @@ const JobList = () => {
         )}
       </Box>
 
-      {/* Modal for adding new job */}
       <Modal
         open={isNewJob}
         onClose={() => setIsNewJob(false)}
@@ -327,7 +404,6 @@ const JobList = () => {
         </Fade>
       </Modal>
 
-      {/* Delete confirmation dialog */}
       <Dialog
         open={openDeleteDialog}
         onClose={handleCloseDeleteDialog}
@@ -336,7 +412,7 @@ const JobList = () => {
         <DialogTitle
           sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.25rem' }}
         >
-          Are you sure you want to delete the selected job(s)?
+          Are you sure you want to delete the selected job?
         </DialogTitle>
         <DialogContent sx={{ padding: '16px', textAlign: 'center' }}>
           <Typography>Once deleted, this action cannot be undone.</Typography>
@@ -355,11 +431,13 @@ const JobList = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Job details slider */}
       <Drawer
         anchor='right'
         open={openJobDetails}
-        onClose={handleCloseJobDetails}
+        onClose={() => {
+          handleCloseJobDetails()
+          setIsEditing(false)
+        }}
         PaperProps={{
           sx: {
             width: '100%',
@@ -387,7 +465,10 @@ const JobList = () => {
               variant='contained'
               color='error'
               size='small'
-              onClick={handleCloseJobDetails}
+              onClick={() => {
+                handleCloseJobDetails()
+                setIsEditing(false)
+              }}
               sx={{ display: { xs: 'flex', md: 'none' } }}
             >
               <CloseIcon />
@@ -407,27 +488,109 @@ const JobList = () => {
           >
             <TextField
               label='Address'
-              value={currentJobDetails.address}
+              value={
+                isEditing
+                  ? editableJobDetails?.address
+                  : currentJobDetails?.address
+              }
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{
+                readOnly: !isEditing
+              }}
+              onChange={e =>
+                isEditing && handleFieldChange('address', e.target.value)
+              }
             />
             <TextField
               label='Wind Speed'
-              value={currentJobDetails.windSpeed}
+              value={
+                isEditing
+                  ? editableJobDetails?.windSpeed
+                  : currentJobDetails?.windSpeed
+              }
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{
+                readOnly: !isEditing
+              }}
+              onChange={e =>
+                isEditing && handleFieldChange('windSpeed', e.target.value)
+              }
             />
-            <TextField
-              label='Location From Coastline'
-              value={currentJobDetails.locationFromCoastline}
-              fullWidth
-              InputProps={{ readOnly: true }}
-            />
+            <FormControl fullWidth>
+              <InputLabel>Location From Coastline</InputLabel>
+              <Select
+                label='Location From Coastline'
+                value={
+                  isEditing
+                    ? editableJobDetails?.locationFromCoastline || ''
+                    : currentJobDetails?.locationFromCoastline || ''
+                }
+                onChange={e =>
+                  isEditing &&
+                  handleFieldChange('locationFromCoastline', e.target.value)
+                }
+                readOnly={!isEditing}
+                inputProps={{
+                  readOnly: !isEditing
+                }}
+              >
+                <MenuItem value='0-1km'>0-1km</MenuItem>
+                <MenuItem value='1-10km'>1-10km</MenuItem>
+                <MenuItem value='>10km'>>10km</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               label='Council Name'
-              value={currentJobDetails.councilName}
+              value={
+                isEditing
+                  ? editableJobDetails?.councilName
+                  : currentJobDetails?.councilName
+              }
               fullWidth
-              InputProps={{ readOnly: true }}
+              InputProps={{
+                readOnly: !isEditing
+              }}
+              onChange={e =>
+                isEditing && handleFieldChange('councilName', e.target.value)
+              }
+            />
+            <FormControl fullWidth>
+              <InputLabel>Status</InputLabel>
+              <Select
+                label='Status'
+                value={
+                  isEditing
+                    ? editableJobDetails?.status || ''
+                    : currentJobDetails?.status || ''
+                }
+                onChange={e =>
+                  isEditing && handleFieldChange('status', e.target.value)
+                }
+                readOnly={!isEditing}
+                inputProps={{
+                  readOnly: !isEditing
+                }}
+              >
+                <MenuItem value='PENDING'>Pending</MenuItem>
+                <MenuItem value='IN_PROGRESS'>In Progress</MenuItem>
+                <MenuItem value='ON_HOLD'>On Hold</MenuItem>
+                <MenuItem value='COMPLETED'>Completed</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label='Comments'
+              value={
+                isEditing
+                  ? editableJobDetails?.comments || ''
+                  : currentJobDetails?.comments || 'N/A'
+              }
+              fullWidth
+              InputProps={{
+                readOnly: !isEditing
+              }}
+              onChange={e =>
+                isEditing && handleFieldChange('comments', e.target.value)
+              }
             />
             <TextField
               label='Created At'
@@ -437,21 +600,39 @@ const JobList = () => {
                   : 'N/A'
               }
               fullWidth
-              InputProps={{ readOnly: true }}
-            />
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={() => {
-                console.log('Edit button clicked')
+              InputProps={{
+                readOnly: true
               }}
-              sx={{ alignSelf: 'flex-center' }}
-            >
-              Edit
-            </Button>
+            />
+            {isEditing ? (
+              <>
+                <Button
+                  variant='contained'
+                  color='primary'
+                  onClick={handleSaveJobDetails}
+                >
+                  Save
+                </Button>
+                <Button
+                  variant='outlined'
+                  onClick={handleCancelEdit}
+                  sx={{ marginLeft: 1 }}
+                >
+                  Cancel
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleEditJobDetails}
+              >
+                Edit
+              </Button>
+            )}
           </Box>
         ) : (
-          <Typography>No job details to display.</Typography>
+          <Typography>No job details available.</Typography>
         )}
       </Drawer>
     </Container>

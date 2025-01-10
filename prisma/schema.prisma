@@ -12,10 +12,15 @@ model User {
   email     String   @unique
   password  String
   name      String
-  role      String
+  role      Role     @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   jobs      Job[]    @relation("UserJobs")
+}
+
+enum Role {
+  USER
+  ADMIN
 }
 
 model Job {
@@ -24,8 +29,17 @@ model Job {
   windSpeed             String    
   locationFromCoastline String  
   councilName           String
+  status                JobStatus @default(PENDING)
   userId                String   
-  createdAt            DateTime @default(now())      
-  updatedAt            DateTime @updatedAt            
-  user             User     @relation("UserJobs", fields: [userId], references: [id])
+  comments              String?
+  createdAt             DateTime @default(now())      
+  updatedAt             DateTime @updatedAt            
+  user                  User     @relation("UserJobs", fields: [userId], references: [id])
+}
+
+enum JobStatus{
+  PENDING
+  IN_PROGRESS
+  ON_HOLD
+  COMPLETED
 }

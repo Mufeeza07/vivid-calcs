@@ -6,12 +6,8 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
   IconButton,
   InputAdornment,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
   Typography
 } from '@mui/material'
@@ -35,13 +31,11 @@ const SignUp = () => {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [errors, setErrors] = useState({
     name: '',
     email: '',
-    password: '',
-    role: ''
+    password: ''
   })
   const [loading, setLoading] = useState(false)
 
@@ -50,7 +44,7 @@ const SignUp = () => {
   }, [])
 
   const validateForm = () => {
-    const formErrors = { name: '', email: '', password: '', role: '' }
+    const formErrors = { name: '', email: '', password: '' }
     let isValid = true
 
     if (!name) {
@@ -71,11 +65,6 @@ const SignUp = () => {
       isValid = false
     }
 
-    if (!role) {
-      formErrors.role = 'Role is required'
-      isValid = false
-    }
-
     setErrors(formErrors)
     return isValid
   }
@@ -92,8 +81,7 @@ const SignUp = () => {
           body: JSON.stringify({
             name,
             email,
-            password,
-            role
+            password
           })
         })
 
@@ -113,10 +101,6 @@ const SignUp = () => {
         setLoading(false)
       }
     }
-  }
-
-  const handleRoleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setRole(event.target.value as string)
   }
 
   if (loadingAuth) {
@@ -249,7 +233,7 @@ const SignUp = () => {
             }}
           />
 
-          <FormControl fullWidth required sx={{ marginBottom: 3 }}>
+          {/* <FormControl fullWidth required sx={{ marginBottom: 3 }}>
             <InputLabel>Role</InputLabel>
             <Select
               value={role}
@@ -266,7 +250,7 @@ const SignUp = () => {
               <MenuItem value='user'>User</MenuItem>
               <MenuItem value='admin'>Admin</MenuItem>
             </Select>
-          </FormControl>
+          </FormControl> */}
 
           <Button
             variant='contained'
