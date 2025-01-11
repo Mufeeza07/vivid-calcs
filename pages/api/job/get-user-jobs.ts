@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import prisma from '@/prisma/client'
 import { getUserFromToken } from '@/utils/auth'
 import { NextApiRequest, NextApiResponse } from 'next'
-
 
 export default async function handler(
   req: NextApiRequest,
@@ -23,13 +23,48 @@ export default async function handler(
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const jobs = await prisma.job.findMany({
-      where: {
-        userId: user.userId
+    const { page, limit, status } = req.query
+
+    const pageNumber = parseInt(page as string) || 1
+    const limitNumber = parseInt(limit as string) || 10
+
+    const skip = (pageNumber - 1) * limitNumber
+
+    // Build a dynamic filter object
+    const filter: any = {
+      userId: user.userId
+    }
+
+    // Add status filter if provided
+    if (status) {
+      filter.status = status
+    }
+
+    const [jobs, totalJobs] = await Promise.all([
+      prisma.job.findMany({
+        where: filter,
+        orderBy: {
+          createdAt: 'desc'
+        },
+        skip,
+        take: limitNumber
+      }),
+      prisma.job.count({
+        where: filter
+      })
+    ])
+
+    const totalPages = Math.ceil(totalJobs / limitNumber)
+
+    res.status(200).json({
+      message: 'Jobs retrieved successfully',
+      jobs,
+      pagination: {
+        currentPage: pageNumber,
+        totalPages,
+        totalJobs
       }
     })
-
-    res.status(200).json({ message: 'Jobs retrieved successfully', jobs })
   } catch (error) {
     console.error('Error retrieving jobs:', error)
     res.status(500).json({ message: 'Internal Server Error' })

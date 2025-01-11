@@ -41,13 +41,17 @@ const JobList = () => {
   const [currentJobDetails, setCurrentJobDetails] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editableJobDetails, setEditableJobDetails] = useState<any>(null)
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1
+  })
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
-    fetchJobs()
-  }, [])
+    fetchJobs(pagination.currentPage)
+  }, [pagination.currentPage])
 
-  const fetchJobs = async () => {
+  const fetchJobs = async (page: number) => {
     const token = localStorage.getItem('token')
     if (!token) {
       alert('Authorization token is missing')
@@ -55,17 +59,25 @@ const JobList = () => {
       return
     }
 
+    setLoading(true)
     try {
-      const response = await fetch('/api/job/get-user-jobs', {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
+      const response = await fetch(
+        `/api/job/get-user-jobs?page=${page}&limit=10`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
-      })
+      )
 
       if (response.ok) {
         const data = await response.json()
         setJobs(data.jobs || [])
+        setPagination({
+          currentPage: data.pagination.currentPage,
+          totalPages: data.pagination.totalPages
+        })
       } else {
         alert('Failed to fetch jobs')
       }
@@ -74,6 +86,11 @@ const JobList = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > pagination.totalPages) return
+    setPagination(prev => ({ ...prev, currentPage: newPage }))
   }
 
   const handleDeleteJobs = async () => {
@@ -223,6 +240,7 @@ const JobList = () => {
           <Typography variant='h6' gutterBottom sx={{ marginBottom: 0 }}>
             Previous Jobs
           </Typography>
+
           <Button
             variant='contained'
             onClick={() => setIsNewJob(true)}
@@ -240,7 +258,51 @@ const JobList = () => {
             + Job
           </Button>
         </Box>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            alignItems: 'center',
+            gap: 2
+          }}
+        >
+          {/* Status Filter Dropdown */}
+          <FormControl sx={{ marginBottom: 2, minWidth: 150 }}>
+            <InputLabel id='status-filter-label' sx={{ color: 'white' }}>
+              Status
+            </InputLabel>
+            <Select
+              labelId='status-filter-label'
+              id='status-filter'
+              // value={statusFilter}
+              // onChange={handleStatusChange}
+              label='Status'
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  color: 'white',
+                  border: '1px solid white',
+                  borderRadius: '10px',
+                  backgroundColor: '#f4f4f4',
 
+                  '&:hover': {
+                    border: '1px solid #ccc',
+                    backgroundColor: '#2a2a2a'
+                  },
+                  '&:focus': {
+                    border: '1px solid #fff',
+                    backgroundColor: '#2a2a2a'
+                  }
+                }
+              }}
+            >
+              <MenuItem value=''>All</MenuItem>
+              <MenuItem value='active'>Pending</MenuItem>
+              <MenuItem value='inactive'>In Progress</MenuItem>
+              <MenuItem value='inactive'>On Hold</MenuItem>
+              <MenuItem value='completed'>Completed</MenuItem>
+            </Select>
+          </FormControl>
+        </Box>
         {loading ? (
           <Box
             sx={{
@@ -358,9 +420,102 @@ const JobList = () => {
             ))}
           </Box>
         )}
+        {/* Pagination Number Bar */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            marginTop: 4,
+            paddingBottom: 2,
+            gap: 1
+          }}
+        >
+          {/* Left Arrow (Disabled) */}
+          <Button
+            variant='outlined'
+            disabled={pagination.currentPage === 1}
+            onClick={() => handlePageChange(pagination.currentPage - 1)}
+            sx={{
+              borderRadius: '50%',
+              minWidth: '32px',
+              height: '32px'
+            }}
+          >
+            {'<'}
+          </Button>
 
+          {/* Pagination Numbers */}
+          {[...Array(pagination.totalPages).keys()].map(pageNum => {
+            const page = pageNum + 1
+            if (
+              page === 1 ||
+              page === pagination.totalPages ||
+              (page >= pagination.currentPage - 1 &&
+                page <= pagination.currentPage + 1)
+            ) {
+              return (
+                <Button
+                  key={page}
+                  variant={
+                    pagination.currentPage === page ? 'contained' : 'outlined'
+                  }
+                  onClick={() => handlePageChange(page)}
+                  sx={{
+                    borderRadius: '50%',
+                    minWidth: '32px',
+                    height: '32px'
+                  }}
+                >
+                  {page}
+                </Button>
+              )
+            }
+            if (
+              page < pagination.currentPage - 2 ||
+              page > pagination.currentPage + 2
+            ) {
+              return null
+            }
+            if (page === pagination.currentPage - 2) {
+              return (
+                <Typography key='prev-ellipsis' sx={{ alignSelf: 'center' }}>
+                  ...
+                </Typography>
+              )
+            }
+            if (page === pagination.currentPage + 2) {
+              return (
+                <Typography key='next-ellipsis' sx={{ alignSelf: 'center' }}>
+                  ...
+                </Typography>
+              )
+            }
+            return null
+          })}
+
+          {/* Right Arrow (Disabled) */}
+          <Button
+            variant='outlined'
+            disabled={pagination.currentPage === pagination.totalPages}
+            onClick={() => handlePageChange(pagination.currentPage + 1)}
+            sx={{
+              borderRadius: '50%',
+              minWidth: '32px',
+              height: '32px'
+            }}
+          >
+            {'>'}
+          </Button>
+        </Box>
         {selectedJobs.size > 0 && (
-          <Box sx={{ marginTop: 4, marginRight: 2, display: 'flex', justifyContent: 'center' }}>
+          <Box
+            sx={{
+              marginTop: 4,
+              marginRight: 2,
+              display: 'flex',
+              justifyContent: 'center'
+            }}
+          >
             <Button
               variant='contained'
               color='error'
