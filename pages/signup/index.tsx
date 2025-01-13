@@ -132,7 +132,6 @@ const SignUp = () => {
         }}
       />
 
-      {/* SignUp Form */}
       <Container
         maxWidth='sm'
         sx={{

@@ -1,8 +1,24 @@
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from 'react'
-import { Box, TextField, FormControl, Select, InputLabel, MenuItem, Button, Typography } from '@mui/material'
+import {
+  Box,
+  TextField,
+  FormControl,
+  Select,
+  InputLabel,
+  MenuItem,
+  Button,
+  Typography,
+  SelectChangeEvent
+} from '@mui/material'
 
-const JobForm = ({ closeModal }: { closeModal: () => void }) => {
+const JobForm = ({
+  closeModal,
+  onJobAdded
+}: {
+  closeModal: () => void
+  onJobAdded: (newJob: any) => void
+}) => {
   const [jobData, setJobData] = useState({
     address: '',
     windSpeed: '',
@@ -17,7 +33,9 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
     councilName: false
   })
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
+  ) => {
     const { name, value } = e.target
     setJobData(prevState => ({
       ...prevState,
@@ -25,16 +43,15 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
     }))
   }
 
-  const handleLocationChange = (e: React.ChangeEvent<{ value: unknown }>) => {
+  const handleLocationChange = (event: SelectChangeEvent) => {
     setJobData(prevState => ({
       ...prevState,
-      locationFromCoastline: e.target.value as string
+      locationFromCoastline: event.target.value
     }))
   }
 
   const handleCreateJob = async () => {
-  
-    let formErrors = { ...errors }
+    const formErrors = { ...errors }
     formErrors.address = !jobData.address
     formErrors.windSpeed = !jobData.windSpeed
     formErrors.locationFromCoastline = !jobData.locationFromCoastline
@@ -43,14 +60,13 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
     setErrors(formErrors)
 
     if (!Object.values(formErrors).includes(true)) {
-      const token = localStorage.getItem('token') 
+      const token = localStorage.getItem('token')
 
       if (!token) {
         alert('Authorization token missing')
         return
       }
 
-    
       const job = {
         address: jobData.address,
         windSpeed: jobData.windSpeed,
@@ -63,7 +79,7 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`
           },
           body: JSON.stringify(job)
         })
@@ -74,7 +90,7 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
 
         const result = await response.json()
         console.log('Job Created:', result)
-      
+        onJobAdded(result.job)
         closeModal()
       } catch (error) {
         console.error('Error creating job:', error)
@@ -84,64 +100,76 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
   }
 
   return (
-    <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 3  }}>
-      <Typography variant="h5" align="center"  sx={{
-      marginBottom: '16px',
-      fontWeight: '600',
-      color: '#4a90e2',
-      fontSize: '26px',
-      letterSpacing: '1px',
-      textTransform: 'uppercase',
-      textShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-      backgroundColor: '#1e1e1e', 
-      padding: '12px 24px', 
-      borderRadius: '12px', 
-      display: 'inline-block', 
-      boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', 
-      textAlign: 'center',
-    }}>
+    <Box
+      component='form'
+      sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 3 }}
+    >
+      <Typography
+        variant='h5'
+        align='center'
+        sx={{
+          marginBottom: '16px',
+          fontWeight: '600',
+          color: '#4a90e2',
+          fontSize: '26px',
+          letterSpacing: '1px',
+          textTransform: 'uppercase',
+          textShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+          backgroundColor: '#1e1e1e',
+          padding: '12px 24px',
+          borderRadius: '12px',
+          display: 'inline-block',
+          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+          textAlign: 'center'
+        }}
+      >
         Create a New Job
       </Typography>
 
       <TextField
-        label="Address"
-        name="address"
+        label='Address'
+        name='address'
         value={jobData.address}
         onChange={handleInputChange}
         fullWidth
         required
         sx={{ marginBottom: 2 }}
         error={errors.address}
-        helperText={errors.address && "Address is required"}
+        helperText={errors.address && 'Address is required'}
         FormHelperTextProps={{
           sx: {
-            marginLeft: '0px', 
+            marginLeft: '0px'
           }
         }}
       />
 
       <TextField
-        label="Wind Speed"
-        name="windSpeed"
+        label='Wind Speed'
+        name='windSpeed'
         value={jobData.windSpeed}
         onChange={handleInputChange}
         fullWidth
         required
         sx={{ marginBottom: 2 }}
         error={errors.windSpeed}
-        helperText={errors.windSpeed && "Wind speed is required"}
+        helperText={errors.windSpeed && 'Wind speed is required'}
         FormHelperTextProps={{
           sx: {
-            marginLeft: '0px', 
+            marginLeft: '0px'
           }
         }}
       />
 
-      <FormControl fullWidth required error={errors.locationFromCoastline} sx={{ marginBottom: 2}}>
+      <FormControl
+        fullWidth
+        required
+        error={errors.locationFromCoastline}
+        sx={{ marginBottom: 2 }}
+      >
         <InputLabel>Location from Coastline</InputLabel>
         <Select
           value={jobData.locationFromCoastline}
-          label="Location from Coastline"
+          label='Location from Coastline'
           onChange={handleLocationChange}
           sx={{
             '& .MuiOutlinedInput-root': {
@@ -150,49 +178,55 @@ const JobForm = ({ closeModal }: { closeModal: () => void }) => {
             }
           }}
         >
-          <MenuItem value="0-1km">0-1km</MenuItem>
-          <MenuItem value="1-10km">1-10km</MenuItem>
-          <MenuItem value=">10km">>10km</MenuItem>
+          <MenuItem value='0-1km'>0-1km</MenuItem>
+          <MenuItem value='1-10km'>1-10km</MenuItem>
+          <MenuItem value='>10km'>&gt;10km</MenuItem>
         </Select>
-        {errors.locationFromCoastline && <Typography color="error"  sx={{ marginTop: 0.5,  fontSize: '0.78rem'}}>Location is required</Typography>}
+        {errors.locationFromCoastline && (
+          <Typography
+            color='error'
+            sx={{ marginTop: 0.5, fontSize: '0.78rem' }}
+          >
+            Location is required
+          </Typography>
+        )}
       </FormControl>
 
       <TextField
-        label="Council Name"
-        name="councilName"
+        label='Council Name'
+        name='councilName'
         value={jobData.councilName}
         onChange={handleInputChange}
         fullWidth
         required
         sx={{ marginBottom: 2 }}
         error={errors.councilName}
-        helperText={errors.councilName && "Council name is required"}
+        helperText={errors.councilName && 'Council name is required'}
         FormHelperTextProps={{
           sx: {
-            marginLeft: '0px', 
+            marginLeft: '0px'
           }
         }}
       />
 
-<Button
-  variant="contained"
-  onClick={handleCreateJob}
-  sx={{
-    alignSelf: 'flex-center',
-    padding: '10px 20px',
-    fontSize: '16px',
-    borderRadius: '8px',
-    backgroundColor: '#1e1e1e', 
-    color: '#4a90e2', 
-    ':hover': {
-      backgroundColor: '#333333', 
-    },
-    boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', 
-  }}
->
-  Submit
-</Button>
-
+      <Button
+        variant='contained'
+        onClick={handleCreateJob}
+        sx={{
+          alignSelf: 'flex-center',
+          padding: '10px 20px',
+          fontSize: '16px',
+          borderRadius: '8px',
+          backgroundColor: '#1e1e1e',
+          color: '#4a90e2',
+          ':hover': {
+            backgroundColor: '#333333'
+          },
+          boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)'
+        }}
+      >
+        Submit
+      </Button>
     </Box>
   )
 }

@@ -20,6 +20,7 @@ import {
   Modal,
   Paper,
   Select,
+  SelectChangeEvent,
   TextField,
   Typography
 } from '@mui/material'
@@ -46,12 +47,14 @@ const JobList = () => {
     totalPages: 1
   })
 
+  const [statusFilter, setStatusFilter] = useState('')
+
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
-    fetchJobs(pagination.currentPage)
-  }, [pagination.currentPage])
+    fetchJobs(pagination.currentPage, statusFilter)
+  }, [pagination.currentPage, statusFilter])
 
-  const fetchJobs = async (page: number) => {
+  const fetchJobs = async (page: number, filter: string) => {
     const token = localStorage.getItem('token')
     if (!token) {
       alert('Authorization token is missing')
@@ -61,15 +64,17 @@ const JobList = () => {
 
     setLoading(true)
     try {
-      const response = await fetch(
-        `/api/job/get-user-jobs?page=${page}&limit=10`,
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const query = new URLSearchParams({
+        page: page.toString(),
+        limit: '10',
+        status: filter
+      }).toString()
+      const response = await fetch(`/api/job/get-user-jobs?${query}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`
         }
-      )
+      })
 
       if (response.ok) {
         const data = await response.json()
@@ -88,6 +93,9 @@ const JobList = () => {
     }
   }
 
+  const handleStatusChange = (event: SelectChangeEvent) => {
+    setStatusFilter(event.target.value)
+  }
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
     setPagination(prev => ({ ...prev, currentPage: newPage }))
@@ -177,7 +185,7 @@ const JobList = () => {
   }
 
   const handleFieldChange = (field: string, value: string) => {
-    setEditableJobDetails(prev => ({
+    setEditableJobDetails((prev: any) => ({
       ...prev,
       [field]: value
     }))
@@ -230,7 +238,7 @@ const JobList = () => {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: 4,
+            marginBottom: 2,
             backgroundColor: '#1976d2',
             padding: '8px 14px',
             borderRadius: '4px',
@@ -263,43 +271,48 @@ const JobList = () => {
             display: 'flex',
             justifyContent: 'flex-end',
             alignItems: 'center',
-            gap: 2
+            gap: 2,
+            '@media (max-width: 600px)': {
+              justifyContent: 'center'
+            }
           }}
         >
           {/* Status Filter Dropdown */}
-          <FormControl sx={{ marginBottom: 2, minWidth: 150 }}>
+          <FormControl variant='filled' sx={{ m: 2, minWidth: 150 }}>
             <InputLabel id='status-filter-label' sx={{ color: 'white' }}>
               Status
             </InputLabel>
             <Select
               labelId='status-filter-label'
               id='status-filter'
-              // value={statusFilter}
-              // onChange={handleStatusChange}
+              value={statusFilter}
+              onChange={handleStatusChange}
               label='Status'
               sx={{
-                '& .MuiOutlinedInput-root': {
-                  color: 'white',
-                  border: '1px solid white',
-                  borderRadius: '10px',
-                  backgroundColor: '#f4f4f4',
-
-                  '&:hover': {
-                    border: '1px solid #ccc',
-                    backgroundColor: '#2a2a2a'
-                  },
-                  '&:focus': {
-                    border: '1px solid #fff',
-                    backgroundColor: '#2a2a2a'
-                  }
+                border: '1px solid #7cd3f2',
+                borderRadius: '5px',
+                color: 'white',
+                height: '52px',
+                '& .MuiSelect-icon': {
+                  color: 'white'
+                },
+                '&:hover': {
+                  border: '1px solid #ccc',
+                  backgroundColor: '#2a2a2a'
+                },
+                '&:focus': {
+                  border: '1px solid #fff',
+                  backgroundColor: '#2a2a2a'
                 }
               }}
             >
-              <MenuItem value=''>All</MenuItem>
-              <MenuItem value='active'>Pending</MenuItem>
-              <MenuItem value='inactive'>In Progress</MenuItem>
-              <MenuItem value='inactive'>On Hold</MenuItem>
-              <MenuItem value='completed'>Completed</MenuItem>
+              <MenuItem value=''>
+                <em>None</em>
+              </MenuItem>
+              <MenuItem value='PENDING'>Pending</MenuItem>
+              <MenuItem value='IN_PROGRESS'>In Progress</MenuItem>
+              <MenuItem value='ON_HOLD'>On Hold</MenuItem>
+              <MenuItem value='COMPLETED'>Completed</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -430,7 +443,6 @@ const JobList = () => {
             gap: 1
           }}
         >
-          {/* Left Arrow (Disabled) */}
           <Button
             variant='outlined'
             disabled={pagination.currentPage === 1}
@@ -444,7 +456,6 @@ const JobList = () => {
             {'<'}
           </Button>
 
-          {/* Pagination Numbers */}
           {[...Array(pagination.totalPages).keys()].map(pageNum => {
             const page = pageNum + 1
             if (
@@ -493,7 +504,6 @@ const JobList = () => {
             return null
           })}
 
-          {/* Right Arrow (Disabled) */}
           <Button
             variant='outlined'
             disabled={pagination.currentPage === pagination.totalPages}
@@ -551,8 +561,8 @@ const JobList = () => {
           >
             {isNewJob && (
               <JobForm
+                onJobAdded={handleNewJobAdded}
                 closeModal={() => setIsNewJob(false)}
-                onNewJobAdded={handleNewJobAdded}
               />
             )}
           </Paper>
@@ -691,7 +701,7 @@ const JobList = () => {
               >
                 <MenuItem value='0-1km'>0-1km</MenuItem>
                 <MenuItem value='1-10km'>1-10km</MenuItem>
-                <MenuItem value='>10km'>>10km</MenuItem>
+                <MenuItem value='>10km'>&gt;10km</MenuItem>
               </Select>
             </FormControl>
             <TextField
