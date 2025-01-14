@@ -1,6 +1,14 @@
 'use client'
 
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
+import ContactMailIcon from '@mui/icons-material/ContactMail'
+import DashboardIcon from '@mui/icons-material/Dashboard'
+import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import HomeIcon from '@mui/icons-material/Home'
+import InfoIcon from '@mui/icons-material/Info'
+import LoginIcon from '@mui/icons-material/Login'
 import MenuIcon from '@mui/icons-material/Menu'
+import SettingsIcon from '@mui/icons-material/Settings'
 import {
   AppBar,
   Box,
@@ -9,17 +17,22 @@ import {
   IconButton,
   List,
   ListItem,
+  ListItemIcon,
   ListItemText,
+  Menu,
+  MenuItem,
   Toolbar
 } from '@mui/material'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [userName, setUserName] = useState('')
+  const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter() // Initialize useRouter
 
   const toggleDrawer = () => {
@@ -28,15 +41,42 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
+    const user = JSON.parse(localStorage.getItem('user'))
     setIsLoggedIn(!!token)
+
+    if (user) {
+      setUserName(user.name)
+      console.log('User Name:', user.name)
+    }
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
     localStorage.removeItem('user')
     setIsLoggedIn(false)
-    router.push('/') // Redirect to home page after logout
+    setUserName('')
+    router.push('/')
   }
+
+  const handleMenuOpen = event => {
+    setAnchorEl(event.currentTarget)
+  }
+
+  const handleMenuClose = () => {
+    setAnchorEl(null)
+  }
+
+  const getInitials = name => {
+    if (!name) return ''
+    const nameArray = name.split(' ')
+    const firstInitial = nameArray[0]?.charAt(0).toUpperCase() || ''
+    const secondInitial = nameArray[1]?.charAt(0).toUpperCase() || ''
+    return firstInitial + secondInitial
+  }
+
+  const initials = getInitials(userName)
+
+  console.log('check name initials', initials)
 
   const buttonStyles = {
     marginRight: 2,
@@ -75,7 +115,6 @@ const Navbar = () => {
               paddingX: { xs: 2, sm: 4, md: 8, lg: 12, xl: 40 }
             }}
           >
-            {/* Logo */}
             <Box
               sx={{
                 width: { xs: 90, sm: 100, md: 120, lg: 140, xl: 150 },
@@ -91,7 +130,6 @@ const Navbar = () => {
               />
             </Box>
 
-            {/* Menu Button for mobile */}
             <IconButton
               color='inherit'
               edge='end'
@@ -138,20 +176,68 @@ const Navbar = () => {
                   </Link>
                 </>
               ) : (
-                <Button
-                  color='inherit'
-                  sx={buttonStyles}
-                  onClick={handleLogout}
-                >
-                  Logout
-                </Button>
+                <>
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      cursor: 'pointer'
+                    }}
+                    onClick={handleMenuOpen}
+                  >
+                    <Box
+                      sx={{
+                        ml: 1,
+                        fontWeight: 'bold',
+                        color: 'white',
+                        display: 'flex',
+                        alignItems: 'center',
+                        fontSize: '16px',
+                        minWidth: '32px',
+                        justifyContent: 'center',
+                        backgroundColor: '#1976d2',
+                        borderRadius: '50%',
+                        height: '36px',
+                        width: '36px',
+                        textAlign: 'center'
+                      }}
+                    >
+                      {initials}
+                    </Box>
+                  </Box>
+
+                  <Menu
+                    anchorEl={anchorEl}
+                    open={Boolean(anchorEl)}
+                    onClose={handleMenuClose}
+                    keepMounted
+                    sx={{ marginTop: '2px' }}
+                  >
+                    <MenuItem
+                      onClick={() => {
+                        router.push('/homepage')
+                        handleMenuClose()
+                      }}
+                    >
+                      Dashboard
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        router.push('/account-settings')
+                        handleMenuClose()
+                      }}
+                    >
+                      Settings
+                    </MenuItem>
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                  </Menu>
+                </>
               )}
             </Box>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Drawer (for mobile) */}
       <Drawer
         anchor='left'
         open={drawerOpen}
@@ -166,27 +252,59 @@ const Navbar = () => {
       >
         <List>
           <ListItem component='a' href='/'>
+            <ListItemIcon>
+              <HomeIcon />
+            </ListItemIcon>
             <ListItemText primary='Home' />
           </ListItem>
           <ListItem component='a' href='/about'>
+            <ListItemIcon>
+              <InfoIcon />
+            </ListItemIcon>
             <ListItemText primary='About' />
           </ListItem>
           <ListItem component='a' href='/contact'>
+            <ListItemIcon>
+              <ContactMailIcon />
+            </ListItemIcon>
             <ListItemText primary='Contact' />
           </ListItem>
           {!isLoggedIn ? (
             <>
               <ListItem component='a' href='/login'>
+                <ListItemIcon>
+                  <LoginIcon />
+                </ListItemIcon>
                 <ListItemText primary='Login' />
               </ListItem>
               <ListItem component='a' href='/signup'>
+                <ListItemIcon>
+                  <AppRegistrationIcon />
+                </ListItemIcon>
                 <ListItemText primary='Signup' />
               </ListItem>
             </>
           ) : (
-            <ListItem component='div' onClick={handleLogout}>
-              <ListItemText primary='Logout' />
-            </ListItem>
+            <>
+              <ListItem component='a' href='/dashboard'>
+                <ListItemIcon>
+                  <DashboardIcon />
+                </ListItemIcon>
+                <ListItemText primary=' Dashboard' />
+              </ListItem>
+              <ListItem component='a' href='/account-settings'>
+                <ListItemIcon>
+                  <SettingsIcon />
+                </ListItemIcon>
+                <ListItemText primary=' Settings' />
+              </ListItem>
+              <ListItem component='div' onClick={handleLogout}>
+                <ListItemIcon>
+                  <ExitToAppIcon />
+                </ListItemIcon>
+                <ListItemText primary='Logout' />
+              </ListItem>
+            </>
           )}
         </List>
       </Drawer>

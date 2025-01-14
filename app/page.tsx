@@ -1,6 +1,6 @@
-import Footer from './components/Footer/Footer'
-import HeroSection from './components/HeroSection/HeroSection'
-import Navbar from './components/Navbar/Navbar'
+import Footer from './components/Footer'
+import HeroSection from './components/HeroSection'
+import Navbar from './components/Navbar'
 
 export default function page() {
   return (

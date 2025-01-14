@@ -1,6 +1,6 @@
 import { Container } from '@mui/material'
-import JobsList from '../../app/components/JobsList/JobsList'
-import Navbar from '../../app/components/Navbar/Navbar'
+import JobsList from '../../app/components/JobsList'
+import Navbar from '../../app/components/Navbar'
 //import ModulesTab from '../../app/components/ModuleTab/ModulesTab'
 import '../../app/globals.css'
 

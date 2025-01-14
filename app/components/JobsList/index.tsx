@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import CloseIcon from '@mui/icons-material/Close'
+import DeleteIcon from '@mui/icons-material/Delete'
+import DescriptionIcon from '@mui/icons-material/Description'
 import {
   Backdrop,
   Box,
@@ -21,15 +22,13 @@ import {
   Paper,
   Select,
   SelectChangeEvent,
-  TextField,
   Typography
 } from '@mui/material'
-import DeleteIcon from '@mui/icons-material/Delete'
-import DescriptionIcon from '@mui/icons-material/Description'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { useEffect, useState } from 'react'
-import JobForm from '../JobForm/Form'
+import JobDetailsDrawer from '../JobDetails'
+import JobForm from '../JobForm'
 
 const JobList = () => {
   const [isNewJob, setIsNewJob] = useState(false)
@@ -277,7 +276,7 @@ const JobList = () => {
             }
           }}
         >
-          {/* Status Filter Dropdown */}
+          {/* Status Filter */}
           <FormControl variant='filled' sx={{ m: 2, minWidth: 150 }}>
             <InputLabel id='status-filter-label' sx={{ color: 'white' }}>
               Status
@@ -596,209 +595,23 @@ const JobList = () => {
         </DialogActions>
       </Dialog>
 
+      {/* Job Details Drawer */}
       <Drawer
         anchor='right'
         open={openJobDetails}
-        onClose={() => {
-          handleCloseJobDetails()
-          setIsEditing(false)
-        }}
-        PaperProps={{
-          sx: {
-            width: '100%',
-            maxWidth: 600,
-            padding: 3,
-            backgroundColor: '#f5f5f5',
-            boxShadow: 24
-          }
-        }}
+        onClose={handleCloseJobDetails}
+        sx={{ width: '50%' }}
       >
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            width: '100%',
-            borderBottom: '1px solid #ccc',
-            paddingBottom: 2,
-            marginBottom: 4
-          }}
-        >
-          <Typography variant='h6'>Job Details</Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
-            <Button
-              variant='contained'
-              color='error'
-              size='small'
-              onClick={() => {
-                handleCloseJobDetails()
-                setIsEditing(false)
-              }}
-              sx={{ display: { xs: 'flex', md: 'none' } }}
-            >
-              <CloseIcon />
-            </Button>
-          </Box>
-        </Box>
-        {currentJobDetails ? (
-          <Box
-            component='form'
-            noValidate
-            autoComplete='off'
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 3
-            }}
-          >
-            <TextField
-              label='Address'
-              value={
-                isEditing
-                  ? editableJobDetails?.address
-                  : currentJobDetails?.address
-              }
-              fullWidth
-              InputProps={{
-                readOnly: !isEditing
-              }}
-              onChange={e =>
-                isEditing && handleFieldChange('address', e.target.value)
-              }
-            />
-            <TextField
-              label='Wind Speed'
-              value={
-                isEditing
-                  ? editableJobDetails?.windSpeed
-                  : currentJobDetails?.windSpeed
-              }
-              fullWidth
-              InputProps={{
-                readOnly: !isEditing
-              }}
-              onChange={e =>
-                isEditing && handleFieldChange('windSpeed', e.target.value)
-              }
-            />
-            <FormControl fullWidth>
-              <InputLabel>Location From Coastline</InputLabel>
-              <Select
-                label='Location From Coastline'
-                value={
-                  isEditing
-                    ? editableJobDetails?.locationFromCoastline || ''
-                    : currentJobDetails?.locationFromCoastline || ''
-                }
-                onChange={e =>
-                  isEditing &&
-                  handleFieldChange('locationFromCoastline', e.target.value)
-                }
-                readOnly={!isEditing}
-                inputProps={{
-                  readOnly: !isEditing
-                }}
-              >
-                <MenuItem value='0-1km'>0-1km</MenuItem>
-                <MenuItem value='1-10km'>1-10km</MenuItem>
-                <MenuItem value='>10km'>&gt;10km</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label='Council Name'
-              value={
-                isEditing
-                  ? editableJobDetails?.councilName
-                  : currentJobDetails?.councilName
-              }
-              fullWidth
-              InputProps={{
-                readOnly: !isEditing
-              }}
-              onChange={e =>
-                isEditing && handleFieldChange('councilName', e.target.value)
-              }
-            />
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label='Status'
-                value={
-                  isEditing
-                    ? editableJobDetails?.status || ''
-                    : currentJobDetails?.status || ''
-                }
-                onChange={e =>
-                  isEditing && handleFieldChange('status', e.target.value)
-                }
-                readOnly={!isEditing}
-                inputProps={{
-                  readOnly: !isEditing
-                }}
-              >
-                <MenuItem value='PENDING'>Pending</MenuItem>
-                <MenuItem value='IN_PROGRESS'>In Progress</MenuItem>
-                <MenuItem value='ON_HOLD'>On Hold</MenuItem>
-                <MenuItem value='COMPLETED'>Completed</MenuItem>
-              </Select>
-            </FormControl>
-            <TextField
-              label='Comments'
-              value={
-                isEditing
-                  ? editableJobDetails?.comments || ''
-                  : currentJobDetails?.comments || 'N/A'
-              }
-              fullWidth
-              InputProps={{
-                readOnly: !isEditing
-              }}
-              onChange={e =>
-                isEditing && handleFieldChange('comments', e.target.value)
-              }
-            />
-            <TextField
-              label='Created At'
-              value={
-                currentJobDetails?.createdAt
-                  ? new Date(currentJobDetails.createdAt).toLocaleDateString()
-                  : 'N/A'
-              }
-              fullWidth
-              InputProps={{
-                readOnly: true
-              }}
-            />
-            {isEditing ? (
-              <>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={handleSaveJobDetails}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant='outlined'
-                  onClick={handleCancelEdit}
-                  sx={{ marginLeft: 1 }}
-                >
-                  Cancel
-                </Button>
-              </>
-            ) : (
-              <Button
-                variant='contained'
-                color='primary'
-                onClick={handleEditJobDetails}
-              >
-                Edit
-              </Button>
-            )}
-          </Box>
-        ) : (
-          <Typography>No job details available.</Typography>
-        )}
+        <JobDetailsDrawer
+          currentJobDetails={currentJobDetails}
+          editableJobDetails={editableJobDetails}
+          isEditing={isEditing}
+          handleCloseJobDetails={handleCloseJobDetails}
+          handleEditJobDetails={handleEditJobDetails}
+          handleCancelEdit={handleCancelEdit}
+          handleFieldChange={handleFieldChange}
+          handleSaveJobDetails={handleSaveJobDetails}
+        />
       </Drawer>
     </Container>
   )

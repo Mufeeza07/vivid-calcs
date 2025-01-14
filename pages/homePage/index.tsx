@@ -1,6 +1,6 @@
 import UserDashboard from '@/app/components/Dashboard'
 import { Container } from '@mui/material'
-import Navbar from '../../app/components/Navbar/Navbar'
+import Navbar from '../../app/components/Navbar'
 import '../../app/globals.css'
 
 const HomePage = () => {

@@ -9,7 +9,7 @@ const HeroSection = () => {
 
   const handleNavigate = () => {
     if (isLoggedIn()) {
-      router.push('/homePage')
+      router.push('/homepage')
     } else {
       router.push('/login')
     }
