@@ -1,15 +1,13 @@
 import { configureStore } from '@reduxjs/toolkit'
-import jobReducer from './slice/jobSlice'
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux'
+import jobsReducer from './slice/jobSlice'
 
 export const store = configureStore({
     reducer: {
-        job: jobReducer,
+        job: jobsReducer,
     },
 })
+
 
 export type RootState = ReturnType<typeof store.getState>
 export type AppDispatch = typeof store.dispatch
 
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

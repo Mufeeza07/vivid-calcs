@@ -30,12 +30,11 @@ export default async function handler(
 
     const skip = (pageNumber - 1) * limitNumber
 
-    // Build a dynamic filter object
+
     const filter: any = {
       userId: user.userId
     }
 
-    // Add status filter if provided
     if (status) {
       filter.status = status
     }

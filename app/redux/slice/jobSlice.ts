@@ -1,60 +1,110 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
-interface Job {
+export interface Job {
     jobId: string;
     address: string;
     windSpeed: string;
     locationFromCoastline: string;
     councilName: string;
-    status: string;
+    status: 'PENDING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED';
     userId: string;
-    comments: string | null;
+    comments?: string;
     createdAt: string;
     updatedAt: string;
 }
 
-interface JobState {
-    jobs: Job[];
+interface JobsState {
+    completedJobs: Job[];
+    inProgressJobs: Job[];
+    recentJobs: Job[];
     loading: boolean;
-    pagination: {
-        currentPage: number;
-        totalPages: number;
-    };
-    statusFilter: string;
+    error: string | null;
 }
 
-const initialState: JobState = {
-    jobs: [],
-    loading: true,
-    pagination: {
-        currentPage: 1,
-        totalPages: 1,
-    },
-    statusFilter: '',
+const initialState: JobsState = {
+    completedJobs: [],
+    inProgressJobs: [],
+    recentJobs: [],
+    loading: false,
+    error: null,
 };
+interface FetchJobsParams {
+    status?: string;
+    page?: number;
+}
 
+export const fetchJobs = createAsyncThunk(
+    'jobs/fetchJobs',
+    async ({ status, page }: FetchJobsParams = {}) => {
+        try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                throw new Error('Authorization token is missing');
+            }
+
+            const query = new URLSearchParams({
+                limit: '10',
+                page: page ? page.toString() : '1',
+                ...(status ? { status } : {}),
+            }).toString();
+
+            const response = await fetch(`/api/job/get-user-jobs?${query}`, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to fetch jobs');
+            }
+
+            const data = await response.json();
+            // console.log("data check", data)
+            return { data, status };
+        } catch (error: any) {
+            return error.message;
+        }
+    }
+);
 
 const jobSlice = createSlice({
     name: 'jobs',
     initialState,
-    reducers: {
+    reducers: {},
+    extraReducers: (builder) => {
+        builder
+            .addCase(fetchJobs.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchJobs.fulfilled, (state, action: PayloadAction<any>) => {
+                const status = action.meta.arg?.status;
 
-        setJobs: (state, action: PayloadAction<Job[]>) => {
-            state.jobs = action.payload;
-        },
-        setLoading: (state, action: PayloadAction<boolean>) => {
-            state.loading = action.payload;
-        },
-        setPagination: (state, action: PayloadAction<{ currentPage: number; totalPages: number }>) => {
-            state.pagination = action.payload;
-        },
-        setStatusFilter: (state, action: PayloadAction<string>) => {
-            state.statusFilter = action.payload;
-        },
+                if (status === 'COMPLETED') {
+                    state.completedJobs = action.payload.data;
+                } else if (status === 'IN_PROGRESS') {
+                    state.inProgressJobs = action.payload.data;
+                } else {
+                    state.recentJobs = action.payload.data;
+                }
 
-    }
-})
+                state.loading = false;
+            })
+            .addCase(fetchJobs.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            });
+    },
+});
 
+export const selectJobsLoading = (state: RootState) => state.job.loading;
+export const selectJobsError = (state: RootState) => state.job.error;
+export const selectCompletedJobs = (state: RootState) => state.job.completedJobs;
+export const selectInProgressJobs = (state: RootState) => state.job.inProgressJobs;
+export const selectRecentJobs = (state: RootState) => state.job.recentJobs;
 
-export const { setJobs, setLoading, setPagination, setStatusFilter } = jobSlice.actions;
 export default jobSlice.reducer;

@@ -33,7 +33,7 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userName, setUserName] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
-  const router = useRouter() // Initialize useRouter
+  const router = useRouter()
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen)
@@ -46,7 +46,6 @@ const Navbar = () => {
 
     if (user) {
       setUserName(user.name)
-      console.log('User Name:', user.name)
     }
   }, [])
 
@@ -75,8 +74,6 @@ const Navbar = () => {
   }
 
   const initials = getInitials(userName)
-
-  console.log('check name initials', initials)
 
   const buttonStyles = {
     marginRight: 2,
