@@ -114,17 +114,12 @@ const Navbar = () => {
           >
             <Box
               sx={{
+                position: 'relative',
                 width: { xs: 90, sm: 100, md: 120, lg: 140, xl: 150 },
                 height: { xs: 54, sm: 60, md: 70, lg: 80, xl: 90 }
               }}
             >
-              <Image
-                src='/logo.png'
-                alt='Logo'
-                width={100}
-                height={100}
-                layout='responsive'
-              />
+              <Image src='/logo.png' alt='Logo' fill priority />
             </Box>
 
             <IconButton

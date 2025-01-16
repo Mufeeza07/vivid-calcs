@@ -18,6 +18,8 @@ export interface Job {
 interface JobsState {
     completedJobs: Job[];
     inProgressJobs: Job[];
+    pendingJobs: Job[];
+    onHoldJobs: Job[];
     recentJobs: Job[];
     loading: boolean;
     error: string | null;
@@ -26,6 +28,8 @@ interface JobsState {
 const initialState: JobsState = {
     completedJobs: [],
     inProgressJobs: [],
+    pendingJobs: [],
+    onHoldJobs: [],
     recentJobs: [],
     loading: false,
     error: null,
@@ -88,6 +92,10 @@ const jobSlice = createSlice({
                     state.completedJobs = action.payload.data;
                 } else if (status === 'IN_PROGRESS') {
                     state.inProgressJobs = action.payload.data;
+                } else if (status === 'ON_HOLD') {
+                    state.onHoldJobs = action.payload.data;
+                } else if (status === 'PENDING') {
+                    state.pendingJobs = action.payload.data;
                 } else {
                     state.recentJobs = action.payload.data;
                 }
@@ -104,6 +112,8 @@ const jobSlice = createSlice({
 export const selectJobsLoading = (state: RootState) => state.job.loading;
 export const selectJobsError = (state: RootState) => state.job.error;
 export const selectCompletedJobs = (state: RootState) => state.job.completedJobs;
+export const selectOnHoldJobs = (state: RootState) => state.job.onHoldJobs;
+export const selectPendingJobs = (state: RootState) => state.job.pendingJobs;
 export const selectInProgressJobs = (state: RootState) => state.job.inProgressJobs;
 export const selectRecentJobs = (state: RootState) => state.job.recentJobs;
 

@@ -74,7 +74,7 @@ const Login = () => {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user', JSON.stringify(data.user))
 
-          router.push('/')
+          router.push('/homepage')
         } else {
           setErrors({
             email: '',
@@ -224,7 +224,7 @@ const Login = () => {
           </Button>
 
           <Typography align='center' data-aos='fade-up' data-aos-delay='600'>
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Button
               onClick={() => router.push('/signup')}
               sx={{ textTransform: 'none', padding: 0 }}
