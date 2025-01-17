@@ -1,4 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import {
+  fetchJobs,
+  selectCompletedJobs,
+  selectInProgressJobs,
+  selectJobsLoading,
+  selectOnHoldJobs,
+  selectPendingJobs,
+  selectRecentJobs
+} from '@/app/redux/slice/jobSlice'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DescriptionIcon from '@mui/icons-material/Description'
 import {
@@ -22,18 +31,28 @@ import {
   Paper,
   Select,
   SelectChangeEvent,
+  TextField,
   Typography
 } from '@mui/material'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import JobDetailsDrawer from '../JobDetails'
 import JobForm from '../JobForm'
 
 const JobList = () => {
+  const dispatch = useDispatch()
+
+  const allJobs = useSelector(selectRecentJobs)
+  const completedJobs = useSelector(selectCompletedJobs)
+  const inProgressJobs = useSelector(selectInProgressJobs)
+  const pendingJobs = useSelector(selectPendingJobs)
+  const onHoldJobs = useSelector(selectOnHoldJobs)
+  const loading = useSelector(selectJobsLoading)
+
   const [isNewJob, setIsNewJob] = useState(false)
   const [jobs, setJobs] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedJobs, setSelectedJobs] = useState<Set<string>>(new Set())
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false)
   const [jobToDelete, setJobToDelete] = useState<string | null>(null)
@@ -50,51 +69,42 @@ const JobList = () => {
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
-    fetchJobs(pagination.currentPage, statusFilter)
-  }, [pagination.currentPage, statusFilter])
+    dispatch(fetchJobs({ page: pagination.currentPage, status: statusFilter }))
+  }, [dispatch, statusFilter, pagination.currentPage])
 
-  const fetchJobs = async (page: number, filter: string) => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      alert('Authorization token is missing')
-      setLoading(false)
-      return
+  useEffect(() => {
+    const jobsMapping = {
+      '': allJobs,
+      PENDING: pendingJobs,
+      IN_PROGRESS: inProgressJobs,
+      ON_HOLD: onHoldJobs,
+      COMPLETED: completedJobs
     }
 
-    setLoading(true)
-    try {
-      const query = new URLSearchParams({
-        page: page.toString(),
-        limit: '10',
-        status: filter
-      }).toString()
-      const response = await fetch(`/api/job/get-user-jobs?${query}`, {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        setJobs(data.jobs || [])
+    const selectedJobsData = jobsMapping[statusFilter]
+    if (selectedJobsData) {
+      setJobs(selectedJobsData.jobs || [])
+      if (selectedJobsData.pagination) {
         setPagination({
-          currentPage: data.pagination.currentPage,
-          totalPages: data.pagination.totalPages
+          currentPage: selectedJobsData.pagination.currentPage,
+          totalPages: selectedJobsData.pagination.totalPages
         })
-      } else {
-        alert('Failed to fetch jobs')
       }
-    } catch (error) {
-      console.error('Error fetching jobs:', error)
-    } finally {
-      setLoading(false)
     }
-  }
+  }, [
+    statusFilter,
+    allJobs,
+    pendingJobs,
+    inProgressJobs,
+    onHoldJobs,
+    completedJobs
+  ])
 
   const handleStatusChange = (event: SelectChangeEvent) => {
     setStatusFilter(event.target.value)
+    setPagination(prev => ({ ...prev, currentPage: 1 }))
   }
+
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return
     setPagination(prev => ({ ...prev, currentPage: newPage }))
@@ -268,15 +278,48 @@ const JobList = () => {
         <Box
           sx={{
             display: 'flex',
-            justifyContent: 'flex-end',
+            justifyContent: 'space-between',
             alignItems: 'center',
             gap: 2,
             '@media (max-width: 600px)': {
-              justifyContent: 'center'
+              flexDirection: 'column',
+              justifyContent: 'center',
+              gap: 1
             }
           }}
         >
-          {/* Status Filter */}
+          <TextField
+            label='Search Job'
+            placeholder='Search here'
+            variant='filled'
+            sx={{
+              backgroundColor: '#2a2a2a',
+              borderRadius: '5px',
+              color: 'white',
+              width: '100%',
+              '& .MuiInputBase-input': {
+                color: 'white'
+              },
+              '& .MuiFormLabel-root': {
+                color: 'white',
+
+                '&.Mui-focused': {
+                  color: '#fff'
+                }
+              },
+
+              '&:hover': {
+                borderColor: '#ccc',
+                backgroundColor: '#2a2a2a'
+              },
+              '&:focus': {
+                borderColor: '#fff',
+                backgroundColor: '#2a2a2a'
+              }
+            }}
+            // onChange={handleSearchChange}
+          />
+
           <FormControl variant='filled' sx={{ m: 2, minWidth: 150 }}>
             <InputLabel id='status-filter-label' sx={{ color: 'white' }}>
               Status
@@ -315,6 +358,7 @@ const JobList = () => {
             </Select>
           </FormControl>
         </Box>
+
         {loading ? (
           <Box
             sx={{
@@ -328,7 +372,7 @@ const JobList = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {jobs.map(job => (
+            {jobs?.map(job => (
               <Box
                 key={job.jobId}
                 sx={{

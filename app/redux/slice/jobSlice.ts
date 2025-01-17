@@ -2,18 +2,18 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
-export interface Job {
-    jobId: string;
-    address: string;
-    windSpeed: string;
-    locationFromCoastline: string;
-    councilName: string;
-    status: 'PENDING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED';
-    userId: string;
-    comments?: string;
-    createdAt: string;
-    updatedAt: string;
-}
+// export interface Job {
+//     jobId: string;
+//     address: string;
+//     windSpeed: string;
+//     locationFromCoastline: string;
+//     councilName: string;
+//     status: 'PENDING' | 'IN_PROGRESS' | 'ON_HOLD' | 'COMPLETED';
+//     userId: string;
+//     comments?: string;
+//     createdAt: string;
+//     updatedAt: string;
+// }
 
 interface JobsState {
     completedJobs: Job[];
@@ -118,3 +118,6 @@ export const selectInProgressJobs = (state: RootState) => state.job.inProgressJo
 export const selectRecentJobs = (state: RootState) => state.job.recentJobs;
 
 export default jobSlice.reducer;
+
+
+
