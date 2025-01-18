@@ -14,7 +14,7 @@ export default async function handler(
   try {
     const token = req.headers.authorization?.split(' ')[1]
     if (!token) {
-      return res.status(401).json({ message: 'Authorization token is missing' })
+      return res.status(401).json({ message: 'Unauthorized' })
     }
 
     const user = getUserFromToken(token)

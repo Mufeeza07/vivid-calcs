@@ -35,6 +35,9 @@ model Job {
   createdAt             DateTime @default(now())      
   updatedAt             DateTime @updatedAt            
   user                  User     @relation("UserJobs", fields: [userId], references: [id])
+
+  nails                 Nails[]  
+  boltStrength          BoltStrength[]
 }
 
 enum JobStatus{
@@ -42,4 +45,51 @@ enum JobStatus{
   IN_PROGRESS
   ON_HOLD
   COMPLETED
+}
+
+
+model Nails {
+    id                   Int     @id @default(autoincrement())
+    jobId                String  @unique
+    type                 Type
+    k13                  Float
+    diameter             Float
+    screwJD              Float
+    phi                  Float
+    k1                   Float
+    k14                  Float
+    k16                  Float
+    k17                  Float
+    designLoad           Float
+    screwPenetration     Float
+    firstTimberThickness Float
+    createdAt            DateTime @default(now())      
+    updatedAt            DateTime @updatedAt     
+
+    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+
+}
+
+enum Type {
+  STEEL_TO_STEEL
+  TIMBER_TO_TIMBER
+  TIMBER_TO_STEEL
+}
+
+
+model BoltStrength {
+    id                   Int     @id @default(autoincrement())
+    jobId                String  @unique
+    type                 Type
+    phi                  Float
+    k1                   Float
+    k16                  Float
+    k17                  Float
+    qsk                  Float
+    designStrength       Float
+    createdAt            DateTime @default(now())      
+    updatedAt            DateTime @updatedAt     
+
+    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+
 }

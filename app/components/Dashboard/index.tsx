@@ -79,7 +79,7 @@ const UserDashboard = () => {
 
   const getJobsCount = (data: any) => {
     if (data && data.jobs && data.pagination) {
-      return data.pagination.totalJobs
+      return data.pagination.totalJobs || 0
     }
     return 0
   }
