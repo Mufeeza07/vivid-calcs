@@ -19,10 +19,10 @@ import {
   DialogTitle
 } from '@mui/material'
 import { useDispatch, useSelector } from 'react-redux'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
 
-const NailsCalculator = () => {
+const BoltStrengthCalculator = () => {
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
 
@@ -30,28 +30,23 @@ const NailsCalculator = () => {
     dispatch(fetchJobs())
   }, [dispatch])
 
-  const jobOptions = allJobs?.jobs?.map(job => ({
-    id: job.jobId,
-    name: job.address
-  }))
+  const jobOptions = useMemo(
+    () => allJobs?.jobs?.map(job => ({ id: job.jobId, name: job.address })),
+    [allJobs]
+  )
 
   const [inputs, setInputs] = useState({
-    k13: 0,
-    diameter: 0,
-    screwJD: 0,
     phi: 0,
     k1: 0,
-    k14: 0,
     k16: 0,
     k17: 0,
+    qsk: 0,
     type: '',
     jobId: ''
   })
 
   const [results, setResults] = useState({
-    designLoad: null as number | null,
-    screwPenetration: null as number | null,
-    firstTimberThickness: null as number | null
+    designStrength: null as number | null
   })
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -76,16 +71,12 @@ const NailsCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { k13, diameter, screwJD, phi, k1, k14, k16, k17 } = inputs
+    const { phi, k1, k16, k17, qsk } = inputs
 
-    const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
-    const screwPenetration = diameter * 7
-    const firstTimberThickness = diameter * 10
+    const designStrength = phi * k1 * k16 * k17 * qsk
 
     setResults({
-      designLoad,
-      screwPenetration,
-      firstTimberThickness
+      designStrength
     })
   }
 
@@ -97,12 +88,6 @@ const NailsCalculator = () => {
     setDialogOpen(false)
   }
 
-  const handleConfirmSave = () => {
-    // Save logic goes here
-    console.log('Results saved!', results)
-    setDialogOpen(false)
-  }
-
   return (
     <>
       <Navbar />
@@ -111,7 +96,7 @@ const NailsCalculator = () => {
           elevation={3}
           sx={{
             padding: 4,
-            maxWidth: 900,
+            maxWidth: 600,
             margin: 'auto',
             backgroundColor: '#1e1e1e',
             color: 'white',
@@ -119,7 +104,7 @@ const NailsCalculator = () => {
           }}
         >
           <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Nails Calculator
+            Bolt Strength Calculator
           </Typography>
           <Box
             sx={{
@@ -191,14 +176,11 @@ const NailsCalculator = () => {
 
               {/* Numeric Inputs */}
               {[
-                { name: 'k13', label: 'K13' },
-                { name: 'diameter', label: '14g Diameter' },
-                { name: 'screwJD', label: '14g Screw' },
                 { name: 'phi', label: 'Phi' },
                 { name: 'k1', label: 'K1' },
-                { name: 'k14', label: 'K14' },
                 { name: 'k16', label: 'K16' },
-                { name: 'k17', label: 'K17' }
+                { name: 'k17', label: 'K17' },
+                { name: 'qsk', label: 'Qsk' }
               ].map(({ name, label }) => (
                 <TextField
                   key={name}
@@ -238,39 +220,30 @@ const NailsCalculator = () => {
                 gap: 2
               }}
             >
-              {[
-                { label: 'Design Load', value: results.designLoad },
-                {
-                  label: 'Screw Penetration in Second Timber',
-                  value: results.screwPenetration
-                },
-                {
-                  label: 'First Timber Thickness',
-                  value: results.firstTimberThickness
+              <TextField
+                label='Design Strength'
+                value={
+                  results.designStrength !== null
+                    ? results.designStrength.toFixed(2)
+                    : ''
                 }
-              ].map(({ label, value }) => (
-                <TextField
-                  key={label}
-                  label={label}
-                  value={value !== null ? value.toFixed(2) : ''}
-                  InputProps={{
-                    readOnly: true
-                  }}
-                  variant='filled'
-                  fullWidth
-                  sx={{
-                    '& .MuiFilledInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' }
-                  }}
-                />
-              ))}
+                InputProps={{
+                  readOnly: true
+                }}
+                variant='filled'
+                fullWidth
+                sx={{
+                  '& .MuiFilledInput-root': {
+                    backgroundColor: '#282828',
+                    color: 'white'
+                  },
+                  '& .MuiInputLabel-root': { color: '#0288d1' }
+                }}
+              />
             </Box>
           </Box>
 
-          {/* Action Button */}
+          {/* Action Buttons */}
           <Box
             sx={{
               marginTop: 3,
@@ -317,7 +290,7 @@ const NailsCalculator = () => {
               fontSize: '1.25rem'
             }}
           >
-            Nail Calculations
+            Bolt Strength
           </DialogTitle>
           <DialogContent
             sx={{
@@ -353,7 +326,6 @@ const NailsCalculator = () => {
             <Button
               color='success'
               variant='contained'
-              onClick={handleConfirmSave}
               sx={{
                 backgroundColor: '#4caf50',
                 '&:hover': {
@@ -370,4 +342,4 @@ const NailsCalculator = () => {
   )
 }
 
-export default NailsCalculator
+export default BoltStrengthCalculator
