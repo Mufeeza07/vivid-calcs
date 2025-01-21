@@ -63,7 +63,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(201).json({ message: 'Nail calculations saved successfully', nail })
 
     } catch (error) {
-        res.status(500).json({ message: 'Internal Server Error', error: error })
+        return res.status(500).json({ message: 'Internal Server Error', error: error })
     }
 
 

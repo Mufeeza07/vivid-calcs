@@ -3,13 +3,13 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        res.status(405).json({ message: 'Method Not Allowed' })
+        return res.status(405).json({ message: 'Method Not Allowed' })
     }
     try {
         const token = req.headers.authorization?.split('')[1];
 
         if (!token) {
-            res.status(401).json({ message: 'Unauthorized' })
+            return res.status(401).json({ message: 'Unauthorized' })
         }
 
         const { jobId } = req.query

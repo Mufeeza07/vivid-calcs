@@ -75,14 +75,25 @@ CREATE TABLE "BoltStrength" (
     CONSTRAINT "BoltStrength_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "Weld" (
+    "id" SERIAL NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" "Type" NOT NULL,
+    "phi" DOUBLE PRECISION NOT NULL,
+    "vw" DOUBLE PRECISION NOT NULL,
+    "fuw" DOUBLE PRECISION NOT NULL,
+    "tt" DOUBLE PRECISION NOT NULL,
+    "kr" DOUBLE PRECISION NOT NULL,
+    "strength" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Weld_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Nails_jobId_key" ON "Nails"("jobId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "BoltStrength_jobId_key" ON "BoltStrength"("jobId");
 
 -- AddForeignKey
 ALTER TABLE "Job" ADD CONSTRAINT "Job_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -92,3 +103,6 @@ ALTER TABLE "Nails" ADD CONSTRAINT "Nails_jobId_fkey" FOREIGN KEY ("jobId") REFE
 
 -- AddForeignKey
 ALTER TABLE "BoltStrength" ADD CONSTRAINT "BoltStrength_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Weld" ADD CONSTRAINT "Weld_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;

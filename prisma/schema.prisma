@@ -38,6 +38,7 @@ model Job {
 
   nails                 Nails[]  
   boltStrength          BoltStrength[]
+  weld                  Weld[]
 }
 
 enum JobStatus{
@@ -50,7 +51,7 @@ enum JobStatus{
 
 model Nails {
     id                   Int     @id @default(autoincrement())
-    jobId                String  @unique
+    jobId                String  
     type                 Type
     k13                  Float
     diameter             Float
@@ -79,7 +80,7 @@ enum Type {
 
 model BoltStrength {
     id                   Int     @id @default(autoincrement())
-    jobId                String  @unique
+    jobId                String  
     type                 Type
     phi                  Float
     k1                   Float
@@ -87,6 +88,23 @@ model BoltStrength {
     k17                  Float
     qsk                  Float
     designStrength       Float
+    createdAt            DateTime @default(now())      
+    updatedAt            DateTime @updatedAt     
+
+    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+
+}
+
+model Weld {
+    id                   Int     @id @default(autoincrement())
+    jobId                String  
+    type                 Type
+    phi                  Float
+    vw                   Float
+    fuw                  Float
+    tt                   Float
+    kr                   Float
+    strength             Float
     createdAt            DateTime @default(now())      
     updatedAt            DateTime @updatedAt     
 
