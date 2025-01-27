@@ -3,14 +3,20 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     if (req.method !== 'POST') {
-        return res.status(405).json({ message: "Method Not Allowed" })
+        return res.status(405).json({
+            message: "Method Not Allowed",
+            status: 405
+        })
     }
 
     try {
-        const token = req.headers.authorization?.split('')[1];
+        const token = req.headers.authorization?.split(' ')[1];
 
         if (!token) {
-            return res.status(401).json({ message: 'Unauthorized' })
+            return res.status(401).json({
+                message: 'Unauthorized',
+                status: 401
+            })
         }
 
         const { jobId } = req.query;
@@ -19,7 +25,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         console.log('coming jobId', jobId)
 
         if (!jobId || typeof jobId !== 'string') {
-            return res.status(400).json({ message: 'Job ID is required' })
+            return res.status(400).json({
+                message: 'Job ID is required',
+                status: 400
+            })
         }
 
         const {
@@ -38,7 +47,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         } = req.body
 
         if (!type || !k13 || !diameter || !screwJD || !phi || !k1 || !k14 || !k16 || !k17 || !designLoad || !screwPenetration || !firstTimberThickness) {
-            return res.status(400).json({ message: 'All fields are required' })
+            return res.status(400).json({
+                message: 'All fields are required',
+                status: 400
+            })
         }
 
 
@@ -60,10 +72,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             }
         })
 
-        res.status(201).json({ message: 'Nail calculations saved successfully', nail })
+        res.status(201).json({
+            message: 'Nail calculations saved successfully',
+            status: 201,
+            data: nail
+        })
 
     } catch (error) {
-        return res.status(500).json({ message: 'Internal Server Error', error: error })
+        return res.status(500).json({
+            message: 'Internal Server Error',
+            status: 500,
+            error: error
+        })
     }
 
 

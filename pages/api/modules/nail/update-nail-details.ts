@@ -2,10 +2,10 @@ import prisma from "@/prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== 'GET') {
+    if (req.method !== 'PATCH') {
         return res.status(405).json({
             message: "Method Not Allowed",
-            status: 405
+            status: 405,
         })
     }
 
@@ -18,33 +18,30 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
         }
 
-        const { jobId } = req.query
-
-        if (!jobId || typeof jobId !== 'string') {
+        const { nailId } = req.query
+        if (!nailId || typeof nailId !== 'string') {
             return res.status(400).json({
-                status: 400,
-                message: " Job ID is required.",
-            });
+                message: 'Nail Details ID is required',
+                status: 400
+            })
         }
 
-        const boltStrengthDetails = await prisma.boltStrength.findMany({
-            where: { jobId }
+        const parsedId = parseInt(nailId, 10);
+
+        const updateData = req.body
+        const updatedNailDetails = await prisma.nails.update({
+            where: { id: parsedId },
+            data: updateData
         })
 
-        if (!boltStrengthDetails || boltStrengthDetails.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: `No Bolt details found for Job ID ${jobId}.`,
-            });
-        }
-
         res.status(200).json({
+            message: 'Nail details updated successfully',
             status: 200,
-            message: "Bolt details retrieved successfully.",
-            data: boltStrengthDetails,
-        });
+            nail: updatedNailDetails
 
-    } catch (error) {
+        })
+    }
+    catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
             status: 500,

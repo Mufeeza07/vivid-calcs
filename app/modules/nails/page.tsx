@@ -1,26 +1,27 @@
 'use client'
 
 import Navbar from '@/app/components/Navbar'
+import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
 import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   TextField,
-  Typography,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle
+  Typography
 } from '@mui/material'
-import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState } from 'react'
-import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const NailsCalculator = () => {
   const dispatch = useDispatch()
@@ -90,6 +91,23 @@ const NailsCalculator = () => {
   }
 
   const handleSave = () => {
+    const requiredFields = [
+      'type',
+      'k13',
+      'diameter',
+      'screwJD',
+      'phi',
+      'k1',
+      'k14',
+      'k16',
+      'k17'
+    ]
+    const fields = requiredFields.filter(field => !inputs[field])
+    if (fields.length > 0) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -97,15 +115,77 @@ const NailsCalculator = () => {
     setDialogOpen(false)
   }
 
-  const handleConfirmSave = () => {
-    // Save logic goes here
-    console.log('Results saved!', results)
-    setDialogOpen(false)
+  const handleConfirmSave = async () => {
+    const token = localStorage.getItem('token')
+    if (!inputs.jobId || !inputs.type) {
+      alert('Please select a job and type before saving.')
+      return
+    }
+
+    try {
+      const response = await fetch(
+        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            type: inputs.type,
+            k13: inputs.k13,
+            diameter: inputs.diameter,
+            screwJD: inputs.screwJD,
+            phi: inputs.phi,
+            k1: inputs.k1,
+            k14: inputs.k14,
+            k16: inputs.k16,
+            k17: inputs.k17,
+            designLoad: results.designLoad,
+            screwPenetration: results.screwPenetration,
+            firstTimberThickness: results.firstTimberThickness
+          })
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        toast.error(`Error: ${errorData.message}`)
+        return
+      }
+
+      const data = await response.json()
+      console.log('Saved successfully:', data)
+      toast.success('Nail calculations saved successfully!')
+      setDialogOpen(false)
+
+      setInputs({
+        k13: 0,
+        diameter: 0,
+        screwJD: 0,
+        phi: 0,
+        k1: 0,
+        k14: 0,
+        k16: 0,
+        k17: 0,
+        type: '',
+        jobId: ''
+      })
+      setResults({
+        designLoad: null,
+        screwPenetration: null,
+        firstTimberThickness: null
+      })
+    } catch (error) {
+      console.error('Error saving nail calculations:', error)
+      toast.error('Failed to save. Please try again later.')
+    }
   }
 
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
         <Paper
           elevation={3}
