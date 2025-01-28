@@ -67,8 +67,8 @@ const ModuleTabs = () => {
       icon: <GridOn fontSize='large' />
     },
     {
-      label: 'Steel Beam Calculator',
-      description: 'Design and calculate the specifications for steel beams.',
+      label: 'Beam and Slab Analysis',
+      description: 'Perform concrete slab and beam analysis.',
       path: 'beam',
       icon: <Calculate fontSize='large' />
     },

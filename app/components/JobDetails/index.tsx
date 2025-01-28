@@ -131,6 +131,9 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
                 isEditing &&
                 handleFieldChange('locationFromCoastline', e.target.value)
               }
+              SelectDisplayProps={{
+                style: { pointerEvents: isEditing ? 'auto' : 'none' }
+              }}
             >
               <MenuItem value='0-1km'>0-1km</MenuItem>
               <MenuItem value='1-10km'>1-10km</MenuItem>
@@ -164,6 +167,9 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
               onChange={e =>
                 isEditing && handleFieldChange('status', e.target.value)
               }
+              SelectDisplayProps={{
+                style: { pointerEvents: isEditing ? 'auto' : 'none' }
+              }}
             >
               <MenuItem value='PENDING'>Pending</MenuItem>
               <MenuItem value='IN_PROGRESS'>In Progress</MenuItem>
@@ -212,13 +218,18 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
               </Button>
             </>
           ) : (
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={handleEditJobDetails}
-            >
-              Edit
-            </Button>
+            <>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={handleEditJobDetails}
+              >
+                Edit
+              </Button>
+              <Button variant='outlined' color='secondary'>
+                View More Details
+              </Button>
+            </>
           )}
         </Box>
       ) : (

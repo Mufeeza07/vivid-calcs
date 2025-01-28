@@ -22,7 +22,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 
-const BoltStrengthCalculator = () => {
+const WeldStrengthCalculator = () => {
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
 
@@ -36,11 +36,11 @@ const BoltStrengthCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
+    vw: 0.6,
     phi: 0,
-    k1: 0,
-    k16: 0,
-    k17: 0,
-    qsk: 0,
+    fuw: 0,
+    tt: 0,
+    kr: 0,
     type: '',
     jobId: ''
   })
@@ -71,9 +71,9 @@ const BoltStrengthCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { phi, k1, k16, k17, qsk } = inputs
+    const { vw, phi, fuw, tt, kr } = inputs
 
-    const designStrength = phi * k1 * k16 * k17 * qsk
+    const designStrength = (vw * fuw * tt * kr * phi) / 1000
 
     setResults({
       designStrength
@@ -81,7 +81,7 @@ const BoltStrengthCalculator = () => {
   }
 
   const handleSave = () => {
-    const requiredFields = ['jobId', 'type', 'phi', 'k1', 'k16', 'k17', 'qsk']
+    const requiredFields = ['jobId', 'type', 'phi', 'fuw', 'tt', 'kr']
     const missingFields = requiredFields.filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
@@ -102,7 +102,7 @@ const BoltStrengthCalculator = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/bolt/create-bolt-details?jobId=${inputs.jobId}`,
+        `/api/modules/weld/create-weld-details?jobId=${inputs.jobId}`,
         {
           method: 'POST',
           headers: {
@@ -112,11 +112,11 @@ const BoltStrengthCalculator = () => {
           body: JSON.stringify({
             type: inputs.type,
             phi: inputs.phi,
-            k1: inputs.k1,
-            k16: inputs.k16,
-            k17: inputs.k17,
-            qsk: inputs.qsk,
-            designStrength: results.designStrength
+            fuw: inputs.fuw,
+            tt: inputs.tt,
+            kr: inputs.kr,
+            vw: inputs.vw,
+            strength: results.designStrength
           })
         }
       )
@@ -126,7 +126,7 @@ const BoltStrengthCalculator = () => {
         toast.error(`Error: ${errorData.message}`)
         return
       }
-      toast.success('Bolt calculations saved successfully!')
+      toast.success('Weld calculations saved successfully!')
       setDialogOpen(false)
     } catch (error) {
       toast.error('Failed to save data')
@@ -150,7 +150,7 @@ const BoltStrengthCalculator = () => {
           }}
         >
           <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Bolt Strength Calculator
+            Weld Calculator
           </Typography>
           <Box
             sx={{
@@ -219,14 +219,35 @@ const BoltStrengthCalculator = () => {
                   <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                 </Select>
               </FormControl>
-
-              {/* Numeric Inputs */}
+              <TextField
+                label='Vw '
+                name='vw'
+                type='number'
+                variant='outlined'
+                value={inputs.vw}
+                InputProps={{
+                  readOnly: true
+                }}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    }
+                  },
+                  '& .MuiInputLabel-root': { color: '#0288d1' }
+                }}
+              />
               {[
                 { name: 'phi', label: 'Phi' },
-                { name: 'k1', label: 'K1' },
-                { name: 'k16', label: 'K16' },
-                { name: 'k17', label: 'K17' },
-                { name: 'qsk', label: 'Qsk' }
+                { name: 'fuw', label: 'Fuw' },
+                { name: 'tt', label: 'Tt' },
+                { name: 'kr', label: 'Kr' }
               ].map(({ name, label }) => (
                 <TextField
                   key={name}
@@ -336,7 +357,7 @@ const BoltStrengthCalculator = () => {
               fontSize: '1.25rem'
             }}
           >
-            Bolt Strength
+            Weld Strength
           </DialogTitle>
           <DialogContent
             sx={{
@@ -389,4 +410,4 @@ const BoltStrengthCalculator = () => {
   )
 }
 
-export default BoltStrengthCalculator
+export default WeldStrengthCalculator

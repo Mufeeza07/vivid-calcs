@@ -21,7 +21,6 @@ import {
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 
 const NailsCalculator = () => {
   const dispatch = useDispatch()
@@ -92,6 +91,7 @@ const NailsCalculator = () => {
 
   const handleSave = () => {
     const requiredFields = [
+      'jobId',
       'type',
       'k13',
       'diameter',
@@ -117,10 +117,6 @@ const NailsCalculator = () => {
 
   const handleConfirmSave = async () => {
     const token = localStorage.getItem('token')
-    if (!inputs.jobId || !inputs.type) {
-      alert('Please select a job and type before saving.')
-      return
-    }
 
     try {
       const response = await fetch(
@@ -154,8 +150,6 @@ const NailsCalculator = () => {
         return
       }
 
-      const data = await response.json()
-      console.log('Saved successfully:', data)
       toast.success('Nail calculations saved successfully!')
       setDialogOpen(false)
 
@@ -178,7 +172,7 @@ const NailsCalculator = () => {
       })
     } catch (error) {
       console.error('Error saving nail calculations:', error)
-      toast.error('Failed to save. Please try again later.')
+      toast.error('Failed to save data.')
     }
   }
 
