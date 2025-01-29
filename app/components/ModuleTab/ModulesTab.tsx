@@ -21,6 +21,7 @@ import {
 } from '@mui/material'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import AgricultureIcon from '@mui/icons-material/Agriculture'
 
 const ModuleTabs = () => {
   const router = useRouter()
@@ -38,49 +39,49 @@ const ModuleTabs = () => {
     },
     {
       label: 'Bolt Strength',
-      description: 'Design and calculate bolts.',
+      description: 'Design and calculate bolts',
       path: 'bolt',
       icon: <Bolt fontSize='large' />
     },
     {
       label: 'Nails',
-      description: 'Calculate the number of nails needed for your project.',
+      description: 'Calculate the number of nails needed for your project',
       path: 'nails',
       icon: <Construction fontSize='large' />
     },
     {
-      label: 'Pile Design',
-      description: 'Analyze pile designs.',
-      path: 'pile',
-      icon: <Foundation fontSize='large' />
+      label: 'Soil',
+      description: 'Analyze soil ys and yt',
+      path: 'soil',
+      icon: <AgricultureIcon fontSize='large' />
     },
     {
       label: 'Weld',
-      description: 'Calculate the load-bearing capacity of beams.',
+      description: 'Calculate the load-bearing capacity of beams',
       path: 'weld',
       icon: <PrecisionManufacturing fontSize='large' />
     },
     {
       label: 'Joist Vibration',
-      description: 'Calculate steel flooring joist vibration.',
+      description: 'Calculate steel flooring joist vibration',
       path: 'joist',
       icon: <GridOn fontSize='large' />
     },
     {
       label: 'Beam and Slab Analysis',
-      description: 'Perform concrete slab and beam analysis.',
+      description: 'Perform concrete slab and beam analysis',
       path: 'beam',
       icon: <Calculate fontSize='large' />
     },
     {
       label: 'Flow Velocity',
-      description: 'Calculate the flow velocity.',
+      description: 'Calculate the flow velocity',
       path: 'flow',
       icon: <Speed fontSize='large' />
     },
     {
       label: 'Retaining Wall',
-      description: 'Perform structural calculations for retaining walls.',
+      description: 'Perform structural calculations for retaining walls',
       path: 'wall',
       icon: <Home fontSize='large' />
     }

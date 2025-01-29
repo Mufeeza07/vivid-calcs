@@ -1,6 +1,7 @@
 'use client'
 
 import Navbar from '@/app/components/Navbar'
+import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
 import {
   Box,
   Button,
@@ -9,14 +10,36 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   Typography
 } from '@mui/material'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
 
 const BeamSlabAnalysis = () => {
+  const dispatch = useDispatch()
+  const allJobs = useSelector(selectRecentJobs)
+
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState<'beam' | 'slab' | null>(null)
+
+  useEffect(() => {
+    dispatch(fetchJobs())
+  }, [dispatch])
+
+  const jobOptions = allJobs?.jobs?.map(job => ({
+    id: job.jobId,
+    name: job.address
+  }))
   const [beamInputs, setBeamInputs] = useState({
+    type: '',
+    jobId: '',
     span: 0,
     slabThickness: 0,
     floorLoadWidth: 0,
@@ -31,6 +54,8 @@ const BeamSlabAnalysis = () => {
   })
 
   const [slabInputs, setSlabInputs] = useState({
+    type: '',
+    jobId: '',
     span: 0,
     slabThickness: 0,
     loadWidth: 0,
@@ -61,7 +86,12 @@ const BeamSlabAnalysis = () => {
     const { name, value } = e.target
     setBeamInputs(prev => ({
       ...prev,
-      [name!]: value === '' ? '' : Math.max(0, parseFloat(value) || 0)
+      [name!]:
+        name === 'jobId' || name === 'type'
+          ? value
+          : value === ''
+            ? ''
+            : Math.max(0, parseFloat(value) || 0)
     }))
   }
 
@@ -71,7 +101,12 @@ const BeamSlabAnalysis = () => {
     const { name, value } = e.target
     setSlabInputs(prev => ({
       ...prev,
-      [name!]: value === '' ? '' : Math.max(0, parseFloat(value) || 0)
+      [name!]:
+        name === 'jobId' || name === 'type'
+          ? value
+          : value === ''
+            ? ''
+            : Math.max(0, parseFloat(value) || 0)
     }))
   }
 
@@ -97,9 +132,60 @@ const BeamSlabAnalysis = () => {
     })
   }
 
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    e.target.select()
+  }
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false)
+  }
+
+  const handleSave = (type: 'beam' | 'slab') => {
+    const requiredFields =
+      type === 'beam'
+        ? [
+            'jobId',
+            'type',
+            'span',
+            'slabThickness',
+            'floorLoadWidth',
+            'roofLoadWidth',
+            'wallHeight',
+            'slabDensity',
+            'slabLiveLoad',
+            'flooringLoad',
+            'roofDeadLoad',
+            'roofLiveLoad',
+            'wallDeadLoad'
+          ]
+        : [
+            'jobId',
+            'type',
+            'span',
+            'slabThickness',
+            'loadWidth',
+            'slabDensity',
+            'slabLiveLoad',
+            'flooringLoad'
+          ]
+
+    const inputs = type === 'beam' ? beamInputs : slabInputs
+
+    // Check for missing fields
+    const missingFields = requiredFields.filter(field => !inputs[field])
+
+    if (missingFields.length > 0) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+    setDialogType(type)
+    setOpenDialog(true)
+  }
+
   return (
     <>
       <Navbar />
+      <ToastContainer />
       <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
         <Box
           sx={{
@@ -125,6 +211,62 @@ const BeamSlabAnalysis = () => {
               Beam Analysis
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
+                <Select
+                  name='jobId'
+                  label='job'
+                  value={beamInputs.jobId}
+                  onChange={handleBeamChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  {jobOptions?.map(job => (
+                    <MenuItem key={job.id} value={job.id}>
+                      {job.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
+                <Select
+                  name='type'
+                  label='type'
+                  value={beamInputs.type}
+                  onChange={handleBeamChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
+                  <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
+                  <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
+                </Select>
+              </FormControl>
+
               {[
                 { name: 'span', label: 'Span' },
                 { name: 'slabThickness', label: 'Slab Thickness' },
@@ -146,6 +288,7 @@ const BeamSlabAnalysis = () => {
                   variant='outlined'
                   value={beamInputs[name as keyof typeof beamInputs]}
                   onChange={handleBeamChange}
+                  onFocus={handleFocus}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -202,20 +345,41 @@ const BeamSlabAnalysis = () => {
               ))}
             </Box>
 
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={calculateBeamResults}
+            <Box
               sx={{
-                marginTop: 2,
-                backgroundColor: '#0288d1',
-                '&:hover': {
-                  backgroundColor: '#026aa1'
-                }
+                marginTop: 3,
+                display: 'flex',
+                justifyContent: 'space-between'
               }}
             >
-              Calculate
-            </Button>
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={calculateBeamResults}
+                sx={{
+                  backgroundColor: '#0288d1',
+                  '&:hover': {
+                    backgroundColor: '#026aa1'
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+
+              <Button
+                variant='contained'
+                color='secondary'
+                onClick={() => handleSave('beam')}
+                sx={{
+                  backgroundColor: '#7b1fa2',
+                  '&:hover': {
+                    backgroundColor: '#4a148c'
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </Box>
           </Paper>
 
           {/* Slab Analysis */}
@@ -234,6 +398,60 @@ const BeamSlabAnalysis = () => {
               Slab Analysis
             </Typography>
             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
+                <Select
+                  name='jobId'
+                  label='job'
+                  value={slabInputs.jobId}
+                  onChange={handleSlabChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  {jobOptions?.map(job => (
+                    <MenuItem key={job.id} value={job.id}>
+                      {job.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
+                <Select
+                  name='type'
+                  label='type'
+                  value={slabInputs.type}
+                  onChange={handleSlabChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
+                  <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
+                  <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
+                </Select>
+              </FormControl>
               {[
                 { name: 'span', label: 'Span' },
                 { name: 'slabThickness', label: 'Slab Thickness' },
@@ -250,6 +468,7 @@ const BeamSlabAnalysis = () => {
                   variant='outlined'
                   value={slabInputs[name as keyof typeof slabInputs]}
                   onChange={handleSlabChange}
+                  onFocus={handleFocus}
                   fullWidth
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -306,22 +525,96 @@ const BeamSlabAnalysis = () => {
               ))}
             </Box>
 
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={calculateSlabResults}
+            <Box
               sx={{
-                marginTop: 2,
-                backgroundColor: '#0288d1',
+                marginTop: 3,
+                display: 'flex',
+                justifyContent: 'space-between'
+              }}
+            >
+              <Button
+                variant='contained'
+                color='primary'
+                onClick={calculateSlabResults}
+                sx={{
+                  backgroundColor: '#0288d1',
+                  '&:hover': {
+                    backgroundColor: '#026aa1'
+                  }
+                }}
+              >
+                Calculate
+              </Button>
+
+              <Button
+                variant='contained'
+                color='secondary'
+                onClick={() => handleSave('slab')}
+                sx={{
+                  backgroundColor: '#7b1fa2',
+                  '&:hover': {
+                    backgroundColor: '#4a148c'
+                  }
+                }}
+              >
+                Save
+              </Button>
+            </Box>
+          </Paper>
+        </Box>
+        <Dialog open={openDialog} onClose={handleCloseDialog}>
+          <DialogTitle
+            sx={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: '1.25rem'
+            }}
+          >
+            {dialogType === 'beam' ? 'Beam Analysis ' : 'Slab Analysis '}
+          </DialogTitle>
+          <DialogContent
+            sx={{
+              padding: '16px',
+              textAlign: 'center',
+              color: '#444'
+            }}
+          >
+            <Typography>Do you want to save the current data?</Typography>
+          </DialogContent>
+          <DialogActions
+            sx={{
+              justifyContent: 'center',
+              gap: 2
+            }}
+          >
+            <Button
+              onClick={handleCloseDialog}
+              color='primary'
+              variant='outlined'
+              sx={{
+                borderColor: '#0288d1',
+                color: '#0288d1',
                 '&:hover': {
-                  backgroundColor: '#026aa1'
+                  backgroundColor: '#e1f5fe'
                 }
               }}
             >
-              Calculate
+              No
             </Button>
-          </Paper>
-        </Box>
+            <Button
+              color='success'
+              variant='contained'
+              sx={{
+                backgroundColor: '#4caf50',
+                '&:hover': {
+                  backgroundColor: '#388e3c'
+                }
+              }}
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     </>
   )
