@@ -155,6 +155,7 @@ const BoltStrengthCalculator = () => {
           <Box
             sx={{
               display: 'flex',
+              flexDirection: { xs: 'column', sm: 'row' },
               gap: 4
             }}
           >
