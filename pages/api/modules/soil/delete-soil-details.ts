@@ -2,7 +2,7 @@ import prisma from "@/prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    if (req.method !== 'GET') {
+    if (req.method !== 'DELETE') {
         return res.status(405).json({
             message: "Method Not Allowed",
             status: 405
@@ -11,6 +11,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     try {
         const token = req.headers.authorization?.split(' ')[1]
+
         if (!token) {
             return res.status(401).json({
                 message: "Unauthorized",
@@ -18,29 +19,42 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             })
         }
 
-        const { jobId } = req.query
+        const { soilId } = req.query
 
-        if (!jobId || typeof jobId !== 'string') {
+        if (!soilId) {
             return res.status(400).json({
-                status: 400,
-                message: " Job ID is required.",
-            });
+                message: "Soil ID is required",
+                status: 400
+            })
         }
 
-        const boltStrengthDetails = await prisma.boltStrength.findMany({
-            where: { jobId }
+
+        const parsedId = parseInt(soilId as string, 10);
+
+        const existingDetails = await prisma.soilAnalysis.findUnique({
+            where: { id: parsedId }
+        })
+
+        if (!existingDetails) {
+            return res.status(404).json({
+                message: "Soil details not found",
+                status: 404
+            })
+        }
+
+        await prisma.soilAnalysis.delete({
+            where: { id: parsedId }
         })
 
         res.status(200).json({
-            status: 200,
-            message: "Bolt details retrieved successfully.",
-            data: boltStrengthDetails,
-        });
+            message: "Soil deleted successfully",
+            status: 200
+        })
 
     } catch (error) {
         res.status(500).json({
             message: "Internal Server Error",
-            status: 500,
+            status: 5000,
             error: error
         })
     }

@@ -103,6 +103,46 @@ const SoilCalculator = () => {
     setDialogOpen(false)
   }
 
+  const handleConfirmSave = async () => {
+    const token = localStorage.getItem('token')
+    try {
+      const response = await fetch(
+        `/api/modules/soil/create-soil-details?jobId=${inputs.jobId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            type: inputs.type,
+            shrinkageIndex: inputs.shrinkageIndex,
+            lateralRestraint: inputs.lateralRestraint,
+            suctionChange: inputs.suctionChange,
+            layerThickness: inputs.layerThickness,
+            instabilityIndex: results.instabilityIndex,
+            surfaceMovement: results.surfaceMovement
+          })
+        }
+      )
+
+      const responseData = await response.json()
+
+      if (!response.ok) {
+        toast.error(`Error: ${responseData.message || 'Failed to save data'}`)
+        return
+      }
+
+      toast.success(
+        responseData.message || 'Soil calculations saved successfully!'
+      )
+      setDialogOpen(false)
+    } catch (error) {
+      toast.error('Failed to save data')
+      return
+    }
+  }
+
   return (
     <>
       <Navbar />
@@ -316,6 +356,7 @@ const SoilCalculator = () => {
             <Button
               color='success'
               variant='contained'
+              onClick={handleConfirmSave}
               sx={{
                 backgroundColor: '#4caf50',
                 '&:hover': { backgroundColor: '#388e3c' }

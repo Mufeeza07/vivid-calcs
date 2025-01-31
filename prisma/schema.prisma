@@ -39,6 +39,7 @@ model Job {
   nails                 Nails[]  
   boltStrength          BoltStrength[]
   weld                  Weld[]
+  soilAnalysis          SoilAnalysis[]
 }
 
 enum JobStatus{
@@ -105,6 +106,23 @@ model Weld {
     tt                   Float
     kr                   Float
     strength             Float
+    createdAt            DateTime @default(now())      
+    updatedAt            DateTime @updatedAt     
+
+    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+
+}
+
+model SoilAnalysis {
+    id                   Int     @id @default(autoincrement())
+    jobId                String  
+    type                 Type
+    shrinkageIndex       Float
+    lateralRestraint     Float
+    suctionChange        Float
+    layerThickness       Float
+    instabilityIndex     Float
+    surfaceMovement      Float
     createdAt            DateTime @default(now())      
     updatedAt            DateTime @updatedAt     
 

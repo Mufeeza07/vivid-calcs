@@ -186,12 +186,13 @@ const BeamSlabAnalysis = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
+      <Container
+        sx={{ marginTop: 8, textAlign: 'center', color: 'white', px: 1 }}
+      >
         <Box
           sx={{
             display: 'flex',
             justifyContent: 'space-between',
-
             flexWrap: 'wrap'
           }}
         >

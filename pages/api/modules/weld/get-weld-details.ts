@@ -25,13 +25,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             where: { jobId }
         })
 
-        if (!weldDetails || weldDetails.length === 0) {
-            return res.status(404).json({
-                status: 404,
-                message: `No Weld details found for Job ID ${jobId}.`,
-            });
-        }
-
         res.status(200).json({
             status: 200,
             message: "Weld details retrieved successfully.",
