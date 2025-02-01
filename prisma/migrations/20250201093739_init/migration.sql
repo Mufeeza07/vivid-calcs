@@ -92,6 +92,72 @@ CREATE TABLE "Weld" (
     CONSTRAINT "Weld_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "SoilAnalysis" (
+    "id" SERIAL NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" "Type" NOT NULL,
+    "shrinkageIndex" DOUBLE PRECISION NOT NULL,
+    "lateralRestraint" DOUBLE PRECISION NOT NULL,
+    "suctionChange" DOUBLE PRECISION NOT NULL,
+    "layerThickness" DOUBLE PRECISION NOT NULL,
+    "instabilityIndex" DOUBLE PRECISION NOT NULL,
+    "surfaceMovement" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SoilAnalysis_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "BeamAnalysis" (
+    "id" SERIAL NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "span" DOUBLE PRECISION NOT NULL,
+    "slabThickness" DOUBLE PRECISION NOT NULL,
+    "floorLoadWidth" DOUBLE PRECISION NOT NULL,
+    "roofLoadWidth" DOUBLE PRECISION NOT NULL,
+    "wallHeight" DOUBLE PRECISION NOT NULL,
+    "slabDensity" DOUBLE PRECISION NOT NULL,
+    "slabLiveLoad" DOUBLE PRECISION NOT NULL,
+    "flooringLoad" DOUBLE PRECISION NOT NULL,
+    "roofDeadLoad" DOUBLE PRECISION NOT NULL,
+    "roofLiveLoad" DOUBLE PRECISION NOT NULL,
+    "wallDeadLoad" DOUBLE PRECISION NOT NULL,
+    "totalDeadLoad" DOUBLE PRECISION NOT NULL,
+    "totalLiveLoad" DOUBLE PRECISION NOT NULL,
+    "ultimateLoad" DOUBLE PRECISION NOT NULL,
+    "moment" DOUBLE PRECISION NOT NULL,
+    "shear" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "BeamAnalysis_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SlabAnalysis" (
+    "id" SERIAL NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "span" DOUBLE PRECISION NOT NULL,
+    "slabThickness" DOUBLE PRECISION NOT NULL,
+    "loadWidth" DOUBLE PRECISION NOT NULL,
+    "slabDensity" DOUBLE PRECISION NOT NULL,
+    "slabLiveLoad" DOUBLE PRECISION NOT NULL,
+    "flooringLoad" DOUBLE PRECISION NOT NULL,
+    "totalDeadLoad" DOUBLE PRECISION NOT NULL,
+    "totalLiveLoad" DOUBLE PRECISION NOT NULL,
+    "ultimateLoad" DOUBLE PRECISION NOT NULL,
+    "moment" DOUBLE PRECISION NOT NULL,
+    "shear" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SlabAnalysis_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -106,3 +172,12 @@ ALTER TABLE "BoltStrength" ADD CONSTRAINT "BoltStrength_jobId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "Weld" ADD CONSTRAINT "Weld_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SoilAnalysis" ADD CONSTRAINT "SoilAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "BeamAnalysis" ADD CONSTRAINT "BeamAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SlabAnalysis" ADD CONSTRAINT "SlabAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;

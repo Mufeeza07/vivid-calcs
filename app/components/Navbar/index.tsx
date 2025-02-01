@@ -119,7 +119,7 @@ const Navbar = () => {
                 height: { xs: 54, sm: 60, md: 70, lg: 80, xl: 90 }
               }}
             >
-              <Image src='/logo.png' alt='Logo' fill priority />
+              <Image src='/images/logo.png' alt='Logo' fill priority />
             </Box>
 
             <IconButton

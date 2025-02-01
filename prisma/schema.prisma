@@ -40,6 +40,8 @@ model Job {
   boltStrength          BoltStrength[]
   weld                  Weld[]
   soilAnalysis          SoilAnalysis[]
+  beamAnalysis          BeamAnalysis[]
+  slabAnalysis          SlabAnalysis[]
 }
 
 enum JobStatus{
@@ -128,4 +130,51 @@ model SoilAnalysis {
 
     job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 
+}
+
+model BeamAnalysis {
+    id              Int     @id @default(autoincrement())
+    jobId           String  
+    type            String
+    span            Float
+    slabThickness   Float
+    floorLoadWidth  Float
+    roofLoadWidth   Float
+    wallHeight      Float
+    slabDensity     Float
+    slabLiveLoad    Float
+    flooringLoad    Float
+    roofDeadLoad    Float
+    roofLiveLoad    Float
+    wallDeadLoad    Float
+    totalDeadLoad   Float
+    totalLiveLoad   Float
+    ultimateLoad    Float
+    moment          Float
+    shear           Float
+    createdAt       DateTime @default(now())      
+    updatedAt       DateTime @updatedAt     
+
+    job             Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+}
+
+model SlabAnalysis {
+    id              Int     @id @default(autoincrement())
+    jobId           String  
+    type            String
+    span            Float
+    slabThickness   Float
+    loadWidth       Float
+    slabDensity     Float
+    slabLiveLoad    Float
+    flooringLoad    Float
+    totalDeadLoad   Float
+    totalLiveLoad   Float
+    ultimateLoad    Float
+    moment          Float
+    shear           Float
+    createdAt       DateTime @default(now())      
+    updatedAt       DateTime @updatedAt     
+
+    job             Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }

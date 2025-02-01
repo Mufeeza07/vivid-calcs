@@ -15,16 +15,14 @@ const Footer = () => {
       }}
     >
       <Container maxWidth='lg'>
-        {/* Logo and About Section */}
         <Grid container spacing={4}>
           <Grid item xs={12} sm={4}>
             <Box display='flex' alignItems='center' marginBottom={2}>
-              {/* Footer Logo */}
               <Image
                 src='/images/logo.png'
                 alt='Vivid Engineering Logo'
-                width={140} // Larger width
-                height={70} // Larger height
+                width={140}
+                height={70}
               />
             </Box>
             <Typography variant='body2'>
@@ -34,7 +32,7 @@ const Footer = () => {
             </Typography>
           </Grid>
 
-          {/* Quick Links */}
+
           <Grid item xs={12} sm={4}>
             <Typography variant='h6' gutterBottom sx={{ fontWeight: 'bold' }}>
               Quick Links
@@ -48,7 +46,7 @@ const Footer = () => {
                   display: 'block',
                   marginBottom: 1,
                   transition: 'color 0.3s',
-                  '&:hover': { color: '#1e90ff' } // Hover effect
+                  '&:hover': { color: '#1e90ff' }
                 }}
               >
                 About Us
@@ -61,7 +59,7 @@ const Footer = () => {
                   display: 'block',
                   marginBottom: 1,
                   transition: 'color 0.3s',
-                  '&:hover': { color: '#1e90ff' } // Hover effect
+                  '&:hover': { color: '#1e90ff' }
                 }}
               >
                 Services
@@ -74,7 +72,7 @@ const Footer = () => {
                   display: 'block',
                   marginBottom: 1,
                   transition: 'color 0.3s',
-                  '&:hover': { color: '#1e90ff' } // Hover effect
+                  '&:hover': { color: '#1e90ff' }
                 }}
               >
                 Contact Us
@@ -87,7 +85,7 @@ const Footer = () => {
                   display: 'block',
                   marginBottom: 1,
                   transition: 'color 0.3s',
-                  '&:hover': { color: '#1e90ff' } // Hover effect
+                  '&:hover': { color: '#1e90ff' }
                 }}
               >
                 FAQ
@@ -95,7 +93,7 @@ const Footer = () => {
             </Box>
           </Grid>
 
-          {/* Contact Section */}
+
           <Grid item xs={12} sm={4}>
             <Typography variant='h6' gutterBottom sx={{ fontWeight: 'bold' }}>
               Contact Us
@@ -109,14 +107,14 @@ const Footer = () => {
                   sx={{
                     textDecoration: 'none',
                     transition: 'color 0.3s',
-                    '&:hover': { color: '#1e90ff' } // Hover effect
+                    '&:hover': { color: '#1e90ff' }
                   }}
                 >
                   info@vividengineering.com
                 </Link>
               </Typography>
             </Box>
-            {/* Landline */}
+
             <Box display='flex' alignItems='center' marginBottom={1}>
               <Phone sx={{ marginRight: 1 }} />
               <Typography variant='body2'>
@@ -126,14 +124,14 @@ const Footer = () => {
                   sx={{
                     textDecoration: 'none',
                     transition: 'color 0.3s',
-                    '&:hover': { color: '#1e90ff' } // Hover effect
+                    '&:hover': { color: '#1e90ff' }
                   }}
                 >
                   +1 (123) 456-7890
                 </Link>
               </Typography>
             </Box>
-            {/* Mobile Phone */}
+
             <Box display='flex' alignItems='center' marginBottom={1}>
               <Smartphone sx={{ marginRight: 1 }} />
               <Typography variant='body2'>
@@ -143,7 +141,7 @@ const Footer = () => {
                   sx={{
                     textDecoration: 'none',
                     transition: 'color 0.3s',
-                    '&:hover': { color: '#1e90ff' } // Hover effect
+                    '&:hover': { color: '#1e90ff' }
                   }}
                 >
                   +1 (987) 654-3210
@@ -159,7 +157,7 @@ const Footer = () => {
           </Grid>
         </Grid>
 
-        {/* Footer Bottom */}
+
         <Box
           sx={{
             marginTop: 4,
