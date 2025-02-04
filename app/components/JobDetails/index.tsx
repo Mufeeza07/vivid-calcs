@@ -12,6 +12,7 @@ import {
   Drawer
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
+import { useRouter } from 'next/navigation'
 
 type JobDetailsProps = {
   currentJobDetails: any
@@ -34,6 +35,15 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
   handleFieldChange,
   handleSaveJobDetails
 }) => {
+
+  const router = useRouter()
+
+  const handleViewMore = () => {
+    console.log("current job id", currentJobDetails.jobId)
+    if (currentJobDetails?.jobId) {
+      router.push(`/jobModulesDetails/${currentJobDetails.jobId}`)
+    }
+  }
   return (
     <Drawer
       anchor='right'
@@ -226,7 +236,7 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
               >
                 Edit
               </Button>
-              <Button variant='outlined' color='secondary'>
+              <Button variant='outlined' color='secondary' onClick={handleViewMore}>
                 View More Details
               </Button>
             </>
