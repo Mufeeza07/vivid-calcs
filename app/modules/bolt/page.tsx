@@ -21,10 +21,14 @@ import {
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import { useRouter } from 'next/navigation'
 
 const BoltStrengthCalculator = () => {
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
+
+  const router = useRouter()
 
   useEffect(() => {
     dispatch(fetchJobs())
@@ -137,7 +141,12 @@ const BoltStrengthCalculator = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
+      <Box sx={{ mt: 2, px: 2, }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} >
+          Back
+        </Button>
+      </Box >
+      <Container sx={{ marginTop: 2, textAlign: 'center', color: 'white' }}>
         <Paper
           elevation={3}
           sx={{
@@ -149,6 +158,7 @@ const BoltStrengthCalculator = () => {
             border: '1px solid #0288d1'
           }}
         >
+
           <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
             Bolt Strength Calculator
           </Typography>
@@ -246,9 +256,9 @@ const BoltStrengthCalculator = () => {
                     },
                     '& .MuiInputLabel-root': { color: '#0288d1' },
                     '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
-                      {
-                        borderColor: '#0288d1'
-                      },
+                    {
+                      borderColor: '#0288d1'
+                    },
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#0288d1'
                     }

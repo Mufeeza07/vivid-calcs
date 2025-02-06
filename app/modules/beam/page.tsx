@@ -111,7 +111,6 @@ const BeamSlabAnalysis = () => {
   }
 
   const calculateBeamResults = () => {
-    // Placeholder for beam calculation logic
     setBeamResults({
       totalDeadLoad: 0,
       totalLiveLoad: 0,
@@ -122,7 +121,6 @@ const BeamSlabAnalysis = () => {
   }
 
   const calculateSlabResults = () => {
-    // Placeholder for slab calculation logic
     setSlabResults({
       totalDeadLoad: 0,
       totalLiveLoad: 0,
@@ -171,7 +169,6 @@ const BeamSlabAnalysis = () => {
 
     const inputs = type === 'beam' ? beamInputs : slabInputs
 
-    // Check for missing fields
     const missingFields = requiredFields.filter(field => !inputs[field])
 
     if (missingFields.length > 0) {

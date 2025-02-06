@@ -292,9 +292,9 @@ const NailsCalculator = () => {
                     },
                     '& .MuiInputLabel-root': { color: '#0288d1' },
                     '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
-                      {
-                        borderColor: '#0288d1'
-                      },
+                    {
+                      borderColor: '#0288d1'
+                    },
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#0288d1'
                     }
