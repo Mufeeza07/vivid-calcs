@@ -24,54 +24,53 @@ enum Role {
 }
 
 model Job {
-  jobId                 String   @id @default(uuid()) 
+  jobId                 String    @id @default(uuid())
   address               String
-  windSpeed             String    
-  locationFromCoastline String  
+  windSpeed             String
+  locationFromCoastline String
   councilName           String
   status                JobStatus @default(PENDING)
-  userId                String   
+  userId                String
   comments              String?
-  createdAt             DateTime @default(now())      
-  updatedAt             DateTime @updatedAt            
-  user                  User     @relation("UserJobs", fields: [userId], references: [id])
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation("UserJobs", fields: [userId], references: [id])
 
-  nails                 Nails[]  
-  boltStrength          BoltStrength[]
-  weld                  Weld[]
-  soilAnalysis          SoilAnalysis[]
-  beamAnalysis          BeamAnalysis[]
-  slabAnalysis          SlabAnalysis[]
+  nails         Nails[]
+  boltStrength  BoltStrength[]
+  weld          Weld[]
+  soilAnalysis  SoilAnalysis[]
+  beamAnalysis  BeamAnalysis[]
+  slabAnalysis  SlabAnalysis[]
+  ScrewStrength ScrewStrength[]
 }
 
-enum JobStatus{
+enum JobStatus {
   PENDING
   IN_PROGRESS
   ON_HOLD
   COMPLETED
 }
 
-
 model Nails {
-    id                   Int     @id @default(autoincrement())
-    jobId                String  
-    type                 Type
-    k13                  Float
-    diameter             Float
-    screwJD              Float
-    phi                  Float
-    k1                   Float
-    k14                  Float
-    k16                  Float
-    k17                  Float
-    designLoad           Float
-    screwPenetration     Float
-    firstTimberThickness Float
-    createdAt            DateTime @default(now())      
-    updatedAt            DateTime @updatedAt     
+  id                   Int      @id @default(autoincrement())
+  jobId                String
+  type                 Type
+  k13                  Float
+  diameter             Float
+  screwJD              Float
+  phi                  Float
+  k1                   Float
+  k14                  Float
+  k16                  Float
+  k17                  Float
+  designLoad           Float
+  screwPenetration     Float
+  firstTimberThickness Float
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
 
-    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
-
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
 enum Type {
@@ -80,101 +79,175 @@ enum Type {
   TIMBER_TO_STEEL
 }
 
-
 model BoltStrength {
-    id                   Int     @id @default(autoincrement())
-    jobId                String  
-    type                 Type
-    phi                  Float
-    k1                   Float
-    k16                  Float
-    k17                  Float
-    qsk                  Float
-    designStrength       Float
-    createdAt            DateTime @default(now())      
-    updatedAt            DateTime @updatedAt     
+  id             Int      @id @default(autoincrement())
+  jobId          String
+  type           Type
+  phi            Float
+  k1             Float
+  k16            Float
+  k17            Float
+  qsk            Float
+  designStrength Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
-
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
 model Weld {
-    id                   Int     @id @default(autoincrement())
-    jobId                String  
-    type                 Type
-    phi                  Float
-    vw                   Float
-    fuw                  Float
-    tt                   Float
-    kr                   Float
-    strength             Float
-    createdAt            DateTime @default(now())      
-    updatedAt            DateTime @updatedAt     
+  id        Int      @id @default(autoincrement())
+  jobId     String
+  type      Type
+  phi       Float
+  vw        Float
+  fuw       Float
+  tt        Float
+  kr        Float
+  strength  Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
-
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
 model SoilAnalysis {
-    id                   Int     @id @default(autoincrement())
-    jobId                String  
-    type                 Type
-    shrinkageIndex       Float
-    lateralRestraint     Float
-    suctionChange        Float
-    layerThickness       Float
-    instabilityIndex     Float
-    surfaceMovement      Float
-    createdAt            DateTime @default(now())      
-    updatedAt            DateTime @updatedAt     
+  id               Int      @id @default(autoincrement())
+  jobId            String
+  type             Type
+  shrinkageIndex   Float
+  lateralRestraint Float
+  suctionChange    Float
+  layerThickness   Float
+  instabilityIndex Float
+  surfaceMovement  Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 
-    job                  Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
-
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
 model BeamAnalysis {
-    id              Int     @id @default(autoincrement())
-    jobId           String  
-    type            String
-    span            Float
-    slabThickness   Float
-    floorLoadWidth  Float
-    roofLoadWidth   Float
-    wallHeight      Float
-    slabDensity     Float
-    slabLiveLoad    Float
-    flooringLoad    Float
-    roofDeadLoad    Float
-    roofLiveLoad    Float
-    wallDeadLoad    Float
-    totalDeadLoad   Float
-    totalLiveLoad   Float
-    ultimateLoad    Float
-    moment          Float
-    shear           Float
-    createdAt       DateTime @default(now())      
-    updatedAt       DateTime @updatedAt     
+  id             Int      @id @default(autoincrement())
+  jobId          String
+  type           String
+  span           Float
+  slabThickness  Float
+  floorLoadWidth Float
+  roofLoadWidth  Float
+  wallHeight     Float
+  slabDensity    Float
+  slabLiveLoad   Float
+  flooringLoad   Float
+  roofDeadLoad   Float
+  roofLiveLoad   Float
+  wallDeadLoad   Float
+  totalDeadLoad  Float
+  totalLiveLoad  Float
+  ultimateLoad   Float
+  moment         Float
+  shear          Float
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 
-    job             Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
 model SlabAnalysis {
-    id              Int     @id @default(autoincrement())
-    jobId           String  
-    type            String
-    span            Float
-    slabThickness   Float
-    loadWidth       Float
-    slabDensity     Float
-    slabLiveLoad    Float
-    flooringLoad    Float
-    totalDeadLoad   Float
-    totalLiveLoad   Float
-    ultimateLoad    Float
-    moment          Float
-    shear           Float
-    createdAt       DateTime @default(now())      
-    updatedAt       DateTime @updatedAt     
+  id            Int      @id @default(autoincrement())
+  jobId         String
+  type          String
+  span          Float
+  slabThickness Float
+  loadWidth     Float
+  slabDensity   Float
+  slabLiveLoad  Float
+  flooringLoad  Float
+  totalDeadLoad Float
+  totalLiveLoad Float
+  ultimateLoad  Float
+  moment        Float
+  shear         Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-    job             Job     @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+}
+
+model ScrewStrength {
+  id                   Int        @id @default(autoincrement())
+  jobId                String
+  type                 Type
+  screwType            ScrewType
+  category             Category?
+  screwSize            ScrewSize?
+  jdType               JDType?
+  load                 Load?
+  loadType             LoadType?
+  phi                  Float?
+  k1                   Float?
+  k13                  Float?
+  k14                  Float?
+  k16                  Float?
+  k17                  Float?
+  screwJD              Float?
+  shankDiameter        Float?
+  lp                   Float?
+  qk                   Float?
+  DesignLoad           Float?
+  screwPenetration     Float?
+  firstTimberThickness Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+}
+
+enum Category {
+  AFFECTED_AREA_LESS_25M2
+  AFFECTED_AREA_GREATER_25M2
+  POST_DISASTER_BUILDING
+}
+
+enum ScrewType {
+  SHEAR
+  UPLIFT
+}
+
+enum ScrewSize {
+  SIZE_4
+  SIZE_6
+  SIZE_8
+  SIZE_10
+  SIZE_12
+  SIZE_14
+  SIZE_18
+}
+
+enum JDType {
+  JD1
+  JD2
+  JD3
+  JD4
+  JD5
+  JD6
+}
+
+enum Load {
+  PARALLEL_TO_GRAINS
+  PERPENDICULAR_TO_GRAINS
+}
+
+enum LoadType {
+  PERMANENT_ACTION
+  ROOF_LIVE_LOAD_DISTRIBUTED
+  ROOF_LIVE_LOAD_CONCENTRATED
+  FLOOR_LIVE_LOADS_DISTRIBUTED
+  FLOOR_LIVE_LOADS_CONCENTRATED
+  PERMANENT_LONG_TERM_IMPOSED_ACTION
+  PERMANENT_WIND_IMPOSED_ACTION
+  PERMANENT_WIND_ACTION_REVERSAL
+  PERMANENT_EARTHQUAKE_IMPOSED_ACTION
+  FIRE
 }
