@@ -5,6 +5,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -15,7 +19,7 @@ import {
 } from '@mui/material'
 import { useRouter } from 'next/navigation'
 import { use, useEffect, useState } from 'react'
-import { ToastContainer } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
@@ -26,6 +30,8 @@ const ScrewStrength = () => {
   const allJobs = useSelector(selectRecentJobs)
 
   const [selectedType, setSelectedType] = useState('')
+  const [openDialog, setOpenDialog] = useState(false)
+  const [dialogType, setDialogType] = useState<'shear' | 'uplift' | null>(null)
 
   useEffect(() => {
     dispatch(fetchJobs())
@@ -103,18 +109,68 @@ const ScrewStrength = () => {
           </FormControl>
 
           {selectedType === 'shear' && (
-            <ShearScrewCalculator jobOptions={jobOptions} />
+            <ShearScrewCalculator
+              jobOptions={jobOptions}
+              setOpenDialog={setOpenDialog}
+              setDialogType={setDialogType}
+            />
           )}
           {selectedType === 'uplift' && (
-            <UpliftScrewCalculator jobOptions={jobOptions} />
+            <UpliftScrewCalculator
+              jobOptions={jobOptions}
+              setOpenDialog={setOpenDialog}
+              setDialogType={setDialogType}
+            />
           )}
         </Paper>
       </Container>
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle
+          sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.25rem' }}
+        >
+          {dialogType === 'shear'
+            ? 'Shear Screw Strength'
+            : 'Uplift Screw Strength'}
+        </DialogTitle>
+        <DialogContent
+          sx={{ padding: '16px', textAlign: 'center', color: '#444' }}
+        >
+          <Typography>Do you want to save the current data?</Typography>
+        </DialogContent>
+        <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
+          <Button
+            onClick={() => setOpenDialog(false)}
+            color='primary'
+            variant='outlined'
+            sx={{
+              borderColor: '#0288d1',
+              color: '#0288d1',
+              '&:hover': {
+                backgroundColor: '#e1f5fe'
+              }
+            }}
+          >
+            No
+          </Button>
+          <Button
+            color='success'
+            variant='contained'
+            sx={{
+              backgroundColor: '#4caf50',
+              '&:hover': {
+                backgroundColor: '#388e3c'
+              }
+            }}
+          >
+            Yes
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   )
 }
 
-const ShearScrewCalculator = ({ jobOptions }) => {
+const ShearScrewCalculator = ({ jobOptions, setOpenDialog, setDialogType }) => {
   const [screwInputs, setScrewInputs] = useState({
     jobId: '',
     type: '',
@@ -253,8 +309,22 @@ const ShearScrewCalculator = ({ jobOptions }) => {
     })
   }
 
+  const handleSave = () => {
+    const requiredFields = Object.keys(screwInputs)
+    const missingFields = requiredFields.filter(field => !screwInputs[field])
+
+    if (missingFields.length > 0) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setDialogType('shear')
+    setOpenDialog(true)
+  }
+
   return (
     <>
+      <ToastContainer />
       <Container
         sx={{ marginTop: 4, textAlign: 'center', color: 'white, px:1' }}
       >
@@ -626,6 +696,7 @@ const ShearScrewCalculator = ({ jobOptions }) => {
             <Button
               variant='contained'
               color='secondary'
+              onClick={handleSave}
               sx={{
                 backgroundColor: '#7b1fa2',
                 '&:hover': {
@@ -642,7 +713,11 @@ const ShearScrewCalculator = ({ jobOptions }) => {
   )
 }
 
-const UpliftScrewCalculator = ({ jobOptions }) => {
+const UpliftScrewCalculator = ({
+  jobOptions,
+  setOpenDialog,
+  setDialogType
+}) => {
   const [screwInputs, setScrewInputs] = useState({
     jobId: '',
     type: '',
@@ -753,8 +828,22 @@ const UpliftScrewCalculator = ({ jobOptions }) => {
     })
   }
 
+  const handleSave = () => {
+    const requiredFields = Object.keys(screwInputs)
+    const missingFields = requiredFields.filter(field => !screwInputs[field])
+
+    if (missingFields.length > 0) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setDialogType('shear')
+    setOpenDialog(true)
+  }
+
   return (
     <>
+      <ToastContainer />
       <Container
         sx={{ marginTop: 4, textAlign: 'center', color: 'white, px:1' }}
       >
@@ -1056,6 +1145,7 @@ const UpliftScrewCalculator = ({ jobOptions }) => {
             <Button
               variant='contained'
               color='secondary'
+              onClick={handleSave}
               sx={{
                 backgroundColor: '#7b1fa2',
                 '&:hover': {
