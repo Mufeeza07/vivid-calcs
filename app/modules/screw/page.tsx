@@ -1058,7 +1058,7 @@ const UpliftScrewCalculator = ({
               </FormControl>
 
               {[
-                { name: 'shankDiameter', label: 'Shank Diameter' },
+                { name: 'shankDiameter', label: 'Shank Diameter (mm)' },
                 { name: 'phi', label: 'Phi' },
                 { name: 'k13', label: 'K13' },
                 { name: 'lp', label: 'Lp (mm)' },

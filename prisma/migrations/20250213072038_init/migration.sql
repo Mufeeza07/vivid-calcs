@@ -7,6 +7,24 @@ CREATE TYPE "JobStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED
 -- CreateEnum
 CREATE TYPE "Type" AS ENUM ('STEEL_TO_STEEL', 'TIMBER_TO_TIMBER', 'TIMBER_TO_STEEL');
 
+-- CreateEnum
+CREATE TYPE "Category" AS ENUM ('AFFECTED_AREA_LESS_25M2', 'AFFECTED_AREA_GREATER_25M2', 'POST_DISASTER_BUILDING');
+
+-- CreateEnum
+CREATE TYPE "ScrewType" AS ENUM ('SHEAR', 'UPLIFT');
+
+-- CreateEnum
+CREATE TYPE "ScrewSize" AS ENUM ('SIZE_4', 'SIZE_6', 'SIZE_8', 'SIZE_10', 'SIZE_12', 'SIZE_14', 'SIZE_18');
+
+-- CreateEnum
+CREATE TYPE "JDType" AS ENUM ('JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6');
+
+-- CreateEnum
+CREATE TYPE "Load" AS ENUM ('PARALLEL_TO_GRAINS', 'PERPENDICULAR_TO_GRAINS');
+
+-- CreateEnum
+CREATE TYPE "LoadType" AS ENUM ('PERMANENT_ACTION', 'ROOF_LIVE_LOAD_DISTRIBUTED', 'ROOF_LIVE_LOAD_CONCENTRATED', 'FLOOR_LIVE_LOADS_DISTRIBUTED', 'FLOOR_LIVE_LOADS_CONCENTRATED', 'PERMANENT_LONG_TERM_IMPOSED_ACTION', 'PERMANENT_WIND_IMPOSED_ACTION', 'PERMANENT_WIND_ACTION_REVERSAL', 'PERMANENT_EARTHQUAKE_IMPOSED_ACTION', 'FIRE');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
@@ -158,6 +176,36 @@ CREATE TABLE "SlabAnalysis" (
     CONSTRAINT "SlabAnalysis_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ScrewStrength" (
+    "id" SERIAL NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" "Type" NOT NULL,
+    "screwType" "ScrewType" NOT NULL,
+    "category" "Category",
+    "screwSize" "ScrewSize",
+    "jdType" "JDType",
+    "load" "Load",
+    "loadType" "LoadType",
+    "phi" DOUBLE PRECISION,
+    "k1" DOUBLE PRECISION,
+    "k13" DOUBLE PRECISION,
+    "k14" DOUBLE PRECISION,
+    "k16" DOUBLE PRECISION,
+    "k17" DOUBLE PRECISION,
+    "screwJD" DOUBLE PRECISION,
+    "shankDiameter" DOUBLE PRECISION,
+    "lp" DOUBLE PRECISION,
+    "qk" DOUBLE PRECISION,
+    "DesignLoad" DOUBLE PRECISION,
+    "screwPenetration" DOUBLE PRECISION,
+    "firstTimberThickness" DOUBLE PRECISION,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ScrewStrength_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -181,3 +229,6 @@ ALTER TABLE "BeamAnalysis" ADD CONSTRAINT "BeamAnalysis_jobId_fkey" FOREIGN KEY 
 
 -- AddForeignKey
 ALTER TABLE "SlabAnalysis" ADD CONSTRAINT "SlabAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ScrewStrength" ADD CONSTRAINT "ScrewStrength_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;

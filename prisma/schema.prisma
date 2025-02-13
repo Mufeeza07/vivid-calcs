@@ -42,7 +42,7 @@ model Job {
   soilAnalysis  SoilAnalysis[]
   beamAnalysis  BeamAnalysis[]
   slabAnalysis  SlabAnalysis[]
-  ScrewStrength ScrewStrength[]
+  screwStrength ScrewStrength[]
 }
 
 enum JobStatus {

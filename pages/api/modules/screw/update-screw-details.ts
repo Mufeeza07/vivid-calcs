@@ -14,6 +14,7 @@ export default async function handler(
 
   try {
     const token = req.headers.authorization?.split(' ')[1]
+
     if (!token) {
       return res.status(401).json({
         message: 'Unauthorized',
@@ -21,32 +22,32 @@ export default async function handler(
       })
     }
 
-    const { nailId } = req.query
-    if (!nailId || typeof nailId !== 'string') {
+    const { screwId } = req.query
+
+    if (!screwId || typeof screwId !== 'string') {
       return res.status(400).json({
-        message: 'Nail Details ID is required',
+        message: 'Screw Details ID is required',
         status: 400
       })
     }
-
-    const parsedId = parseInt(nailId, 10)
+    const parsedId = parseInt(screwId, 10)
 
     const updateData = req.body
-    const updatedNailDetails = await prisma.nails.update({
+    const updatedScrewDetails = await prisma.screwStrength.update({
       where: { id: parsedId },
       data: updateData
     })
 
     res.status(200).json({
-      message: 'Nail details updated successfully',
+      message: 'Screw details updated successfully',
       status: 200,
-      data: updatedNailDetails
+      data: updatedScrewDetails
     })
-  } catch (error) {
+  } catch (error: any) {
     res.status(500).json({
       message: 'Internal Server Error',
       status: 500,
-      error: error
+      error: error.message
     })
   }
 }
