@@ -93,6 +93,7 @@ export default async function handler(
       data: screwStrength
     })
   } catch (error: any) {
+    console.log('error', error.message)
     return res.status(500).json({
       message: 'Internal Server Error',
       status: 500,
