@@ -53,22 +53,28 @@ enum JobStatus {
 }
 
 model Nails {
-  id                   Int      @id @default(autoincrement())
+  id                   Int       @id @default(autoincrement())
   jobId                String
   type                 Type
-  k13                  Float
-  diameter             Float
-  screwJD              Float
-  phi                  Float
-  k1                   Float
-  k14                  Float
-  k16                  Float
-  k17                  Float
-  designLoad           Float
-  screwPenetration     Float
-  firstTimberThickness Float
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  note                 String?
+  category             Category?
+  jdType               JDType?
+  load                 Load?
+  loadType             LoadType?
+  phi                  Float?
+  k1                   Float?
+  k13                  Float?
+  k14                  Float?
+  k16                  Float?
+  k17                  Float?
+  screwJD              Float?
+  nailDiameter         Float?
+  designLoad           Float?
+  screwPenetration     Float?
+  firstTimberThickness Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
@@ -178,6 +184,7 @@ model ScrewStrength {
   id                   Int        @id @default(autoincrement())
   jobId                String
   type                 Type
+  note                 String?
   screwType            ScrewType
   category             Category?
   screwSize            ScrewSize?
@@ -194,7 +201,7 @@ model ScrewStrength {
   shankDiameter        Float?
   lp                   Float?
   qk                   Float?
-  DesignLoad           Float?
+  designLoad           Float?
   screwPenetration     Float?
   firstTimberThickness Float?
 

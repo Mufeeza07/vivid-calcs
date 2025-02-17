@@ -21,10 +21,17 @@ import {
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import InfoIcon from '@mui/icons-material/Info'
+import { useRouter } from 'next/navigation'
+import NailInfoTable from '@/app/components/NailInfoTable'
 
 const NailsCalculator = () => {
+  const router = useRouter()
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
+
+  const [openTable, setOpenTable] = useState(false)
 
   useEffect(() => {
     dispatch(fetchJobs())
@@ -36,14 +43,18 @@ const NailsCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
+    category: '',
+    jdType: '',
+    load: '',
+    loadType: '',
+    nailDiameter: '',
     k13: 0,
-    diameter: 0,
     screwJD: 0,
     phi: 0,
     k1: 0,
-    k14: 0,
-    k16: 0,
-    k17: 0,
+    k14: 1,
+    k16: 1,
+    k17: 1,
     type: '',
     jobId: ''
   })
@@ -56,19 +67,97 @@ const NailsCalculator = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const handleChange = (
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
   ) => {
     const { name, value } = e.target
-    setInputs(prev => ({
-      ...prev,
-      [name!]:
-        name === 'jobId' || name === 'type'
+
+    setInputs(prev => {
+      const updatedValue =
+        name === 'jobId' ||
+        name === 'type' ||
+        name === 'category' ||
+        name === 'screwSize' ||
+        name === 'jdType' ||
+        name === 'load' ||
+        name === 'loadType'
           ? value
           : value === ''
             ? ''
             : Math.max(0, parseFloat(value) || 0)
-    }))
+
+      let updatedState = { ...prev, [name!]: updatedValue }
+
+      if (name === 'category') {
+        const phiValue =
+          value === 'AFFECTED_AREA_LESS_25M2'
+            ? 0.85
+            : value === 'AFFECTED_AREA_GREATER_25M2'
+              ? 0.8
+              : value === 'POST_DISASTER_BUILDING'
+                ? 0.75
+                : 0
+
+        updatedState.phi = phiValue
+      }
+
+      const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
+      const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
+
+      const jdValues = [
+        [1285, 1565, 1920, 2610, 3570, 4310, 5250],
+        [975, 1180, 1445, 1960, 2700, 3245, 3955],
+        [765, 930, 1135, 1550, 2125, 2565, 3125],
+        [545, 665, 810, 1110, 1520, 1830, 2225],
+        [445, 545, 680, 915, 1255, 1505, 1830],
+        [340, 415, 500, 695, 945, 1135, 1385]
+      ]
+
+      if (
+        (name === 'nailDiameter' || name === 'jdType') &&
+        updatedState.nailDiameter &&
+        updatedState.jdType
+      ) {
+        const jdIndex = jdTypes.indexOf(updatedState.jdType)
+        const nailIndex = nailDiameterValues.indexOf(
+          parseFloat(updatedState.nailDiameter)
+        )
+
+        if (jdIndex !== -1 && nailIndex !== -1) {
+          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000 // Convert to KN
+        } else {
+          updatedState.screwJD = 0
+        }
+      }
+
+      if (name === 'load') {
+        updatedState.k13 =
+          value === 'PARALLEL_TO_GRAINS'
+            ? 1
+            : value === 'PERPENDICULAR_TO_GRAINS'
+              ? 0.6
+              : 0
+      }
+
+      const k1Values = {
+        PERMANENT_ACTION: 0.57,
+        ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
+        ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
+        FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
+        FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
+        PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
+        PERMANENT_WIND_IMPOSED_ACTION: 1.14,
+        PERMANENT_WIND_ACTION_REVERSAL: 1.14,
+        PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
+        FIRE: 0.77
+      }
+
+      if (name === 'loadType') {
+        updatedState.k1 = k1Values[value] || 0
+      }
+
+      return updatedState
+    })
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -76,11 +165,11 @@ const NailsCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { k13, diameter, screwJD, phi, k1, k14, k16, k17 } = inputs
+    const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
 
     const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
-    const screwPenetration = diameter * 7
-    const firstTimberThickness = diameter * 10
+    const screwPenetration = nailDiameter * 7
+    const firstTimberThickness = nailDiameter * 10
 
     setResults({
       designLoad,
@@ -90,23 +179,15 @@ const NailsCalculator = () => {
   }
 
   const handleSave = () => {
-    const requiredFields = [
-      'jobId',
-      'type',
-      'k13',
-      'diameter',
-      'screwJD',
-      'phi',
-      'k1',
-      'k14',
-      'k16',
-      'k17'
-    ]
-    const fields = requiredFields.filter(field => !inputs[field])
-    if (fields.length > 0) {
+    const requiredFields = Object.keys(inputs)
+    const missingFields = requiredFields.filter(field => !inputs[field])
+
+    if (missingFields.length > 0) {
+      console.error('Missing Fields:', missingFields)
       toast.error('Please fill in all required fields')
       return
     }
+
     calculateResults()
     setDialogOpen(true)
   }
@@ -130,7 +211,11 @@ const NailsCalculator = () => {
           body: JSON.stringify({
             type: inputs.type,
             k13: inputs.k13,
-            diameter: inputs.diameter,
+            category: inputs.category,
+            load: inputs.load,
+            loadType: inputs.loadType,
+            jdType: inputs.jdType,
+            nailDiameter: inputs.nailDiameter,
             screwJD: inputs.screwJD,
             phi: inputs.phi,
             k1: inputs.k1,
@@ -155,7 +240,11 @@ const NailsCalculator = () => {
 
       setInputs({
         k13: 0,
-        diameter: 0,
+        category: '',
+        jdType: '',
+        load: '',
+        loadType: '',
+        nailDiameter: '',
         screwJD: 0,
         phi: 0,
         k1: 0,
@@ -192,9 +281,37 @@ const NailsCalculator = () => {
             border: '1px solid #0288d1'
           }}
         >
-          <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Nails Calculator
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            <ArrowBackIcon
+              onClick={() => router.back()}
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+            <Typography
+              variant='h5'
+              sx={{ color: '#0288d1', textAlign: 'center' }}
+            >
+              Nail Calculator
+            </Typography>
+            <InfoIcon
+              onClick={() => setOpenTable(true)}
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+          </Box>
           <Box
             sx={{
               display: 'flex',
@@ -206,14 +323,13 @@ const NailsCalculator = () => {
             <Box
               sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
             >
-              {/* Job Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
                 <Select
                   name='jobId'
                   label='job'
                   value={inputs.jobId}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -236,14 +352,13 @@ const NailsCalculator = () => {
                 </Select>
               </FormControl>
 
-              {/* Type Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                 <Select
                   name='type'
                   label='type'
                   value={inputs.type}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -264,12 +379,187 @@ const NailsCalculator = () => {
                 </Select>
               </FormControl>
 
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Category</InputLabel>
+                <Select
+                  name='category'
+                  label='category'
+                  value={inputs.category}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='AFFECTED_AREA_LESS_25M2'>
+                    Affected Area Less Than 25m²
+                  </MenuItem>
+                  <MenuItem value='AFFECTED_AREA_GREATER_25M2'>
+                    Affected Area Greater Than 25m²
+                  </MenuItem>
+                  <MenuItem value='POST_DISASTER_BUILDING'>
+                    Post Disaster Building
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Nail Diameter</InputLabel>
+                <Select
+                  name='nailDiameter'
+                  label='nailDiameter'
+                  value={inputs.nailDiameter}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value={2.5}>2.5</MenuItem>
+                  <MenuItem value={2.8}>2.8</MenuItem>
+                  <MenuItem value={3.15}>3.15</MenuItem>
+                  <MenuItem value={3.75}>3.75</MenuItem>
+                  <MenuItem value={4.5}>4.5</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={5.6}>5.6</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                <Select
+                  name='jdType'
+                  label='jdType'
+                  value={inputs.jdType}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='JD1'>JD1</MenuItem>
+                  <MenuItem value='JD2'>JD2</MenuItem>
+                  <MenuItem value='JD3'>JD3</MenuItem>
+                  <MenuItem value='JD4'>JD4</MenuItem>
+                  <MenuItem value='JD5'>JD5</MenuItem>
+                  <MenuItem value='JD6'>JD6</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
+                <Select
+                  name='load'
+                  label='load'
+                  value={inputs.load}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='PARALLEL_TO_GRAINS'>
+                    Load parallel to grains
+                  </MenuItem>
+                  <MenuItem value='PERPENDICULAR_TO_GRAINS'>
+                    Load perpendicular to grains
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
+                <Select
+                  name='loadType'
+                  label='load type'
+                  value={inputs.loadType}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='PERMANENT_ACTION'>
+                    Permanent Action (Dead Load)
+                  </MenuItem>
+                  <MenuItem value='ROOF_LIVE_LOAD_DISTRIBUTED'>
+                    Roof Live Load - Distributed
+                  </MenuItem>
+                  <MenuItem value='ROOF_LIVE_LOAD_CONCENTRATED'>
+                    Roof Live Load - Concentrated
+                  </MenuItem>
+                  <MenuItem value='FLOOR_LIVE_LOADS_DISTRIBUTED'>
+                    Floor Live Loads - Distributed
+                  </MenuItem>
+                  <MenuItem value='FLOOR_LIVE_LOADS_CONCENTRATED'>
+                    Floor Live Loads - Concentrated
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_LONG_TERM_IMPOSED_ACTION'>
+                    Permanent and Long-Term Imposed Action
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_WIND_IMPOSED_ACTION'>
+                    Permanent, Wind and Imposed Action
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_WIND_ACTION_REVERSAL'>
+                    Permanent and Wind Action Reversal
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_EARTHQUAKE_IMPOSED_ACTION'>
+                    Permanent, Earthquake and Imposed Action
+                  </MenuItem>
+                  <MenuItem value='FIRE'>Fire</MenuItem>
+                </Select>
+              </FormControl>
+
               {/* Numeric Inputs */}
               {[
-                { name: 'k13', label: 'K13' },
-                { name: 'diameter', label: '14g Diameter' },
-                { name: 'screwJD', label: '14g Screw' },
                 { name: 'phi', label: 'Phi' },
+                { name: 'screwJD', label: '14g Screw' },
+                { name: 'k13', label: 'K13' },
                 { name: 'k1', label: 'K1' },
                 { name: 'k14', label: 'K14' },
                 { name: 'k16', label: 'K16' },
@@ -282,7 +572,7 @@ const NailsCalculator = () => {
                   type='number'
                   variant='outlined'
                   value={inputs[name as keyof typeof inputs]}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   onFocus={handleFocus}
                   fullWidth
                   sx={{
@@ -292,9 +582,9 @@ const NailsCalculator = () => {
                     },
                     '& .MuiInputLabel-root': { color: '#0288d1' },
                     '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
-                    {
-                      borderColor: '#0288d1'
-                    },
+                      {
+                        borderColor: '#0288d1'
+                      },
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#0288d1'
                     }
@@ -440,6 +730,8 @@ const NailsCalculator = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        <NailInfoTable open={openTable} onClose={() => setOpenTable(false)} />
       </Container>
     </>
   )

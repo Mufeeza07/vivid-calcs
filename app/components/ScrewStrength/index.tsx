@@ -585,10 +585,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
     jobId: '',
     type: '',
     category: '',
-    screwSize: '',
-    jdType: '',
     load: '',
-    shankDiameter: 0,
     phi: 0,
     k13: 0,
     lp: 0,
@@ -835,7 +832,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
+              {/* <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>
                   Screw Size Number
                 </InputLabel>
@@ -896,7 +893,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                   <MenuItem value='JD5'>JD5</MenuItem>
                   <MenuItem value='JD6'>JD6</MenuItem>
                 </Select>
-              </FormControl>
+              </FormControl> */}
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
@@ -929,7 +926,6 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
               </FormControl>
 
               {[
-                { name: 'shankDiameter', label: 'Shank Diameter (mm)' },
                 { name: 'phi', label: 'Phi' },
                 { name: 'k13', label: 'K13' },
                 { name: 'lp', label: 'Lp (mm)' },
