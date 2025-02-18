@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import InfoIcon from '@mui/icons-material/Info'
 
 const BeamSlabAnalysis = () => {
   const dispatch = useDispatch()
@@ -98,11 +99,6 @@ const BeamSlabAnalysis = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Box sx={{ mt: 2, px: 2 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()}>
-          Back
-        </Button>
-      </Box>
       <Container
         sx={{
           display: 'flex',
@@ -124,13 +120,44 @@ const BeamSlabAnalysis = () => {
             border: '1px solid #0288d1'
           }}
         >
-          <Typography
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            <ArrowBackIcon
+              onClick={() => router.back()}
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+            <Typography
+              variant='h5'
+              sx={{ color: '#0288d1', textAlign: 'center' }}
+            >
+              Analysis Type
+            </Typography>
+            <InfoIcon
+              // onClick={() => setOpenTable(true)}
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+          </Box>
+          {/* <Typography
             variant='h5'
             gutterBottom
             sx={{ color: '#0288d1', marginBottom: 2 }}
           >
             Analysis Type
-          </Typography>
+          </Typography> */}
           <FormControl fullWidth>
             <InputLabel sx={{ color: '#0288d1' }}>Analysis Type</InputLabel>
             <Select

@@ -36,13 +36,12 @@ model Job {
   updatedAt             DateTime  @updatedAt
   user                  User      @relation("UserJobs", fields: [userId], references: [id])
 
-  nails         Nails[]
-  boltStrength  BoltStrength[]
-  weld          Weld[]
-  soilAnalysis  SoilAnalysis[]
-  beamAnalysis  BeamAnalysis[]
-  slabAnalysis  SlabAnalysis[]
-  screwStrength ScrewStrength[]
+  nails            Nails[]
+  boltStrength     BoltStrength[]
+  weld             Weld[]
+  soilAnalysis     SoilAnalysis[]
+  screwStrength    ScrewStrength[]
+  BeamSlabAnalysis BeamSlabAnalysis[]
 }
 
 enum JobStatus {
@@ -133,52 +132,84 @@ model SoilAnalysis {
   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
-model BeamAnalysis {
-  id             Int      @id @default(autoincrement())
+model BeamSlabAnalysis {
+  id             Int          @id @default(autoincrement())
   jobId          String
-  type           String
-  span           Float
-  slabThickness  Float
-  floorLoadWidth Float
-  roofLoadWidth  Float
-  wallHeight     Float
-  slabDensity    Float
-  slabLiveLoad   Float
-  flooringLoad   Float
-  roofDeadLoad   Float
-  roofLiveLoad   Float
-  wallDeadLoad   Float
-  totalDeadLoad  Float
-  totalLiveLoad  Float
-  ultimateLoad   Float
-  moment         Float
-  shear          Float
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  type           Type
+  analysisType   AnalysisType
+  span           Float?
+  slabThickness  Float?
+  floorLoadWidth Float?
+  roofLoadWidth  Float?
+  wallHeight     Float?
+  slabDensity    Float?
+  slabLiveLoad   Float?
+  flooringLoad   Float?
+  roofDeadLoad   Float?
+  roofLiveLoad   Float?
+  wallDeadLoad   Float?
+  totalDeadLoad  Float?
+  totalLiveLoad  Float?
+  ultimateLoad   Float?
+  moment         Float?
+  shear          Float?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
 
   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
 }
 
-model SlabAnalysis {
-  id            Int      @id @default(autoincrement())
-  jobId         String
-  type          String
-  span          Float
-  slabThickness Float
-  loadWidth     Float
-  slabDensity   Float
-  slabLiveLoad  Float
-  flooringLoad  Float
-  totalDeadLoad Float
-  totalLiveLoad Float
-  ultimateLoad  Float
-  moment        Float
-  shear         Float
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+enum AnalysisType {
+  BEAM
+  SLAB
 }
+
+// model BeamAnalysis {
+//   id             Int      @id @default(autoincrement())
+//   jobId          String
+//   type           String
+//   span           Float
+//   slabThickness  Float
+//   floorLoadWidth Float
+//   roofLoadWidth  Float
+//   wallHeight     Float
+//   slabDensity    Float
+//   slabLiveLoad   Float
+//   flooringLoad   Float
+//   roofDeadLoad   Float
+//   roofLiveLoad   Float
+//   wallDeadLoad   Float
+//   totalDeadLoad  Float
+//   totalLiveLoad  Float
+//   ultimateLoad   Float
+//   moment         Float
+//   shear          Float
+//   createdAt      DateTime @default(now())
+//   updatedAt      DateTime @updatedAt
+
+//   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+// }
+
+// model SlabAnalysis {
+//   id            Int      @id @default(autoincrement())
+//   jobId         String
+//   type          String
+//   span          Float
+//   slabThickness Float
+//   loadWidth     Float
+//   slabDensity   Float
+//   slabLiveLoad  Float
+//   flooringLoad  Float
+//   totalDeadLoad Float
+//   totalLiveLoad Float
+//   ultimateLoad  Float
+//   moment        Float
+//   shear         Float
+//   createdAt     DateTime @default(now())
+//   updatedAt     DateTime @updatedAt
+
+//   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+// }
 
 model ScrewStrength {
   id                   Int        @id @default(autoincrement())

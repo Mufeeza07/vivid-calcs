@@ -124,7 +124,7 @@ const NailsCalculator = () => {
         )
 
         if (jdIndex !== -1 && nailIndex !== -1) {
-          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000 // Convert to KN
+          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
         } else {
           updatedState.screwJD = 0
         }
@@ -183,7 +183,6 @@ const NailsCalculator = () => {
     const missingFields = requiredFields.filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
-      console.error('Missing Fields:', missingFields)
       toast.error('Please fill in all required fields')
       return
     }
