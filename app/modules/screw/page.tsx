@@ -54,7 +54,7 @@ const ScrewStrength = () => {
   }
 
   const handleScrewSave = (data: any) => {
-    const screwType = selectedType === 'shear' ? 'SHEAR' : 'UPLIFT'
+    const screwType = selectedType === 'shear' ? 'SHEAR' : 'PULLOUT'
 
     const formattedData = {
       ...data,
@@ -170,7 +170,7 @@ const ScrewStrength = () => {
               }}
             >
               <MenuItem value='shear'>Shear Screw Strength</MenuItem>
-              <MenuItem value='uplift'>Uplift Screw Strength</MenuItem>
+              <MenuItem value='pullout'>Pullout Screw Strength</MenuItem>
             </Select>
           </FormControl>
 
@@ -180,7 +180,7 @@ const ScrewStrength = () => {
               onSave={handleScrewSave}
             />
           )}
-          {selectedType === 'uplift' && (
+          {selectedType === 'pullout' && (
             <UpliftScrewCalculator
               jobOptions={jobOptions}
               onSave={handleScrewSave}
@@ -194,8 +194,8 @@ const ScrewStrength = () => {
         >
           {screwData?.screwType === 'SHEAR'
             ? 'Shear Screw Strength'
-            : screwData?.screwType === 'UPLIFT'
-              ? 'Uplift Screw Strength'
+            : screwData?.screwType === 'PULLOUT'
+              ? 'Pullout Screw Strength'
               : 'Screw Strength'}
         </DialogTitle>
         <DialogContent

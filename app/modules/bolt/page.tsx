@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
 
 const BoltStrengthCalculator = () => {
@@ -42,11 +43,17 @@ const BoltStrengthCalculator = () => {
   const [inputs, setInputs] = useState({
     phi: 0,
     k1: 0,
-    k16: 0,
-    k17: 0,
+    k16: 1,
+    k17: 1,
     qsk: 0,
     type: '',
-    jobId: ''
+    jobId: '',
+    category: '',
+    load: '',
+    loadType: '',
+    jdType: '',
+    boltSize: '',
+    timberThickness: ''
   })
 
   const [results, setResults] = useState({
@@ -55,19 +62,73 @@ const BoltStrengthCalculator = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
+  // const handleChange = (
+  //   e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
+  // ) => {
+  //   const { name, value } = e.target
+  //   setInputs(prev => ({
+  //     ...prev,
+  //     [name!]:
+  //       name === 'jobId' || name === 'type'
+  //         ? value
+  //         : value === ''
+  //           ? ''
+  //           : Math.max(0, parseFloat(value) || 0)
+  //   }))
+  // }
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
   ) => {
     const { name, value } = e.target
-    setInputs(prev => ({
-      ...prev,
-      [name!]:
-        name === 'jobId' || name === 'type'
+
+    setInputs(prev => {
+      const updatedValue =
+        name === 'jobId' ||
+        name === 'type' ||
+        name === 'category' ||
+        name === 'boltSize' ||
+        name === 'jdType' ||
+        name === 'load' ||
+        name === 'loadType'
           ? value
           : value === ''
             ? ''
             : Math.max(0, parseFloat(value) || 0)
-    }))
+
+      let updatedState = { ...prev, [name!]: updatedValue }
+
+      if (name === 'category') {
+        const phiValue =
+          value === 'AFFECTED_AREA_LESS_25M2'
+            ? 0.85
+            : value === 'AFFECTED_AREA_GREATER_25M2'
+              ? 0.8
+              : value === 'POST_DISASTER_BUILDING'
+                ? 0.75
+                : 0
+
+        updatedState.phi = phiValue
+      }
+
+      const k1Values = {
+        PERMANENT_ACTION: 0.57,
+        ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
+        ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
+        FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
+        FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
+        PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
+        PERMANENT_WIND_IMPOSED_ACTION: 1.14,
+        PERMANENT_WIND_ACTION_REVERSAL: 1.14,
+        PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
+        FIRE: 0.77
+      }
+
+      if (name === 'loadType') {
+        updatedState.k1 = k1Values[value] || 0
+      }
+
+      return updatedState
+    })
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -141,11 +202,6 @@ const BoltStrengthCalculator = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Box sx={{ mt: 2, px: 2, }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => router.back()} >
-          Back
-        </Button>
-      </Box >
       <Container sx={{ marginTop: 2, textAlign: 'center', color: 'white' }}>
         <Paper
           elevation={3}
@@ -158,10 +214,36 @@ const BoltStrengthCalculator = () => {
             border: '1px solid #0288d1'
           }}
         >
-
-          <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Bolt Strength Calculator
-          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              mb: 2
+            }}
+          >
+            <ArrowBackIcon
+              onClick={() => router.back()}
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+            <Typography
+              variant='h5'
+              sx={{ color: '#0288d1', textAlign: 'center' }}
+            >
+              Bolt Strength Calculator
+            </Typography>
+            <InfoIcon
+              sx={{
+                cursor: 'pointer',
+                color: '#0288d1',
+                '&:hover': { color: '#026aa1' }
+              }}
+            />
+          </Box>
           <Box
             sx={{
               display: 'flex',
@@ -173,7 +255,6 @@ const BoltStrengthCalculator = () => {
             <Box
               sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
             >
-              {/* Job Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
                 <Select
@@ -203,7 +284,6 @@ const BoltStrengthCalculator = () => {
                 </Select>
               </FormControl>
 
-              {/* Type Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                 <Select
@@ -225,13 +305,223 @@ const BoltStrengthCalculator = () => {
                     }
                   }}
                 >
-                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
                   <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
                   <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                 </Select>
               </FormControl>
 
-              {/* Numeric Inputs */}
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Category</InputLabel>
+                <Select
+                  name='category'
+                  label='category'
+                  value={inputs.category}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='AFFECTED_AREA_LESS_25M2'>
+                    Affected Area Less Than 25m²
+                  </MenuItem>
+                  <MenuItem value='AFFECTED_AREA_GREATER_25M2'>
+                    Affected Area Greater Than 25m²
+                  </MenuItem>
+                  <MenuItem value='POST_DISASTER_BUILDING'>
+                    Post Disaster Building
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
+                <Select
+                  name='loadType'
+                  label='load type'
+                  value={inputs.loadType}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='PERMANENT_ACTION'>
+                    Permanent Action (Dead Load)
+                  </MenuItem>
+                  <MenuItem value='ROOF_LIVE_LOAD_DISTRIBUTED'>
+                    Roof Live Load - Distributed
+                  </MenuItem>
+                  <MenuItem value='ROOF_LIVE_LOAD_CONCENTRATED'>
+                    Roof Live Load - Concentrated
+                  </MenuItem>
+                  <MenuItem value='FLOOR_LIVE_LOADS_DISTRIBUTED'>
+                    Floor Live Loads - Distributed
+                  </MenuItem>
+                  <MenuItem value='FLOOR_LIVE_LOADS_CONCENTRATED'>
+                    Floor Live Loads - Concentrated
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_LONG_TERM_IMPOSED_ACTION'>
+                    Permanent and Long-Term Imposed Action
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_WIND_IMPOSED_ACTION'>
+                    Permanent, Wind and Imposed Action
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_WIND_ACTION_REVERSAL'>
+                    Permanent and Wind Action Reversal
+                  </MenuItem>
+                  <MenuItem value='PERMANENT_EARTHQUAKE_IMPOSED_ACTION'>
+                    Permanent, Earthquake and Imposed Action
+                  </MenuItem>
+                  <MenuItem value='FIRE'>Fire</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
+                <Select
+                  name='load'
+                  label='load'
+                  value={inputs.load}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='PARALLEL_TO_GRAINS'>
+                    Load parallel to grains
+                  </MenuItem>
+                  <MenuItem value='PERPENDICULAR_TO_GRAINS'>
+                    Load perpendicular to grains
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>
+                  Timber Thickness (mm)
+                </InputLabel>
+                <Select
+                  name='timberThickness'
+                  label='Timber Thickness (mm)'
+                  value={inputs.timberThickness}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value={25}>25</MenuItem>
+                  <MenuItem value={35}>35</MenuItem>
+                  <MenuItem value={40}>40</MenuItem>
+                  <MenuItem value={45}>45</MenuItem>
+                  <MenuItem value={70}>70</MenuItem>
+                  <MenuItem value={90}>90</MenuItem>
+                  <MenuItem value={105}>105</MenuItem>
+                  <MenuItem value={120}>120</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
+                <Select
+                  name='boltSize'
+                  label='Bolt Size '
+                  value={inputs.boltSize}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='M6'>M6</MenuItem>
+                  <MenuItem value='M8'>M8</MenuItem>
+                  <MenuItem value='M10'>M10</MenuItem>
+                  <MenuItem value='M12'>M12</MenuItem>
+                  <MenuItem value='M16'>M16</MenuItem>
+                  <MenuItem value='M20'>M20</MenuItem>
+                  <MenuItem value='M24'>M24</MenuItem>
+                  <MenuItem value='M30'>M30</MenuItem>
+                  <MenuItem value='M36'>M36</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                <Select
+                  name='jdType'
+                  label='jdType'
+                  value={inputs.jdType}
+                  onChange={handleChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='JD1'>JD1</MenuItem>
+                  <MenuItem value='JD2'>JD2</MenuItem>
+                  <MenuItem value='JD3'>JD3</MenuItem>
+                  <MenuItem value='JD4'>JD4</MenuItem>
+                  <MenuItem value='JD5'>JD5</MenuItem>
+                  <MenuItem value='JD6'>JD6</MenuItem>
+                </Select>
+              </FormControl>
+
               {[
                 { name: 'phi', label: 'Phi' },
                 { name: 'k1', label: 'K1' },
@@ -249,6 +539,9 @@ const BoltStrengthCalculator = () => {
                   onChange={handleChange}
                   onFocus={handleFocus}
                   fullWidth
+                  InputProps={{
+                    readOnly: ['phi', 'k1', 'qsk'].includes(name)
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: '#282828',
@@ -256,9 +549,9 @@ const BoltStrengthCalculator = () => {
                     },
                     '& .MuiInputLabel-root': { color: '#0288d1' },
                     '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
-                    {
-                      borderColor: '#0288d1'
-                    },
+                      {
+                        borderColor: '#0288d1'
+                      },
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#0288d1'
                     }

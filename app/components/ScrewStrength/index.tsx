@@ -119,10 +119,13 @@ export const ShearScrewCalculator: React.FC<CalculatorProps> = ({
         SIZE_18: 6
       }
 
-      if (name === 'jdType' && prev.screwSize) {
-        const screwIndex = screwSizeMap[prev.screwSize]
-        if (screwIndex !== undefined && jdValues[value]) {
-          updatedState.screwJD = jdValues[value][screwIndex] / 1000
+      if (name === 'jdType' || name === 'screwSize') {
+        const jdType = name === 'jdType' ? value : prev.jdType
+        const screwSize = name === 'screwSize' ? value : prev.screwSize
+        const screwIndex = screwSizeMap[screwSize]
+
+        if (jdType && screwIndex !== undefined && jdValues[jdType]) {
+          updatedState.screwJD = jdValues[jdType][screwIndex] / 1000
         }
       }
 
@@ -585,7 +588,10 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
     jobId: '',
     type: '',
     category: '',
+    screwSize: '',
+    jdType: '',
     load: '',
+    shankDiameter: 0,
     phi: 0,
     k13: 0,
     lp: 0,
@@ -647,12 +653,12 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
       }
 
       const jdValues = {
-        JD1: [1720, 2560, 3570, 4720, 6000, 7380, 10550],
-        JD2: [1280, 1950, 2700, 3570, 4520, 5560, 7950],
-        JD3: [1010, 1520, 2120, 2800, 3570, 4380, 6270],
-        JD4: [710, 1080, 1520, 2020, 2530, 3130, 4480],
-        JD5: [510, 780, 1080, 1420, 1790, 2220, 3170],
-        JD6: [370, 570, 780, 1010, 1310, 1620, 2290]
+        JD1: [81, 102, 125, 147, 168, 189, 232],
+        JD2: [62, 79, 97, 112, 127, 145, 178],
+        JD3: [48, 62, 73, 87, 100, 112, 137],
+        JD4: [37, 46, 56, 66, 75, 85, 104],
+        JD5: [29, 37, 44, 52, 60, 68, 83],
+        JD6: [23, 29, 35, 41, 46, 52, 64]
       }
 
       const screwSizeMap = {
@@ -665,11 +671,12 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
         SIZE_18: 6
       }
 
-      if (name === 'jdType' && prev.screwSize) {
-        const screwIndex = screwSizeMap[prev.screwSize]
-        if (screwIndex !== undefined && jdValues[value]) {
-          updatedState.screwJD = jdValues[value][screwIndex] / 1000
-        }
+      const jdType = name === 'jdType' ? value : prev.jdType
+      const screwSize = name === 'screwSize' ? value : prev.screwSize
+      const screwIndex = screwSizeMap[screwSize]
+
+      if (jdType && screwIndex !== undefined && jdValues[jdType]) {
+        updatedState.qk = jdValues[jdType][screwIndex]
       }
 
       if (name === 'load') {
@@ -731,7 +738,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
             gutterBottom
             sx={{ color: '#0288d1', marginBottom: 2 }}
           >
-            Uplift Screw Strength
+            Pullout Screw Strength
           </Typography>
           <Box
             sx={{
@@ -832,7 +839,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                 </Select>
               </FormControl>
 
-              {/* <FormControl fullWidth>
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>
                   Screw Size Number
                 </InputLabel>
@@ -893,7 +900,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                   <MenuItem value='JD5'>JD5</MenuItem>
                   <MenuItem value='JD6'>JD6</MenuItem>
                 </Select>
-              </FormControl> */}
+              </FormControl>
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
@@ -926,9 +933,10 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
               </FormControl>
 
               {[
+                { name: 'shankDiameter', label: 'Shank Diameter (mm)' },
                 { name: 'phi', label: 'Phi' },
                 { name: 'k13', label: 'K13' },
-                { name: 'lp', label: 'Lp (mm)' },
+                { name: 'lp', label: 'Lp Screw Penetration (mm)' },
                 { name: 'qk', label: 'Qk (N/mm)' }
               ].map(({ name, label }) => (
                 <TextField
@@ -946,7 +954,8 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                       'phi',
                       'shankDiameter',
                       'screwJD',
-                      'k13'
+                      'k13',
+                      'qk'
                     ].includes(name)
                   }}
                   sx={{
@@ -967,7 +976,7 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
               ))}
 
               <TextField
-                label='Design Strength'
+                label='Design Load'
                 value={
                   results.designLoad !== null
                     ? `${results.designLoad.toFixed(2)} KN`

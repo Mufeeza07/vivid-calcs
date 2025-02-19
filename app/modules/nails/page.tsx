@@ -574,6 +574,14 @@ const NailsCalculator = () => {
                   onChange={handleInputChange}
                   onFocus={handleFocus}
                   fullWidth
+                  InputProps={{
+                    readOnly: [
+                      'phi',
+                      'shankDiameter',
+                      'screwJD',
+                      'k13'
+                    ].includes(name)
+                  }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
                       backgroundColor: '#282828',

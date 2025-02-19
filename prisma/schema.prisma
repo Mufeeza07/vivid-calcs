@@ -250,7 +250,7 @@ enum Category {
 
 enum ScrewType {
   SHEAR
-  UPLIFT
+  PULLOUT
 }
 
 enum ScrewSize {
