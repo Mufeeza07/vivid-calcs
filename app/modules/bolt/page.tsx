@@ -24,6 +24,7 @@ import { toast, ToastContainer } from 'react-toastify'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
+import { parallelLoadTable, perpendicularLoadTable } from '@/pages/data/table'
 
 const BoltStrengthCalculator = () => {
   const dispatch = useDispatch()
@@ -108,6 +109,31 @@ const BoltStrengthCalculator = () => {
                 : 0
 
         updatedState.phi = phiValue
+      }
+
+      const tableType = updatedState.load
+      const table =
+        tableType === 'PARALLEL_TO_GRAINS'
+          ? parallelLoadTable
+          : perpendicularLoadTable
+
+      const selectedJD = updatedState.jdType
+      const selectedThickness = updatedState.timberThickness
+      const selectedBoltSize = updatedState.boltSize
+
+      if (selectedJD && selectedThickness && selectedBoltSize) {
+        const thicknessRow = table[selectedJD]?.[selectedThickness]
+
+        if (thicknessRow) {
+          const qskValue = thicknessRow[selectedBoltSize]
+          if (qskValue !== undefined) {
+            updatedState.qsk = qskValue / 1000
+          } else {
+            updatedState.qsk = 0
+          }
+        } else {
+          updatedState.qsk = 0
+        }
       }
 
       const k1Values = {
@@ -417,10 +443,10 @@ const BoltStrengthCalculator = () => {
                   }}
                 >
                   <MenuItem value='PARALLEL_TO_GRAINS'>
-                    Load parallel to grains
+                    Parallel to grains
                   </MenuItem>
                   <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                    Load perpendicular to grains
+                    Perpendicular to grains
                   </MenuItem>
                 </Select>
               </FormControl>
@@ -518,7 +544,9 @@ const BoltStrengthCalculator = () => {
                   <MenuItem value='JD3'>JD3</MenuItem>
                   <MenuItem value='JD4'>JD4</MenuItem>
                   <MenuItem value='JD5'>JD5</MenuItem>
-                  <MenuItem value='JD6'>JD6</MenuItem>
+                  {inputs.load === 'PARALLEL_TO_GRAINS' && (
+                    <MenuItem value='JD6'>JD6</MenuItem>
+                  )}
                 </Select>
               </FormControl>
 
