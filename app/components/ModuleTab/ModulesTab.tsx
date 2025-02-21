@@ -80,11 +80,17 @@ const ModuleTabs = () => {
       icon: <Speed fontSize='large' />
     },
     {
-      label: 'Retaining Wall',
-      description: 'Perform structural calculations for retaining walls',
-      path: 'wall',
-      icon: <Home fontSize='large' />
+      label: 'Pile Design',
+      description: 'Design and analyze pile foundations',
+      path: 'pile',
+      icon: <Foundation fontSize='large' />
     }
+    // {
+    //   label: 'Retaining Wall',
+    //   description: 'Perform structural calculations for retaining walls',
+    //   path: 'wall',
+    //   icon: <Home fontSize='large' />
+    // }
   ]
 
   return (

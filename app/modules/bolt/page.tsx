@@ -63,20 +63,6 @@ const BoltStrengthCalculator = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  // const handleChange = (
-  //   e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
-  // ) => {
-  //   const { name, value } = e.target
-  //   setInputs(prev => ({
-  //     ...prev,
-  //     [name!]:
-  //       name === 'jobId' || name === 'type'
-  //         ? value
-  //         : value === ''
-  //           ? ''
-  //           : Math.max(0, parseFloat(value) || 0)
-  //   }))
-  // }
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
   ) => {
