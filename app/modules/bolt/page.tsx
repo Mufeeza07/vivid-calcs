@@ -24,7 +24,10 @@ import { toast, ToastContainer } from 'react-toastify'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
-import { parallelLoadTable, perpendicularLoadTable } from '@/pages/data/table'
+import {
+  parallelLoadTable,
+  perpendicularLoadTable
+} from '@/pages/data/boltTables'
 
 const BoltStrengthCalculator = () => {
   const dispatch = useDispatch()

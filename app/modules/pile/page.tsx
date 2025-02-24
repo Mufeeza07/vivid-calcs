@@ -17,11 +17,13 @@ import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { PileDesignAnalysis } from '@/app/components/BaseDesign'
+import PileInfoTable from '@/app/components/PileInfoTable'
 
 const BaseDesignAnalysis = () => {
   const router = useRouter()
 
   const [selectedType, setSelectedType] = useState('')
+  const [openTable, setOpenTable] = useState(false)
   const handleTypeChange = (e: SelectChangeEvent<string>) => {
     setSelectedType(e.target.value)
   }
@@ -43,7 +45,7 @@ const BaseDesignAnalysis = () => {
           sx={{
             padding: 4,
             flex: 1,
-            maxWidth: 600,
+            maxWidth: 900,
             backgroundColor: '#1e1e1e',
             color: 'white',
             border: '1px solid #0288d1'
@@ -72,6 +74,7 @@ const BaseDesignAnalysis = () => {
               Base Design Analysis
             </Typography>
             <InfoIcon
+              onClick={() => setOpenTable(true)}
               sx={{
                 cursor: 'pointer',
                 color: '#0288d1',
@@ -107,6 +110,8 @@ const BaseDesignAnalysis = () => {
           {selectedType === 'pile' && <PileDesignAnalysis />}
         </Paper>
       </Container>
+
+      <PileInfoTable open={openTable} onClose={() => setOpenTable(false)} />
     </>
   )
 }
