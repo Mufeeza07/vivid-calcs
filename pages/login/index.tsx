@@ -74,7 +74,7 @@ const Login = () => {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user', JSON.stringify(data.user))
 
-          router.push('/homepage')
+          router.push('/home')
         } else {
           setErrors({
             email: '',

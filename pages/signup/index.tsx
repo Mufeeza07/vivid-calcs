@@ -90,7 +90,7 @@ const SignUp = () => {
         if (response.ok) {
           localStorage.setItem('token', data.token)
           localStorage.setItem('user', JSON.stringify(data.user))
-          router.push('/homepage')
+          router.push('/home')
         } else {
           alert(data.error || 'Something went wrong')
         }

@@ -1,7 +1,6 @@
 import { Container } from '@mui/material'
-import ModulesTab from '../../app/components/ModuleTab/ModulesTab'
-import Navbar from '../../app/components/Navbar'
-import '../../app/globals.css'
+import ModulesTab from '../../components/ModuleTab/ModulesTab'
+import Navbar from '../../components/Navbar'
 
 const ModulesPage = () => {
   return (

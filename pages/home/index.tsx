@@ -1,13 +1,12 @@
+import UserDashboard from '@/components/Dashboard'
 import { Container } from '@mui/material'
-import JobsList from '../../components/JobsList'
 import Navbar from '../../components/Navbar'
 import { Provider } from 'react-redux'
 import { store } from '@/redux/store'
 
-const JobPage = () => {
+const HomePage = () => {
   return (
     <Provider store={store}>
-      {' '}
       <div
         style={{
           backgroundColor: '#1e1e1e',
@@ -17,12 +16,11 @@ const JobPage = () => {
       >
         <Navbar />
         <Container maxWidth='lg' sx={{ paddingTop: 8 }}>
-          {/* <ModulesTab /> */}
-          <JobsList />
+          <UserDashboard />
         </Container>
       </div>
     </Provider>
   )
 }
 
-export default JobPage
+export default HomePage
