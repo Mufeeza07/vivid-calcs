@@ -8,10 +8,13 @@ CREATE TYPE "JobStatus" AS ENUM ('PENDING', 'IN_PROGRESS', 'ON_HOLD', 'COMPLETED
 CREATE TYPE "Type" AS ENUM ('STEEL_TO_STEEL', 'TIMBER_TO_TIMBER', 'TIMBER_TO_STEEL');
 
 -- CreateEnum
+CREATE TYPE "AnalysisType" AS ENUM ('BEAM', 'SLAB');
+
+-- CreateEnum
 CREATE TYPE "Category" AS ENUM ('AFFECTED_AREA_LESS_25M2', 'AFFECTED_AREA_GREATER_25M2', 'POST_DISASTER_BUILDING');
 
 -- CreateEnum
-CREATE TYPE "ScrewType" AS ENUM ('SHEAR', 'UPLIFT');
+CREATE TYPE "ScrewType" AS ENUM ('SHEAR', 'PULLOUT');
 
 -- CreateEnum
 CREATE TYPE "ScrewSize" AS ENUM ('SIZE_4', 'SIZE_6', 'SIZE_8', 'SIZE_10', 'SIZE_12', 'SIZE_14', 'SIZE_18');
@@ -56,7 +59,7 @@ CREATE TABLE "Job" (
 
 -- CreateTable
 CREATE TABLE "Nails" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "type" "Type" NOT NULL,
     "note" TEXT,
@@ -83,7 +86,7 @@ CREATE TABLE "Nails" (
 
 -- CreateTable
 CREATE TABLE "BoltStrength" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "type" "Type" NOT NULL,
     "phi" DOUBLE PRECISION NOT NULL,
@@ -100,7 +103,7 @@ CREATE TABLE "BoltStrength" (
 
 -- CreateTable
 CREATE TABLE "Weld" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "type" "Type" NOT NULL,
     "phi" DOUBLE PRECISION NOT NULL,
@@ -117,7 +120,7 @@ CREATE TABLE "Weld" (
 
 -- CreateTable
 CREATE TABLE "SoilAnalysis" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "type" "Type" NOT NULL,
     "shrinkageIndex" DOUBLE PRECISION NOT NULL,
@@ -133,57 +136,36 @@ CREATE TABLE "SoilAnalysis" (
 );
 
 -- CreateTable
-CREATE TABLE "BeamAnalysis" (
-    "id" SERIAL NOT NULL,
+CREATE TABLE "BeamSlabAnalysis" (
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
-    "span" DOUBLE PRECISION NOT NULL,
-    "slabThickness" DOUBLE PRECISION NOT NULL,
-    "floorLoadWidth" DOUBLE PRECISION NOT NULL,
-    "roofLoadWidth" DOUBLE PRECISION NOT NULL,
-    "wallHeight" DOUBLE PRECISION NOT NULL,
-    "slabDensity" DOUBLE PRECISION NOT NULL,
-    "slabLiveLoad" DOUBLE PRECISION NOT NULL,
-    "flooringLoad" DOUBLE PRECISION NOT NULL,
-    "roofDeadLoad" DOUBLE PRECISION NOT NULL,
-    "roofLiveLoad" DOUBLE PRECISION NOT NULL,
-    "wallDeadLoad" DOUBLE PRECISION NOT NULL,
-    "totalDeadLoad" DOUBLE PRECISION NOT NULL,
-    "totalLiveLoad" DOUBLE PRECISION NOT NULL,
-    "ultimateLoad" DOUBLE PRECISION NOT NULL,
-    "moment" DOUBLE PRECISION NOT NULL,
-    "shear" DOUBLE PRECISION NOT NULL,
+    "type" "Type" NOT NULL,
+    "analysisType" "AnalysisType" NOT NULL,
+    "span" DOUBLE PRECISION,
+    "slabThickness" DOUBLE PRECISION,
+    "floorLoadWidth" DOUBLE PRECISION,
+    "roofLoadWidth" DOUBLE PRECISION,
+    "wallHeight" DOUBLE PRECISION,
+    "slabDensity" DOUBLE PRECISION,
+    "slabLiveLoad" DOUBLE PRECISION,
+    "flooringLoad" DOUBLE PRECISION,
+    "roofDeadLoad" DOUBLE PRECISION,
+    "roofLiveLoad" DOUBLE PRECISION,
+    "wallDeadLoad" DOUBLE PRECISION,
+    "totalDeadLoad" DOUBLE PRECISION,
+    "totalLiveLoad" DOUBLE PRECISION,
+    "ultimateLoad" DOUBLE PRECISION,
+    "moment" DOUBLE PRECISION,
+    "shear" DOUBLE PRECISION,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "BeamAnalysis_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "SlabAnalysis" (
-    "id" SERIAL NOT NULL,
-    "jobId" TEXT NOT NULL,
-    "type" TEXT NOT NULL,
-    "span" DOUBLE PRECISION NOT NULL,
-    "slabThickness" DOUBLE PRECISION NOT NULL,
-    "loadWidth" DOUBLE PRECISION NOT NULL,
-    "slabDensity" DOUBLE PRECISION NOT NULL,
-    "slabLiveLoad" DOUBLE PRECISION NOT NULL,
-    "flooringLoad" DOUBLE PRECISION NOT NULL,
-    "totalDeadLoad" DOUBLE PRECISION NOT NULL,
-    "totalLiveLoad" DOUBLE PRECISION NOT NULL,
-    "ultimateLoad" DOUBLE PRECISION NOT NULL,
-    "moment" DOUBLE PRECISION NOT NULL,
-    "shear" DOUBLE PRECISION NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
-
-    CONSTRAINT "SlabAnalysis_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "BeamSlabAnalysis_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ScrewStrength" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "jobId" TEXT NOT NULL,
     "type" "Type" NOT NULL,
     "note" TEXT,
@@ -212,6 +194,34 @@ CREATE TABLE "ScrewStrength" (
     CONSTRAINT "ScrewStrength_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "PileSlabAnalysis" (
+    "id" TEXT NOT NULL,
+    "jobId" TEXT NOT NULL,
+    "type" "Type" NOT NULL,
+    "frictionAngle" DOUBLE PRECISION NOT NULL,
+    "safetyFactor" DOUBLE PRECISION NOT NULL,
+    "ks" DOUBLE PRECISION NOT NULL,
+    "soilDensity" DOUBLE PRECISION NOT NULL,
+    "factor" DOUBLE PRECISION NOT NULL,
+    "pileDiameter" DOUBLE PRECISION NOT NULL,
+    "frictionResistanceAS" DOUBLE PRECISION NOT NULL,
+    "frictionResistanceMH" DOUBLE PRECISION NOT NULL,
+    "weight" DOUBLE PRECISION NOT NULL,
+    "cohension" DOUBLE PRECISION NOT NULL,
+    "nq" DOUBLE PRECISION NOT NULL,
+    "nc" DOUBLE PRECISION NOT NULL,
+    "reductionStrength" DOUBLE PRECISION NOT NULL,
+    "endBearing" DOUBLE PRECISION NOT NULL,
+    "totalUpliftResistance" DOUBLE PRECISION NOT NULL,
+    "totalPileCapacityAS" DOUBLE PRECISION NOT NULL,
+    "totalPileCapacityMH" DOUBLE PRECISION NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PileSlabAnalysis_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
@@ -231,10 +241,10 @@ ALTER TABLE "Weld" ADD CONSTRAINT "Weld_jobId_fkey" FOREIGN KEY ("jobId") REFERE
 ALTER TABLE "SoilAnalysis" ADD CONSTRAINT "SoilAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "BeamAnalysis" ADD CONSTRAINT "BeamAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "SlabAnalysis" ADD CONSTRAINT "SlabAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "BeamSlabAnalysis" ADD CONSTRAINT "BeamSlabAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScrewStrength" ADD CONSTRAINT "ScrewStrength_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "PileSlabAnalysis" ADD CONSTRAINT "PileSlabAnalysis_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("jobId") ON DELETE CASCADE ON UPDATE CASCADE;

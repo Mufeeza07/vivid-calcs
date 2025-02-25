@@ -25,6 +25,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
 import NailInfoTable from '@/app/components/NailInfoTable'
+import ConfirmationDialog from '@/app/components/ConfirmationBox'
 
 const NailsCalculator = () => {
   const router = useRouter()
@@ -680,63 +681,12 @@ const NailsCalculator = () => {
           </Box>
         </Paper>
 
-        {/* Save Confirmation Dialog */}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth='sm'>
-          <DialogTitle
-            sx={{
-              textAlign: 'center',
-              fontWeight: 'bold',
-              fontSize: '1.25rem'
-            }}
-          >
-            Nail Calculations
-          </DialogTitle>
-          <DialogContent
-            sx={{
-              padding: '16px',
-              textAlign: 'center',
-              color: '#444'
-            }}
-          >
-            <Typography sx={{ fontSize: '1rem', marginBottom: '8px' }}>
-              Do you want to save the current data?
-            </Typography>
-          </DialogContent>
-          <DialogActions
-            sx={{
-              justifyContent: 'center',
-              gap: 2
-            }}
-          >
-            <Button
-              onClick={handleCloseDialog}
-              color='primary'
-              variant='outlined'
-              sx={{
-                borderColor: '#0288d1',
-                color: '#0288d1',
-                '&:hover': {
-                  backgroundColor: '#e1f5fe'
-                }
-              }}
-            >
-              No
-            </Button>
-            <Button
-              color='success'
-              variant='contained'
-              onClick={handleConfirmSave}
-              sx={{
-                backgroundColor: '#4caf50',
-                '&:hover': {
-                  backgroundColor: '#388e3c'
-                }
-              }}
-            >
-              Yes
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmationDialog
+          open={dialogOpen}
+          title='Nail Calculations'
+          onClose={() => setDialogOpen(false)}
+          onConfirm={handleConfirmSave}
+        />
 
         <NailInfoTable open={openTable} onClose={() => setOpenTable(false)} />
       </Container>

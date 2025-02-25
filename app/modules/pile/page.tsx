@@ -71,7 +71,7 @@ const BaseDesignAnalysis = () => {
               variant='h5'
               sx={{ color: '#0288d1', textAlign: 'center' }}
             >
-              Base Design Analysis
+              Footing Design Analysis
             </Typography>
             <InfoIcon
               onClick={() => setOpenTable(true)}

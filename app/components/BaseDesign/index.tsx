@@ -1,8 +1,13 @@
+import { fetchJobs, selectRecentJobs } from '@/app/redux/slice/jobSlice'
 import { frictionAngleMapping } from '@/pages/data/pileTable'
 import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -11,24 +16,39 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import React, { useState } from 'react'
-import { ToastContainer } from 'react-toastify'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { toast, ToastContainer } from 'react-toastify'
+import ConfirmationDialog from '../ConfirmationBox'
 
 export const PileDesignAnalysis = () => {
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const dispatch = useDispatch()
+  const allJobs = useSelector(selectRecentJobs)
+
+  useEffect(() => {
+    dispatch(fetchJobs())
+  }, [dispatch])
+
+  const jobOptions = allJobs?.jobs?.map(job => ({
+    id: job.jobId,
+    name: job.address
+  }))
+
   const [inputs, setInputs] = useState({
     jobId: '',
     type: '',
     frictionAngle: '',
     safetyFactor: 0.55,
     ks: 1.5,
-    soilDensity: 0,
+    soilDensity: 18,
     pileHeight: 0,
     factor: 0,
-    pileDiameter: 0,
+    pileDiameter: 450,
     frictionResistanceAS: 0,
     frictionResistanceMH: 0,
     weight: 0,
-    cohension: 0,
+    cohension: 10,
     nq: 0,
     nc: 0,
     reductionStrength: 0.61,
@@ -37,8 +57,8 @@ export const PileDesignAnalysis = () => {
 
   const [results, setResults] = useState({
     totalUpliftResistance: null as number | null,
-    pileCapacityAS: null as number | null,
-    pileCapacityMH: null as number | null
+    totalPileCapacityAS: null as number | null,
+    totalPileCapacityMH: null as number | null
   })
 
   const handleInputChange = (
@@ -61,7 +81,7 @@ export const PileDesignAnalysis = () => {
         if (!isNaN(frictionAngle)) {
           const factor =
             0.5 * Math.PI * Math.tan((frictionAngle * Math.PI) / 180)
-          updatedState.factor = parseFloat(factor.toFixed(2))
+          updatedState.factor = parseFloat(factor.toFixed(5))
 
           const mapping = frictionAngleMapping[frictionAngle]
           if (mapping) {
@@ -87,7 +107,6 @@ export const PileDesignAnalysis = () => {
         reductionStrength
       } = updatedState
 
-      // Calculate Friction Resistance A-S
       if (
         safetyFactor &&
         soilDensity &&
@@ -110,7 +129,6 @@ export const PileDesignAnalysis = () => {
           frictionResistanceAS.toFixed(2)
         )
 
-        // Calculate Friction Resistance M-H
         const effectivePileHeight = Math.max(0, pileHeight - 1500)
         const frictionResistanceMH =
           (safetyFactor *
@@ -126,14 +144,12 @@ export const PileDesignAnalysis = () => {
           frictionResistanceMH.toFixed(2)
         )
 
-        // Calculate Weight
         const weight =
           (0.9 * 24 * Math.pow(pileDiameter, 2) * Math.PI * pileHeight) /
           4000000000
         updatedState.weight = parseFloat(weight.toFixed(2))
       }
 
-      // Calculate End Bearing
       if (
         reductionStrength &&
         pileDiameter &&
@@ -162,6 +178,39 @@ export const PileDesignAnalysis = () => {
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.select()
   }
+
+  const calculateResults = () => {
+    const { weight, frictionResistanceAS, frictionResistanceMH, endBearing } =
+      inputs
+
+    const totalUpliftResistance = weight * 0.9 + frictionResistanceAS
+    const totalCapacityAS = frictionResistanceAS + endBearing
+    const totalCapacityMH = frictionResistanceMH + endBearing
+
+    setResults({
+      totalUpliftResistance: parseFloat(totalUpliftResistance.toFixed(2)),
+      totalPileCapacityAS: parseFloat(totalCapacityAS.toFixed(2)),
+      totalPileCapacityMH: parseFloat(totalCapacityMH.toFixed(2))
+    })
+  }
+
+  const handleSave = () => {
+    const requiredFields = Object.keys(inputs)
+    const missingFields = requiredFields.filter(field => !inputs[field])
+
+    if (missingFields.length > 0) {
+      toast.error('Please fill in all required fields')
+      return
+    }
+
+    setDialogOpen(true)
+  }
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false)
+  }
+  const handleConfirmSave = async () => {}
+
   return (
     <>
       <ToastContainer />
@@ -200,6 +249,8 @@ export const PileDesignAnalysis = () => {
                 <Select
                   name='jobId'
                   label='job'
+                  value={inputs.jobId}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -214,11 +265,11 @@ export const PileDesignAnalysis = () => {
                     }
                   }}
                 >
-                  {/* {jobOptions?.map(job => (
+                  {jobOptions?.map(job => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
 
@@ -227,6 +278,8 @@ export const PileDesignAnalysis = () => {
                 <Select
                   name='type'
                   label='type'
+                  value={inputs.type}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -357,12 +410,12 @@ export const PileDesignAnalysis = () => {
                   value: results.totalUpliftResistance
                 },
                 {
-                  label: 'Pile Capacity From Skin Fricition (A-S)',
-                  value: results.pileCapacityAS
+                  label: 'Total Pile Capacity (A-S)',
+                  value: results.totalPileCapacityAS
                 },
                 {
-                  label: 'Pile Capacity From Skin Fricition (M-H)',
-                  value: results.pileCapacityMH
+                  label: 'Total Pile Capacity (M-H-E)',
+                  value: results.totalPileCapacityMH
                 }
               ].map(({ label, value }) => (
                 <TextField
@@ -396,7 +449,7 @@ export const PileDesignAnalysis = () => {
             <Button
               variant='contained'
               color='primary'
-              // onClick={calculateResults}
+              onClick={calculateResults}
               sx={{
                 backgroundColor: '#0288d1',
                 '&:hover': {
@@ -410,6 +463,7 @@ export const PileDesignAnalysis = () => {
             <Button
               variant='contained'
               color='secondary'
+              onClick={handleSave}
               sx={{
                 backgroundColor: '#7b1fa2',
                 '&:hover': {
@@ -421,6 +475,13 @@ export const PileDesignAnalysis = () => {
             </Button>
           </Box>
         </Paper>
+
+        <ConfirmationDialog
+          open={dialogOpen}
+          title='Pile Analysis'
+          onClose={handleCloseDialog}
+          onConfirm={handleConfirmSave}
+        />
       </Container>
     </>
   )

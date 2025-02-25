@@ -66,18 +66,19 @@ const PileInfoTable: React.FC<ScrewInfoTableProps> = ({ open, onClose }) => {
               </TableHead>
               <TableBody>
                 {[
-                  { spacing: 'End Distance', distance: '10D' },
-                  { spacing: 'Edge Distance', distance: '5D' },
-                  { spacing: 'Between Screws', distance: '' },
-                  { spacing: 'Along Grain', distance: '10D' },
-                  { spacing: 'Across Grain', distance: '3D' }
+                  { type: 'Very Stiff Clay', stiffness: '3000' },
+                  { type: 'Hard Clay', stiffness: '7500' },
+                  { type: 'Weak Weathered Rock', stiffness: '10000' },
+                  { type: 'Medium Dense Sand', stiffness: '3000' },
+                  { type: 'Dense Sand', stiffness: '4500' },
+                  { type: 'Very Dense Sand', stiffness: '6500' }
                 ].map((row, index) => (
                   <TableRow key={index}>
                     <TableCell sx={{ color: 'white', textAlign: 'center' }}>
-                      {row.spacing}
+                      {row.type}
                     </TableCell>
                     <TableCell sx={{ color: 'white', textAlign: 'center' }}>
-                      {row.distance}
+                      {row.stiffness}
                     </TableCell>
                   </TableRow>
                 ))}
