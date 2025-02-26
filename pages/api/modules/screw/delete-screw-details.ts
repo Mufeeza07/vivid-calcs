@@ -23,18 +23,16 @@ export default async function handler(
     }
     const { id } = req.query
 
-    if (!id) {
+    if (!id || typeof id !== 'string') {
       return res.status(400).json({
         message: 'Bad Request. ID is required',
         status: 400
       })
     }
 
-    const screwId = parseInt(id as string, 10)
-
     const existingDetails = await prisma.screwStrength.findUnique({
       where: {
-        id: screwId
+        id
       }
     })
 
@@ -46,7 +44,7 @@ export default async function handler(
     }
 
     await prisma.screwStrength.delete({
-      where: { id: screwId }
+      where: { id }
     })
 
     res.status(200).json({

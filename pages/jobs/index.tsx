@@ -1,8 +1,8 @@
 import { Container } from '@mui/material'
-import JobsList from '../../components/JobsList'
-import Navbar from '../../components/Navbar'
 import { Provider } from 'react-redux'
 import { store } from '@/redux/store'
+import Navbar from '@/components/Navbar'
+import JobsList from '@/components/JobsList'
 
 const JobPage = () => {
   return (
@@ -17,7 +17,6 @@ const JobPage = () => {
       >
         <Navbar />
         <Container maxWidth='lg' sx={{ paddingTop: 8 }}>
-          {/* <ModulesTab /> */}
           <JobsList />
         </Container>
       </div>

@@ -49,7 +49,7 @@ export default async function handler(
       shankDiameter,
       lp,
       qk,
-      DesignLoad,
+      designLoad,
       screwPenetration,
       firstTimberThickness
     } = req.body

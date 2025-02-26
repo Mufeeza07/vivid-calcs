@@ -1,32 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useEffect, useState, useRef } from 'react'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import {
   Box,
   Button,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Typography,
   CircularProgress,
   Container,
+  Divider,
+  FormControl,
+  IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
-  Divider
+  Select,
+  TextField,
+  Typography
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import { useRouter } from 'next/router'
-import jsPDF from 'jspdf'
-import html2canvas from 'html2canvas'
 import html2pdf from 'html2pdf.js'
+import { useRouter } from 'next/router'
+import { useEffect, useRef, useState } from 'react'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 const JobDetailsPage = () => {
   const router = useRouter()
   const { id } = router.query
   const [jobDetails, setJobDetails] = useState<any>(null)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editableDetails, setEditableDetails] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const pdfRef = useRef<HTMLDivElement>(null)
 
@@ -44,28 +42,12 @@ const JobDetailsPage = () => {
       const data = await response.json()
       console.log('Job details:', data)
       setJobDetails(data.job)
-      setEditableDetails(data.job)
+
       setLoading(false)
     } catch (error) {
       console.error('Error fetching job details:', error)
       setLoading(false)
     }
-  }
-
-  const handleEdit = () => setIsEditing(true)
-  const handleCancelEdit = () => {
-    setIsEditing(false)
-    setEditableDetails(jobDetails)
-  }
-
-  const handleSave = () => {
-    console.log('Saving updated job details:', editableDetails)
-    setJobDetails(editableDetails)
-    setIsEditing(false)
-  }
-
-  const handleFieldChange = (field: string, value: string) => {
-    setEditableDetails((prev: any) => ({ ...prev, [field]: value }))
   }
 
   const generatePDF = async () => {
@@ -79,6 +61,45 @@ const JobDetailsPage = () => {
       }
 
       await html2pdf().from(pdfRef.current).set(pdfOptions).save()
+    }
+  }
+
+  const handleDeleteModuleEntry = async (module: string, entryId: string) => {
+    const token = localStorage.getItem('token')
+
+    const moduleApiMap: { [key: string]: string } = {
+      soilAnalysis: 'soil',
+      weld: 'weld',
+      nails: 'nail',
+      boltStrength: 'bolt',
+      screwStrength: 'screw'
+    }
+
+    const apiModule = moduleApiMap[module]
+    if (!apiModule) {
+      console.error(`Unknown module type: ${module}`)
+      return
+    }
+
+    const endpoint = `/api/modules/${apiModule}/delete-${apiModule}-details?id=${entryId}`
+
+    try {
+      const response = await fetch(endpoint, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+
+      if (response.ok) {
+        console.log(`${module} entry deleted successfully.`)
+        fetchJobDetails()
+      } else {
+        console.error(`Failed to delete ${module} entry.`)
+      }
+    } catch (error) {
+      console.error(`Error deleting ${module} entry:`, error)
     }
   }
 
@@ -107,39 +128,15 @@ const JobDetailsPage = () => {
           <Typography variant='h6'>Job Details</Typography>
 
           <Box>
-            {!isEditing && (
-              <Button
-                variant='contained'
-                color='secondary'
-                startIcon={<PictureAsPdfIcon />}
-                onClick={generatePDF}
-                sx={{ mr: 2 }}
-              >
-                Generate PDF
-              </Button>
-            )}
-            {!isEditing ? (
-              <Button variant='contained' color='primary' onClick={handleEdit}>
-                Edit
-              </Button>
-            ) : (
-              <>
-                <Button
-                  variant='contained'
-                  color='primary'
-                  onClick={handleSave}
-                >
-                  Save
-                </Button>
-                <Button
-                  variant='outlined'
-                  onClick={handleCancelEdit}
-                  sx={{ ml: 2 }}
-                >
-                  Cancel
-                </Button>
-              </>
-            )}
+            <Button
+              variant='contained'
+              color='secondary'
+              startIcon={<PictureAsPdfIcon />}
+              onClick={generatePDF}
+              sx={{ mr: 2 }}
+            >
+              Generate PDF
+            </Button>
           </Box>
         </Box>
 
@@ -155,64 +152,43 @@ const JobDetailsPage = () => {
               {/* Job Details */}
               <TextField
                 label='Address'
-                value={editableDetails?.address || ''}
+                value={jobDetails?.address || ''}
                 fullWidth
-                onChange={e => handleFieldChange('address', e.target.value)}
-                disabled={!isEditing}
+                InputProps={{ readOnly: true }}
               />
               <TextField
                 label='Wind Speed'
-                value={editableDetails?.windSpeed || ''}
+                value={jobDetails?.windSpeed || ''}
                 fullWidth
-                onChange={e => handleFieldChange('windSpeed', e.target.value)}
-                disabled={!isEditing}
+                InputProps={{ readOnly: true }}
               />
 
-              <FormControl fullWidth>
-                <InputLabel>Location From Coastline</InputLabel>
-                <Select
-                  label='Location From Coastline'
-                  value={editableDetails?.locationFromCoastline || ''}
-                  onChange={e =>
-                    handleFieldChange('locationFromCoastline', e.target.value)
-                  }
-                  disabled={!isEditing}
-                >
-                  <MenuItem value='0-1km'>0-1km</MenuItem>
-                  <MenuItem value='1-10km'>1-10km</MenuItem>
-                  <MenuItem value='>10km'>&gt;10km</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                label='Location From Coastline'
+                value={jobDetails?.locationFromCoastline || ''}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
 
               <TextField
                 label='Council Name'
-                value={editableDetails?.councilName || ''}
+                value={jobDetails?.councilName || ''}
                 fullWidth
-                onChange={e => handleFieldChange('councilName', e.target.value)}
-                disabled={!isEditing}
+                InputProps={{ readOnly: true }}
               />
               <TextField
                 label='Comments'
-                value={editableDetails?.comments || ''}
+                value={jobDetails?.comments || ''}
                 fullWidth
-                onChange={e => handleFieldChange('comments', e.target.value)}
-                disabled={!isEditing}
+                InputProps={{ readOnly: true }}
               />
 
-              <FormControl fullWidth>
-                <InputLabel>Status</InputLabel>
-                <Select
-                  label='Status'
-                  value={editableDetails?.status || ''}
-                  onChange={e => handleFieldChange('status', e.target.value)}
-                  disabled={!isEditing}
-                >
-                  <MenuItem value='PENDING'>Pending</MenuItem>
-                  <MenuItem value='IN_PROGRESS'>In Progress</MenuItem>
-                  <MenuItem value='ON_HOLD'>On Hold</MenuItem>
-                  <MenuItem value='COMPLETED'>Completed</MenuItem>
-                </Select>
-              </FormControl>
+              <TextField
+                label='Status'
+                value={jobDetails?.status || ''}
+                fullWidth
+                InputProps={{ readOnly: true }}
+              />
 
               <TextField
                 label='Created At'
@@ -251,17 +227,39 @@ const JobDetailsPage = () => {
                           .replace(/^./, str => str.toUpperCase())}
                       </Typography>
                       {jobDetails[module].map((entry: any, index: number) => (
-                        <Box key={entry.id} sx={{ my: 2 }}>
-                          <Typography variant='subtitle1'>
-                            {module
-                              .replace(/([A-Z])/g, ' $1')
-                              .trim()
-                              .toLowerCase()}{' '}
-                            entry {index + 1}
-                          </Typography>
+                        <Box
+                          key={entry.id}
+                          sx={{
+                            mb: 2
+                          }}
+                        >
+                          <Box
+                            sx={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center'
+                            }}
+                          >
+                            <Typography variant='subtitle1'>
+                              {module
+                                .replace(/([A-Z])/g, ' $1')
+                                .trim()
+                                .toLowerCase()}{' '}
+                              entry {index + 1}
+                            </Typography>
+
+                            <IconButton
+                              color='error'
+                              onClick={() =>
+                                handleDeleteModuleEntry(module, entry.id)
+                              }
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Box>
                           {Object.keys(entry).map(key =>
                             key !== 'id' &&
-                            key !== 'id' &&
+                            key !== 'jobId' &&
                             key !== 'createdAt' &&
                             key !== 'updatedAt' ? (
                               <TextField
@@ -269,8 +267,20 @@ const JobDetailsPage = () => {
                                 label={key.replace(/([A-Z])/g, ' $1').trim()}
                                 value={entry[key] || ''}
                                 fullWidth
-                                disabled={!isEditing}
-                                sx={{ mt: 2 }}
+                                disabled
+                                sx={{
+                                  mt: 2,
+                                  '& .MuiInputBase-input': {
+                                    color: '#333'
+                                  },
+                                  '& .MuiInputLabel-root': {
+                                    color: '#555'
+                                  },
+                                  '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline':
+                                    {
+                                      borderColor: '#aaa'
+                                    }
+                                }}
                               />
                             ) : null
                           )}

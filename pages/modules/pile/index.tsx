@@ -16,7 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { PileDesignAnalysis } from '@/components/BaseDesign'
+import { PileDesignAnalysis } from '@/components/FootingDesign'
 import PileInfoTable from '@/components/PileInfoTable'
 
 const BaseDesignAnalysis = () => {

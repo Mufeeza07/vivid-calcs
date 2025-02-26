@@ -1,13 +1,9 @@
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { frictionAngleMapping } from '@/data/pileTable'
+import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import {
   Box,
   Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,

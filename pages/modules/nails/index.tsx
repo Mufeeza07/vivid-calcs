@@ -1,15 +1,15 @@
 'use client'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
+import NailInfoTable from '@/components/NailInfoTable'
 import Navbar from '@/components/Navbar'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
+import InfoIcon from '@mui/icons-material/Info'
 import {
   Box,
   Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -18,19 +18,17 @@ import {
   TextField,
   Typography
 } from '@mui/material'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import InfoIcon from '@mui/icons-material/Info'
-import { useRouter } from 'next/navigation'
-import { parallelLoadTable, perpendicularLoadTable } from '@/data/boltTables'
 
-const BoltStrengthCalculator = () => {
+const NailsCalculator = () => {
+  const router = useRouter()
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
 
-  const router = useRouter()
+  const [openTable, setOpenTable] = useState(false)
 
   useEffect(() => {
     dispatch(fetchJobs())
@@ -42,28 +40,31 @@ const BoltStrengthCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
-    phi: 0,
-    k1: 0,
-    k16: 1,
-    k17: 1,
-    qsk: 0,
-    type: '',
-    jobId: '',
     category: '',
+    jdType: '',
     load: '',
     loadType: '',
-    jdType: '',
-    boltSize: '',
-    timberThickness: ''
+    nailDiameter: '',
+    k13: 0,
+    screwJD: 0,
+    phi: 0,
+    k1: 0,
+    k14: 1,
+    k16: 1,
+    k17: 1,
+    type: '',
+    jobId: ''
   })
 
   const [results, setResults] = useState({
-    designStrength: null as number | null
+    designLoad: null as number | null,
+    screwPenetration: null as number | null,
+    firstTimberThickness: null as number | null
   })
 
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const handleChange = (
+  const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
   ) => {
     const { name, value } = e.target
@@ -73,7 +74,7 @@ const BoltStrengthCalculator = () => {
         name === 'jobId' ||
         name === 'type' ||
         name === 'category' ||
-        name === 'boltSize' ||
+        name === 'screwSize' ||
         name === 'jdType' ||
         name === 'load' ||
         name === 'loadType'
@@ -97,29 +98,42 @@ const BoltStrengthCalculator = () => {
         updatedState.phi = phiValue
       }
 
-      const tableType = updatedState.load
-      const table =
-        tableType === 'PARALLEL_TO_GRAINS'
-          ? parallelLoadTable
-          : perpendicularLoadTable
+      const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
+      const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
 
-      const selectedJD = updatedState.jdType
-      const selectedThickness = updatedState.timberThickness
-      const selectedBoltSize = updatedState.boltSize
+      const jdValues = [
+        [1285, 1565, 1920, 2610, 3570, 4310, 5250],
+        [975, 1180, 1445, 1960, 2700, 3245, 3955],
+        [765, 930, 1135, 1550, 2125, 2565, 3125],
+        [545, 665, 810, 1110, 1520, 1830, 2225],
+        [445, 545, 680, 915, 1255, 1505, 1830],
+        [340, 415, 500, 695, 945, 1135, 1385]
+      ]
 
-      if (selectedJD && selectedThickness && selectedBoltSize) {
-        const thicknessRow = table[selectedJD]?.[selectedThickness]
+      if (
+        (name === 'nailDiameter' || name === 'jdType') &&
+        updatedState.nailDiameter &&
+        updatedState.jdType
+      ) {
+        const jdIndex = jdTypes.indexOf(updatedState.jdType)
+        const nailIndex = nailDiameterValues.indexOf(
+          parseFloat(updatedState.nailDiameter)
+        )
 
-        if (thicknessRow) {
-          const qskValue = thicknessRow[selectedBoltSize]
-          if (qskValue !== undefined) {
-            updatedState.qsk = qskValue / 1000
-          } else {
-            updatedState.qsk = 0
-          }
+        if (jdIndex !== -1 && nailIndex !== -1) {
+          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
         } else {
-          updatedState.qsk = 0
+          updatedState.screwJD = 0
         }
+      }
+
+      if (name === 'load') {
+        updatedState.k13 =
+          value === 'PARALLEL_TO_GRAINS'
+            ? 1
+            : value === 'PERPENDICULAR_TO_GRAINS'
+              ? 0.6
+              : 0
       }
 
       const k1Values = {
@@ -148,17 +162,21 @@ const BoltStrengthCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { phi, k1, k16, k17, qsk } = inputs
+    const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
 
-    const designStrength = phi * k1 * k16 * k17 * qsk
+    const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
+    const screwPenetration = nailDiameter * 7
+    const firstTimberThickness = nailDiameter * 10
 
     setResults({
-      designStrength
+      designLoad,
+      screwPenetration,
+      firstTimberThickness
     })
   }
 
   const handleSave = () => {
-    const requiredFields = ['jobId', 'type', 'phi', 'k1', 'k16', 'k17', 'qsk']
+    const requiredFields = Object.keys(inputs)
     const missingFields = requiredFields.filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
@@ -179,7 +197,7 @@ const BoltStrengthCalculator = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/bolt/create-bolt-details?jobId=${inputs.jobId}`,
+        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`,
         {
           method: 'POST',
           headers: {
@@ -188,12 +206,21 @@ const BoltStrengthCalculator = () => {
           },
           body: JSON.stringify({
             type: inputs.type,
+            k13: inputs.k13,
+            category: inputs.category,
+            load: inputs.load,
+            loadType: inputs.loadType,
+            jdType: inputs.jdType,
+            nailDiameter: inputs.nailDiameter,
+            screwJD: inputs.screwJD,
             phi: inputs.phi,
             k1: inputs.k1,
+            k14: inputs.k14,
             k16: inputs.k16,
             k17: inputs.k17,
-            qsk: inputs.qsk,
-            designStrength: results.designStrength
+            designLoad: results.designLoad,
+            screwPenetration: results.screwPenetration,
+            firstTimberThickness: results.firstTimberThickness
           })
         }
       )
@@ -203,10 +230,34 @@ const BoltStrengthCalculator = () => {
         toast.error(`Error: ${errorData.message}`)
         return
       }
-      toast.success('Bolt calculations saved successfully!')
+
+      toast.success('Nail calculations saved successfully!')
       setDialogOpen(false)
+
+      setInputs({
+        k13: 0,
+        category: '',
+        jdType: '',
+        load: '',
+        loadType: '',
+        nailDiameter: '',
+        screwJD: 0,
+        phi: 0,
+        k1: 0,
+        k14: 0,
+        k16: 0,
+        k17: 0,
+        type: '',
+        jobId: ''
+      })
+      setResults({
+        designLoad: null,
+        screwPenetration: null,
+        firstTimberThickness: null
+      })
     } catch (error) {
-      toast.error('Failed to save data')
+      console.error('Error saving nail calculations:', error)
+      toast.error('Failed to save data.')
     }
   }
 
@@ -214,12 +265,12 @@ const BoltStrengthCalculator = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Container sx={{ marginTop: 2, textAlign: 'center', color: 'white' }}>
+      <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
         <Paper
           elevation={3}
           sx={{
             padding: 4,
-            maxWidth: 600,
+            maxWidth: 900,
             margin: 'auto',
             backgroundColor: '#1e1e1e',
             color: 'white',
@@ -246,9 +297,10 @@ const BoltStrengthCalculator = () => {
               variant='h5'
               sx={{ color: '#0288d1', textAlign: 'center' }}
             >
-              Bolt Strength Calculator
+              Nail Calculator
             </Typography>
             <InfoIcon
+              onClick={() => setOpenTable(true)}
               sx={{
                 cursor: 'pointer',
                 color: '#0288d1',
@@ -273,7 +325,7 @@ const BoltStrengthCalculator = () => {
                   name='jobId'
                   label='job'
                   value={inputs.jobId}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -302,7 +354,7 @@ const BoltStrengthCalculator = () => {
                   name='type'
                   label='type'
                   value={inputs.type}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -317,6 +369,7 @@ const BoltStrengthCalculator = () => {
                     }
                   }}
                 >
+                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
                   <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
                   <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                 </Select>
@@ -328,7 +381,7 @@ const BoltStrengthCalculator = () => {
                   name='category'
                   label='category'
                   value={inputs.category}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -356,12 +409,103 @@ const BoltStrengthCalculator = () => {
               </FormControl>
 
               <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Nail Diameter</InputLabel>
+                <Select
+                  name='nailDiameter'
+                  label='nailDiameter'
+                  value={inputs.nailDiameter}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value={2.5}>2.5</MenuItem>
+                  <MenuItem value={2.8}>2.8</MenuItem>
+                  <MenuItem value={3.15}>3.15</MenuItem>
+                  <MenuItem value={3.75}>3.75</MenuItem>
+                  <MenuItem value={4.5}>4.5</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={5.6}>5.6</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                <Select
+                  name='jdType'
+                  label='jdType'
+                  value={inputs.jdType}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='JD1'>JD1</MenuItem>
+                  <MenuItem value='JD2'>JD2</MenuItem>
+                  <MenuItem value='JD3'>JD3</MenuItem>
+                  <MenuItem value='JD4'>JD4</MenuItem>
+                  <MenuItem value='JD5'>JD5</MenuItem>
+                  <MenuItem value='JD6'>JD6</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
+                <Select
+                  name='load'
+                  label='load'
+                  value={inputs.load}
+                  onChange={handleInputChange}
+                  sx={{
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiSelect-icon': {
+                      color: '#0288d1'
+                    }
+                  }}
+                >
+                  <MenuItem value='PARALLEL_TO_GRAINS'>
+                    Load parallel to grains
+                  </MenuItem>
+                  <MenuItem value='PERPENDICULAR_TO_GRAINS'>
+                    Load perpendicular to grains
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
                 <Select
                   name='loadType'
                   label='load type'
                   value={inputs.loadType}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   sx={{
                     backgroundColor: '#282828',
                     color: 'white',
@@ -407,141 +551,15 @@ const BoltStrengthCalculator = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
-                <Select
-                  name='load'
-                  label='load'
-                  value={inputs.load}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  <MenuItem value='PARALLEL_TO_GRAINS'>
-                    Parallel to grains
-                  </MenuItem>
-                  <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                    Perpendicular to grains
-                  </MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>
-                  Timber Thickness (mm)
-                </InputLabel>
-                <Select
-                  name='timberThickness'
-                  label='Timber Thickness (mm)'
-                  value={inputs.timberThickness}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  <MenuItem value={25}>25</MenuItem>
-                  <MenuItem value={35}>35</MenuItem>
-                  <MenuItem value={40}>40</MenuItem>
-                  <MenuItem value={45}>45</MenuItem>
-                  <MenuItem value={70}>70</MenuItem>
-                  <MenuItem value={90}>90</MenuItem>
-                  <MenuItem value={105}>105</MenuItem>
-                  <MenuItem value={120}>120</MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
-                <Select
-                  name='boltSize'
-                  label='Bolt Size '
-                  value={inputs.boltSize}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  <MenuItem value='M6'>M6</MenuItem>
-                  <MenuItem value='M8'>M8</MenuItem>
-                  <MenuItem value='M10'>M10</MenuItem>
-                  <MenuItem value='M12'>M12</MenuItem>
-                  <MenuItem value='M16'>M16</MenuItem>
-                  <MenuItem value='M20'>M20</MenuItem>
-                  <MenuItem value='M24'>M24</MenuItem>
-                  <MenuItem value='M30'>M30</MenuItem>
-                  <MenuItem value='M36'>M36</MenuItem>
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                <Select
-                  name='jdType'
-                  label='jdType'
-                  value={inputs.jdType}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  <MenuItem value='JD1'>JD1</MenuItem>
-                  <MenuItem value='JD2'>JD2</MenuItem>
-                  <MenuItem value='JD3'>JD3</MenuItem>
-                  <MenuItem value='JD4'>JD4</MenuItem>
-                  <MenuItem value='JD5'>JD5</MenuItem>
-                  {inputs.load === 'PARALLEL_TO_GRAINS' && (
-                    <MenuItem value='JD6'>JD6</MenuItem>
-                  )}
-                </Select>
-              </FormControl>
-
+              {/* Numeric Inputs */}
               {[
                 { name: 'phi', label: 'Phi' },
+                { name: 'screwJD', label: '14g Screw' },
+                { name: 'k13', label: 'K13' },
                 { name: 'k1', label: 'K1' },
+                { name: 'k14', label: 'K14' },
                 { name: 'k16', label: 'K16' },
-                { name: 'k17', label: 'K17' },
-                { name: 'qsk', label: 'Qsk' }
+                { name: 'k17', label: 'K17' }
               ].map(({ name, label }) => (
                 <TextField
                   key={name}
@@ -550,11 +568,16 @@ const BoltStrengthCalculator = () => {
                   type='number'
                   variant='outlined'
                   value={inputs[name as keyof typeof inputs]}
-                  onChange={handleChange}
+                  onChange={handleInputChange}
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{
-                    readOnly: ['phi', 'k1', 'qsk'].includes(name)
+                    readOnly: [
+                      'phi',
+                      'shankDiameter',
+                      'screwJD',
+                      'k13'
+                    ].includes(name)
                   }}
                   sx={{
                     '& .MuiOutlinedInput-root': {
@@ -584,30 +607,39 @@ const BoltStrengthCalculator = () => {
                 gap: 2
               }}
             >
-              <TextField
-                label='Design Strength'
-                value={
-                  results.designStrength !== null
-                    ? results.designStrength.toFixed(2)
-                    : ''
+              {[
+                { label: 'Design Load', value: results.designLoad },
+                {
+                  label: 'Screw Penetration in Second Timber',
+                  value: results.screwPenetration
+                },
+                {
+                  label: 'First Timber Thickness',
+                  value: results.firstTimberThickness
                 }
-                InputProps={{
-                  readOnly: true
-                }}
-                variant='filled'
-                fullWidth
-                sx={{
-                  '& .MuiFilledInput-root': {
-                    backgroundColor: '#282828',
-                    color: 'white'
-                  },
-                  '& .MuiInputLabel-root': { color: '#0288d1' }
-                }}
-              />
+              ].map(({ label, value }) => (
+                <TextField
+                  key={label}
+                  label={label}
+                  value={value !== null ? value.toFixed(2) : ''}
+                  InputProps={{
+                    readOnly: true
+                  }}
+                  variant='filled'
+                  fullWidth
+                  sx={{
+                    '& .MuiFilledInput-root': {
+                      backgroundColor: '#282828',
+                      color: 'white'
+                    },
+                    '& .MuiInputLabel-root': { color: '#0288d1' }
+                  }}
+                />
+              ))}
             </Box>
           </Box>
 
-          {/* Action Buttons */}
+          {/* Action Button */}
           <Box
             sx={{
               marginTop: 3,
@@ -645,66 +677,17 @@ const BoltStrengthCalculator = () => {
           </Box>
         </Paper>
 
-        {/* Save Confirmation Dialog */}
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth='sm'>
-          <DialogTitle
-            sx={{
-              textAlign: 'center',
-              fontWeight: 'bold',
-              fontSize: '1.25rem'
-            }}
-          >
-            Bolt Strength
-          </DialogTitle>
-          <DialogContent
-            sx={{
-              padding: '16px',
-              textAlign: 'center',
-              color: '#444'
-            }}
-          >
-            <Typography sx={{ fontSize: '1rem', marginBottom: '8px' }}>
-              Do you want to save the current data?
-            </Typography>
-          </DialogContent>
-          <DialogActions
-            sx={{
-              justifyContent: 'center',
-              gap: 2
-            }}
-          >
-            <Button
-              onClick={handleCloseDialog}
-              color='primary'
-              variant='outlined'
-              sx={{
-                borderColor: '#0288d1',
-                color: '#0288d1',
-                '&:hover': {
-                  backgroundColor: '#e1f5fe'
-                }
-              }}
-            >
-              No
-            </Button>
-            <Button
-              color='success'
-              variant='contained'
-              onClick={handleConfirmSave}
-              sx={{
-                backgroundColor: '#4caf50',
-                '&:hover': {
-                  backgroundColor: '#388e3c'
-                }
-              }}
-            >
-              Yes
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmationDialog
+          open={dialogOpen}
+          title='Nail Calculations'
+          onClose={() => setDialogOpen(false)}
+          onConfirm={handleConfirmSave}
+        />
+
+        <NailInfoTable open={openTable} onClose={() => setOpenTable(false)} />
       </Container>
     </>
   )
 }
 
-export default BoltStrengthCalculator
+export default NailsCalculator

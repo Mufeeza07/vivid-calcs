@@ -1,5 +1,6 @@
 'use client'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
 import Navbar from '@/components/Navbar'
 import ScrewInfoTable from '@/components/ScrewInfoTable'
 import {
@@ -11,12 +12,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import {
   Box,
-  Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -188,51 +184,17 @@ const ScrewStrength = () => {
           )}
         </Paper>
       </Container>
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-        <DialogTitle
-          sx={{ textAlign: 'center', fontWeight: 'bold', fontSize: '1.25rem' }}
-        >
-          {screwData?.screwType === 'SHEAR'
+
+      <ConfirmationDialog
+        open={openDialog}
+        title={
+          screwData?.screwType === 'SHEAR'
             ? 'Shear Screw Strength'
-            : screwData?.screwType === 'PULLOUT'
-              ? 'Pullout Screw Strength'
-              : 'Screw Strength'}
-        </DialogTitle>
-        <DialogContent
-          sx={{ padding: '16px', textAlign: 'center', color: '#444' }}
-        >
-          <Typography>Do you want to save the current data?</Typography>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
-          <Button
-            onClick={() => setOpenDialog(false)}
-            color='primary'
-            variant='outlined'
-            sx={{
-              borderColor: '#0288d1',
-              color: '#0288d1',
-              '&:hover': {
-                backgroundColor: '#e1f5fe'
-              }
-            }}
-          >
-            No
-          </Button>
-          <Button
-            color='success'
-            variant='contained'
-            onClick={handleConfirmSave}
-            sx={{
-              backgroundColor: '#4caf50',
-              '&:hover': {
-                backgroundColor: '#388e3c'
-              }
-            }}
-          >
-            Yes
-          </Button>
-        </DialogActions>
-      </Dialog>
+            : 'Pullout Screw Strength'
+        }
+        onClose={() => setOpenDialog(false)}
+        onConfirm={handleConfirmSave}
+      />
 
       <ScrewInfoTable open={openTable} onClose={() => setOpenTable(false)} />
     </>

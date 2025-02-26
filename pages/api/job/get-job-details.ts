@@ -16,21 +16,20 @@ export default async function handler(
       return res.status(401).json({ message: 'Authorization token is missing' })
     }
 
-    const { jobId } = req.query
+    const { id } = req.query
 
-    if (!jobId || typeof jobId !== 'string') {
+    if (!id || typeof id !== 'string') {
       return res.status(400).json({ message: 'Job ID is required ' })
     }
 
     const job = await prisma.job.findUnique({
-      where: { jobId },
+      where: { jobId: id },
       include: {
         nails: true,
         boltStrength: true,
         weld: true,
         soilAnalysis: true,
-        beamAnalysis: true,
-        slabAnalysis: true,
+        BeamSlabAnalysis: true,
         screwStrength: true
       }
     })

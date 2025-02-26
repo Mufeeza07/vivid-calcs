@@ -1,15 +1,12 @@
 'use client'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
 import Navbar from '@/components/Navbar'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import {
   Box,
   Button,
   Container,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -22,7 +19,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 
-const SoilCalculator = () => {
+const WeldStrengthCalculator = () => {
   const dispatch = useDispatch()
   const allJobs = useSelector(selectRecentJobs)
 
@@ -36,25 +33,28 @@ const SoilCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
-    jobId: '',
+    vw: 0.6,
+    phi: 0,
+    fuw: 0,
+    tt: 0,
+    kr: 0,
     type: '',
-    shrinkageIndex: 0,
-    lateralRestraint: 0,
-    suctionChange: 0,
-    layerThickness: 0
+    jobId: ''
   })
 
   const [results, setResults] = useState({
-    instabilityIndex: null as number | null,
-    surfaceMovement: null as number | null
+    designStrength: null as number | null
   })
+
   const [dialogOpen, setDialogOpen] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
+  ) => {
     const { name, value } = e.target
     setInputs(prev => ({
       ...prev,
-      [name]:
+      [name!]:
         name === 'jobId' || name === 'type'
           ? value
           : value === ''
@@ -68,34 +68,25 @@ const SoilCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { shrinkageIndex, lateralRestraint, suctionChange, layerThickness } =
-      inputs
+    const { vw, phi, fuw, tt, kr } = inputs
 
-    const instabilityIndex = shrinkageIndex * lateralRestraint
-    const surfaceMovement =
-      (instabilityIndex * suctionChange * layerThickness) / 100
+    const designStrength = (vw * fuw * tt * kr * phi) / 1000
 
     setResults({
-      instabilityIndex,
-      surfaceMovement
+      designStrength
     })
   }
 
   const handleSave = () => {
-    const requiredFields = [
-      'jobId',
-      'type',
-      'shrinkageIndex',
-      'lateralRestraint',
-      'suctionChange',
-      'layerThickness'
-    ]
-
+    const requiredFields = ['jobId', 'type', 'phi', 'fuw', 'tt', 'kr']
     const missingFields = requiredFields.filter(field => !inputs[field])
+
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')
       return
     }
+
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -105,9 +96,10 @@ const SoilCalculator = () => {
 
   const handleConfirmSave = async () => {
     const token = localStorage.getItem('token')
+
     try {
       const response = await fetch(
-        `/api/modules/soil/create-soil-details?jobId=${inputs.jobId}`,
+        `/api/modules/weld/create-weld-details?jobId=${inputs.jobId}`,
         {
           method: 'POST',
           headers: {
@@ -116,30 +108,25 @@ const SoilCalculator = () => {
           },
           body: JSON.stringify({
             type: inputs.type,
-            shrinkageIndex: inputs.shrinkageIndex,
-            lateralRestraint: inputs.lateralRestraint,
-            suctionChange: inputs.suctionChange,
-            layerThickness: inputs.layerThickness,
-            instabilityIndex: results.instabilityIndex,
-            surfaceMovement: results.surfaceMovement
+            phi: inputs.phi,
+            fuw: inputs.fuw,
+            tt: inputs.tt,
+            kr: inputs.kr,
+            vw: inputs.vw,
+            strength: results.designStrength
           })
         }
       )
 
-      const responseData = await response.json()
-
       if (!response.ok) {
-        toast.error(`Error: ${responseData.message || 'Failed to save data'}`)
+        const errorData = await response.json()
+        toast.error(`Error: ${errorData.message}`)
         return
       }
-
-      toast.success(
-        responseData.message || 'Soil calculations saved successfully!'
-      )
+      toast.success('Weld calculations saved successfully!')
       setDialogOpen(false)
     } catch (error) {
       toast.error('Failed to save data')
-      return
     }
   }
 
@@ -160,7 +147,7 @@ const SoilCalculator = () => {
           }}
         >
           <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Soil Calculator
+            Weld Calculator
           </Typography>
           <Box
             sx={{
@@ -169,9 +156,11 @@ const SoilCalculator = () => {
               gap: 4
             }}
           >
+            {/* Input Fields */}
             <Box
               sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
             >
+              {/* Job Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
                 <Select
@@ -201,6 +190,7 @@ const SoilCalculator = () => {
                 </Select>
               </FormControl>
 
+              {/* Type Selection */}
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                 <Select
@@ -222,17 +212,40 @@ const SoilCalculator = () => {
                     }
                   }}
                 >
-                  {' '}
                   <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
                   <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
                   <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                 </Select>
               </FormControl>
+              <TextField
+                label='Vw '
+                name='vw'
+                type='number'
+                variant='outlined'
+                value={inputs.vw}
+                InputProps={{
+                  readOnly: true
+                }}
+                fullWidth
+                sx={{
+                  '& .MuiOutlinedInput-root': {
+                    backgroundColor: '#282828',
+                    color: 'white',
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    },
+                    '& .MuiOutlinedInput-notchedOutline': {
+                      borderColor: '#0288d1'
+                    }
+                  },
+                  '& .MuiInputLabel-root': { color: '#0288d1' }
+                }}
+              />
               {[
-                { name: 'shrinkageIndex', label: 'Soil Shrinkage Index' },
-                { name: 'lateralRestraint', label: 'Lateral Restraint Factor' },
-                { name: 'suctionChange', label: 'Soil Suction Change' },
-                { name: 'layerThickness', label: 'Thickness of Layer' }
+                { name: 'phi', label: 'Phi' },
+                { name: 'fuw', label: 'Fuw' },
+                { name: 'tt', label: 'Tt' },
+                { name: 'kr', label: 'Kr' }
               ].map(({ name, label }) => (
                 <TextField
                   key={name}
@@ -250,6 +263,10 @@ const SoilCalculator = () => {
                       color: 'white'
                     },
                     '& .MuiInputLabel-root': { color: '#0288d1' },
+                    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
+                      {
+                        borderColor: '#0288d1'
+                      },
                     '& .MuiOutlinedInput-notchedOutline': {
                       borderColor: '#0288d1'
                     }
@@ -257,6 +274,8 @@ const SoilCalculator = () => {
                 />
               ))}
             </Box>
+
+            {/* Output Fields */}
             <Box
               sx={{
                 flex: 1,
@@ -266,32 +285,30 @@ const SoilCalculator = () => {
                 gap: 2
               }}
             >
-              {[
-                { label: 'Instability Index', value: results.instabilityIndex },
-                {
-                  label: 'Char. Surface Movement',
-                  value: results.surfaceMovement
+              <TextField
+                label='Design Strength'
+                value={
+                  results.designStrength !== null
+                    ? results.designStrength.toFixed(2)
+                    : ''
                 }
-              ].map(({ label, value }) => (
-                <TextField
-                  key={label}
-                  label={label}
-                  value={value !== null ? value.toFixed(2) : ''}
-                  InputProps={{ readOnly: true }}
-                  variant='filled'
-                  fullWidth
-                  sx={{
-                    '& .MuiFilledInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' }
-                  }}
-                />
-              ))}
+                InputProps={{
+                  readOnly: true
+                }}
+                variant='filled'
+                fullWidth
+                sx={{
+                  '& .MuiFilledInput-root': {
+                    backgroundColor: '#282828',
+                    color: 'white'
+                  },
+                  '& .MuiInputLabel-root': { color: '#0288d1' }
+                }}
+              />
             </Box>
           </Box>
 
+          {/* Action Buttons */}
           <Box
             sx={{
               marginTop: 3,
@@ -305,18 +322,23 @@ const SoilCalculator = () => {
               onClick={calculateResults}
               sx={{
                 backgroundColor: '#0288d1',
-                '&:hover': { backgroundColor: '#026aa1' }
+                '&:hover': {
+                  backgroundColor: '#026aa1'
+                }
               }}
             >
               Calculate
             </Button>
+
             <Button
               variant='contained'
               color='secondary'
               onClick={handleSave}
               sx={{
                 backgroundColor: '#7b1fa2',
-                '&:hover': { backgroundColor: '#4a148c' }
+                '&:hover': {
+                  backgroundColor: '#4a148c'
+                }
               }}
             >
               Save
@@ -324,51 +346,15 @@ const SoilCalculator = () => {
           </Box>
         </Paper>
 
-        <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth='sm'>
-          <DialogTitle
-            sx={{
-              textAlign: 'center',
-              fontWeight: 'bold',
-              fontSize: '1.25rem'
-            }}
-          >
-            Soil Calculation
-          </DialogTitle>
-          <DialogContent
-            sx={{ padding: '16px', textAlign: 'center', color: '#444' }}
-          >
-            <Typography sx={{ fontSize: '1rem', marginBottom: '8px' }}>
-              Do you want to save the current data?
-            </Typography>
-          </DialogContent>
-          <DialogActions sx={{ justifyContent: 'center', gap: 2 }}>
-            <Button
-              onClick={handleCloseDialog}
-              variant='outlined'
-              sx={{
-                borderColor: '#0288d1',
-                color: '#0288d1',
-                '&:hover': { backgroundColor: '#e1f5fe' }
-              }}
-            >
-              No
-            </Button>
-            <Button
-              color='success'
-              variant='contained'
-              onClick={handleConfirmSave}
-              sx={{
-                backgroundColor: '#4caf50',
-                '&:hover': { backgroundColor: '#388e3c' }
-              }}
-            >
-              Yes
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ConfirmationDialog
+          open={dialogOpen}
+          title='Weld Strength'
+          onClose={() => setDialogOpen(false)}
+          onConfirm={handleConfirmSave}
+        />
       </Container>
     </>
   )
 }
 
-export default SoilCalculator
+export default WeldStrengthCalculator
