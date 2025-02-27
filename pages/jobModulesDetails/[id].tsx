@@ -72,7 +72,8 @@ const JobDetailsPage = () => {
       weld: 'weld',
       nails: 'nail',
       boltStrength: 'bolt',
-      screwStrength: 'screw'
+      screwStrength: 'screw',
+      pileAnalysis: 'pile'
     }
 
     const apiModule = moduleApiMap[module]
@@ -204,8 +205,8 @@ const JobDetailsPage = () => {
                 'nails',
                 'boltStrength',
                 'weld',
-                'beamAnalysis',
-                'slabAnalysis',
+                'beamslabAnalysis',
+                'pileAnalysis',
                 'screwStrength'
               ].map(
                 module =>

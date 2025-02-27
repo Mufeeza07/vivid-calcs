@@ -205,7 +205,54 @@ export const PileDesignAnalysis = () => {
   const handleCloseDialog = () => {
     setDialogOpen(false)
   }
-  const handleConfirmSave = async () => {}
+  const handleConfirmSave = async () => {
+    const token = localStorage.getItem('token')
+
+    try {
+      const response = await fetch(
+        `/api/modules/pile/create-pile-details?jobId=${inputs.jobId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            type: inputs.type,
+            frictionAngle: inputs.frictionAngle,
+            safetyFactor: inputs.safetyFactor,
+            ks: inputs.ks,
+            soilDensity: inputs.soilDensity,
+            pileHeight: inputs.pileHeight,
+            factor: inputs.factor,
+            pileDiameter: inputs.pileDiameter,
+            frictionResistanceAS: inputs.frictionResistanceAS,
+            frictionResistanceMH: inputs.frictionResistanceMH,
+            weight: inputs.weight,
+            cohension: inputs.cohension,
+            nq: inputs.nq,
+            nc: inputs.nc,
+            reductionStrength: inputs.reductionStrength,
+            endBearing: inputs.endBearing,
+            totalUpliftResistance: results.totalUpliftResistance,
+            totalPileCapacityAS: results.totalPileCapacityAS,
+            totalPileCapacityMH: results.totalPileCapacityMH
+          })
+        }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        toast.error(`Error: ${errorData.message}`)
+        return
+      }
+      toast.success('Pile analysis saved successfully!')
+      setDialogOpen(false)
+    } catch (error: any) {
+      console.error('Error saving pile calculations:', error.message)
+      toast.error('Failed to save data.', error)
+    }
+  }
 
   return (
     <>

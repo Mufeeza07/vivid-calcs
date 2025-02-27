@@ -369,7 +369,6 @@ const NailsCalculator = () => {
                     }
                   }}
                 >
-                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
                   <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
                   <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                 </Select>
@@ -491,10 +490,10 @@ const NailsCalculator = () => {
                   }}
                 >
                   <MenuItem value='PARALLEL_TO_GRAINS'>
-                    Load parallel to grains
+                    Parallel to grains
                   </MenuItem>
                   <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                    Load perpendicular to grains
+                    Perpendicular to grains
                   </MenuItem>
                 </Select>
               </FormControl>

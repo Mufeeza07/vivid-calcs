@@ -77,7 +77,7 @@ export default async function handler(
       })
     }
 
-    const pileDesign = await prisma.pileSlabAnalysis.create({
+    const pileDesign = await prisma.pileAnalysis.create({
       data: {
         jobId,
         type,

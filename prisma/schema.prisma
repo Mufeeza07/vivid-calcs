@@ -41,8 +41,8 @@ model Job {
   weld             Weld[]
   soilAnalysis     SoilAnalysis[]
   screwStrength    ScrewStrength[]
-  BeamSlabAnalysis BeamSlabAnalysis[]
-  PileSlabAnalysis PileSlabAnalysis[]
+  beamSlabAnalysis BeamSlabAnalysis[]
+  pileAnalysis     PileAnalysis[]
 }
 
 enum JobStatus {
@@ -56,7 +56,6 @@ model Nails {
   id                   String    @id @default(uuid())
   jobId                String
   type                 Type
-  note                 String?
   category             Category?
   jdType               JDType?
   load                 Load?
@@ -72,6 +71,7 @@ model Nails {
   designLoad           Float?
   screwPenetration     Float?
   firstTimberThickness Float?
+  note                 String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -95,6 +95,7 @@ model BoltStrength {
   k17            Float
   qsk            Float
   designStrength Float
+  note           String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -111,6 +112,7 @@ model Weld {
   tt        Float
   kr        Float
   strength  Float
+  note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -127,6 +129,7 @@ model SoilAnalysis {
   layerThickness   Float
   instabilityIndex Float
   surfaceMovement  Float
+  note             String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -154,6 +157,7 @@ model BeamSlabAnalysis {
   ultimateLoad   Float?
   moment         Float?
   shear          Float?
+  note           String?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
 
@@ -169,7 +173,6 @@ model ScrewStrength {
   id                   String     @id @default(uuid())
   jobId                String
   type                 Type
-  note                 String?
   screwType            ScrewType
   category             Category?
   screwSize            ScrewSize?
@@ -189,6 +192,7 @@ model ScrewStrength {
   designLoad           Float?
   screwPenetration     Float?
   firstTimberThickness Float?
+  note                 String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -244,8 +248,8 @@ enum LoadType {
   FIRE
 }
 
-model PileSlabAnalysis {
-  id                    String @id @default(uuid())
+model PileAnalysis {
+  id                    String  @id @default(uuid())
   jobId                 String
   type                  Type
   frictionAngle         Float
@@ -266,6 +270,7 @@ model PileSlabAnalysis {
   totalUpliftResistance Float
   totalPileCapacityAS   Float
   totalPileCapacityMH   Float
+  note                  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -397,10 +397,10 @@ export const ShearScrewCalculator: React.FC<CalculatorProps> = ({
                   }}
                 >
                   <MenuItem value='PARALLEL_TO_GRAINS'>
-                    Load parallel to grains
+                    Parallel to grains
                   </MenuItem>
                   <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                    Load perpendicular to grains
+                    Perpendicular to grains
                   </MenuItem>
                 </Select>
               </FormControl>
@@ -924,10 +924,10 @@ export const UpliftScrewCalculator: React.FC<CalculatorProps> = ({
                   }}
                 >
                   <MenuItem value='PARALLEL_TO_GRAINS'>
-                    Load parallel to grains
+                    Parallel to grains
                   </MenuItem>
                   <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                    Load perpendicular to grains
+                    Perpendicular to grains
                   </MenuItem>
                 </Select>
               </FormControl>

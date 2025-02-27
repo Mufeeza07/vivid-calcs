@@ -29,8 +29,9 @@ export default async function handler(
         boltStrength: true,
         weld: true,
         soilAnalysis: true,
-        BeamSlabAnalysis: true,
-        screwStrength: true
+        beamSlabAnalysis: true,
+        screwStrength: true,
+        pileAnalysis: true
       }
     })
 
