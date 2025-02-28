@@ -21,19 +21,17 @@ export default async function handler(
       })
     }
 
-    const { nailId } = req.query
-    if (!nailId || typeof nailId !== 'string') {
+    const { id } = req.query
+    if (!id || typeof id !== 'string') {
       return res.status(400).json({
         message: 'Nail Details ID is required',
         status: 400
       })
     }
 
-    const parsedId = parseInt(nailId, 10)
-
     const updateData = req.body
     const updatedNailDetails = await prisma.nails.update({
-      where: { id: parsedId },
+      where: { id },
       data: updateData
     })
 

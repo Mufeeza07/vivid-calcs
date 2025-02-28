@@ -5,7 +5,7 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method !== 'PATCH') {
+  if (req.method !== 'DELETE') {
     return res.status(405).json({
       message: 'Method Not Allowed',
       status: 405
@@ -26,21 +26,29 @@ export default async function handler(
 
     if (!id || typeof id !== 'string') {
       return res.status(400).json({
-        message: 'Screw Details ID is required',
+        message: 'ID is required',
         status: 400
       })
     }
 
-    const updateData = req.body
-    const updatedScrewDetails = await prisma.screwStrength.update({
-      where: { id },
-      data: updateData
+    const existingDetails = await prisma.pileAnalysis.findUnique({
+      where: { id }
+    })
+
+    if (!existingDetails) {
+      return res.status(404).json({
+        message: 'Pile details not found',
+        status: 404
+      })
+    }
+
+    await prisma.pileAnalysis.delete({
+      where: { id }
     })
 
     res.status(200).json({
-      message: 'Screw details updated successfully',
-      status: 200,
-      data: updatedScrewDetails
+      message: 'Pile analysis deleted successfully',
+      status: 200
     })
   } catch (error: any) {
     res.status(500).json({

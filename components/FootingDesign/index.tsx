@@ -241,12 +241,12 @@ export const PileDesignAnalysis = () => {
         }
       )
 
+      const responseData = await response.json()
       if (!response.ok) {
-        const errorData = await response.json()
-        toast.error(`Error: ${errorData.message}`)
+        toast.error(`Error: ${responseData.message}`)
         return
       }
-      toast.success('Pile analysis saved successfully!')
+      toast.success(responseData.message)
       setDialogOpen(false)
     } catch (error: any) {
       console.error('Error saving pile calculations:', error.message)

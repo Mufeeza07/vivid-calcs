@@ -130,9 +130,7 @@ const SoilCalculator = () => {
         return
       }
 
-      toast.success(
-        responseData.message || 'Soil calculations saved successfully!'
-      )
+      toast.success(responseData.message)
       setDialogOpen(false)
     } catch (error) {
       toast.error('Failed to save data')

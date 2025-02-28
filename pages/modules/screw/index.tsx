@@ -77,12 +77,12 @@ const ScrewStrength = () => {
         }
       )
 
+      const responseData = await response.json()
       if (!response.ok) {
-        const errorData = await response.json()
-        toast.error(`Error: ${errorData.message}`)
+        toast.error(`Error: ${responseData.message}`)
         return
       }
-      toast.success('Screw  saved successfully!')
+      toast.success(responseData.message)
       setOpenDialog(false)
     } catch (error) {
       toast.error('Failed to save data')

@@ -23,30 +23,29 @@ export default async function handler(
     }
 
     const { id } = req.query
-
     if (!id || typeof id !== 'string') {
       return res.status(400).json({
-        message: 'Screw Details ID is required',
+        message: 'Pile Details ID is required',
         status: 400
       })
     }
 
     const updateData = req.body
-    const updatedScrewDetails = await prisma.screwStrength.update({
+    const updatedPileDetails = await prisma.pileAnalysis.update({
       where: { id },
       data: updateData
     })
 
     res.status(200).json({
-      message: 'Screw details updated successfully',
+      message: 'Pile details updated successfully',
       status: 200,
-      data: updatedScrewDetails
+      data: updatedPileDetails
     })
-  } catch (error: any) {
-    res.status(500).json({
+  } catch (error) {
+    return res.status(500).json({
       message: 'Internal Server Error',
       status: 500,
-      error: error.message
+      error: error
     })
   }
 }

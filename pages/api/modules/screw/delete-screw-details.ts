@@ -25,15 +25,13 @@ export default async function handler(
 
     if (!id || typeof id !== 'string') {
       return res.status(400).json({
-        message: 'Bad Request. ID is required',
+        message: 'ID is required',
         status: 400
       })
     }
 
     const existingDetails = await prisma.screwStrength.findUnique({
-      where: {
-        id
-      }
+      where: { id }
     })
 
     if (!existingDetails) {
