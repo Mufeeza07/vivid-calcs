@@ -1,3 +1,4 @@
+'use client'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -15,7 +16,6 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import html2pdf from 'html2pdf.js'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
@@ -51,6 +51,10 @@ const JobDetailsPage = () => {
   }
 
   const generatePDF = async () => {
+    if (typeof window === 'undefined') return // Ensure it runs only on the client
+
+    const html2pdf = (await import('html2pdf.js')).default // Dynamically import
+
     if (pdfRef.current) {
       const pdfOptions = {
         margin: 10,
