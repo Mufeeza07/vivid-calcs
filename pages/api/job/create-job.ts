@@ -23,15 +23,28 @@ export default async function handler(
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    const { address, windSpeed, locationFromCoastline, councilName } = req.body
+    const {
+      address,
+      windCategory,
+      windSpeed,
+      locationFromCoastline,
+      councilName
+    } = req.body
 
-    if (!address || !windSpeed || !locationFromCoastline || !councilName) {
+    if (
+      !address ||
+      !windCategory ||
+      !windSpeed ||
+      !locationFromCoastline ||
+      !councilName
+    ) {
       return res.status(400).json({ message: 'All fields are required' })
     }
 
     const job = await prisma.job.create({
       data: {
         address,
+        windCategory,
         windSpeed,
         locationFromCoastline,
         councilName,

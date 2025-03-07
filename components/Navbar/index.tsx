@@ -4,11 +4,13 @@ import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
 import ContactMailIcon from '@mui/icons-material/ContactMail'
 import DashboardIcon from '@mui/icons-material/Dashboard'
 import ExitToAppIcon from '@mui/icons-material/ExitToApp'
+import ExtensionIcon from '@mui/icons-material/Extension'
 import HomeIcon from '@mui/icons-material/Home'
 import InfoIcon from '@mui/icons-material/Info'
 import LoginIcon from '@mui/icons-material/Login'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
+import WorkIcon from '@mui/icons-material/Work'
 import {
   AppBar,
   Box,
@@ -217,6 +219,22 @@ const Navbar = () => {
                     </MenuItem>
                     <MenuItem
                       onClick={() => {
+                        router.push('/jobs')
+                        handleMenuClose()
+                      }}
+                    >
+                      Jobs
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        router.push('/modules')
+                        handleMenuClose()
+                      }}
+                    >
+                      Modules
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
                         router.push('/account-settings')
                         handleMenuClose()
                       }}
@@ -280,11 +298,23 @@ const Navbar = () => {
             </>
           ) : (
             <>
-              <ListItem component='a' href='/dashboard'>
+              <ListItem component='a' href='/home'>
                 <ListItemIcon>
                   <DashboardIcon />
                 </ListItemIcon>
                 <ListItemText primary=' Dashboard' />
+              </ListItem>
+              <ListItem component='a' href='/jobs'>
+                <ListItemIcon>
+                  <WorkIcon />
+                </ListItemIcon>
+                <ListItemText primary=' Jobs' />
+              </ListItem>
+              <ListItem component='a' href='/modules'>
+                <ListItemIcon>
+                  <ExtensionIcon />
+                </ListItemIcon>
+                <ListItemText primary=' Modules' />
               </ListItem>
               <ListItem component='a' href='/account-settings'>
                 <ListItemIcon>

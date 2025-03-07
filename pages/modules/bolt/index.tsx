@@ -4,6 +4,7 @@ import ConfirmationDialog from '@/components/ConfirmationBox'
 import Navbar from '@/components/Navbar'
 import { parallelLoadTable, perpendicularLoadTable } from '@/data/boltTables'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
+import { calculateBoltStrength } from '@/utils/calculateBolt'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import InfoIcon from '@mui/icons-material/Info'
 import {
@@ -61,80 +62,14 @@ const BoltStrengthCalculator = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | { name?: string; value: any }>
+    e: React.ChangeEvent<{ name?: string; value: unknown }>
   ) => {
     const { name, value } = e.target
 
     setInputs(prev => {
-      const updatedValue =
-        name === 'jobId' ||
-        name === 'type' ||
-        name === 'category' ||
-        name === 'boltSize' ||
-        name === 'jdType' ||
-        name === 'load' ||
-        name === 'loadType'
-          ? value
-          : value === ''
-            ? ''
-            : Math.max(0, parseFloat(value) || 0)
+      let updatedState = { ...prev, [name as keyof typeof inputs]: value }
 
-      let updatedState = { ...prev, [name!]: updatedValue }
-
-      if (name === 'category') {
-        const phiValue =
-          value === 'AFFECTED_AREA_LESS_25M2'
-            ? 0.85
-            : value === 'AFFECTED_AREA_GREATER_25M2'
-              ? 0.8
-              : value === 'POST_DISASTER_BUILDING'
-                ? 0.75
-                : 0
-
-        updatedState.phi = phiValue
-      }
-
-      const tableType = updatedState.load
-      const table =
-        tableType === 'PARALLEL_TO_GRAINS'
-          ? parallelLoadTable
-          : perpendicularLoadTable
-
-      const selectedJD = updatedState.jdType
-      const selectedThickness = updatedState.timberThickness
-      const selectedBoltSize = updatedState.boltSize
-
-      if (selectedJD && selectedThickness && selectedBoltSize) {
-        const thicknessRow = table[selectedJD]?.[selectedThickness]
-
-        if (thicknessRow) {
-          const qskValue = thicknessRow[selectedBoltSize]
-          if (qskValue !== undefined) {
-            updatedState.qsk = qskValue / 1000
-          } else {
-            updatedState.qsk = 0
-          }
-        } else {
-          updatedState.qsk = 0
-        }
-      }
-
-      const k1Values = {
-        PERMANENT_ACTION: 0.57,
-        ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
-        ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
-        FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
-        FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
-        PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
-        PERMANENT_WIND_IMPOSED_ACTION: 1.14,
-        PERMANENT_WIND_ACTION_REVERSAL: 1.14,
-        PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
-        FIRE: 0.77
-      }
-
-      if (name === 'loadType') {
-        updatedState.k1 = k1Values[value] || 0
-      }
+      updatedState = calculateBoltStrength(updatedState)
 
       return updatedState
     })
@@ -145,13 +80,8 @@ const BoltStrengthCalculator = () => {
   }
 
   const calculateResults = () => {
-    const { phi, k1, k16, k17, qsk } = inputs
-
-    const designStrength = phi * k1 * k16 * k17 * qsk
-
-    setResults({
-      designStrength
-    })
+    const updatedResults = calculateBoltStrength(inputs)
+    setResults(updatedResults)
   }
 
   const handleSave = () => {
@@ -163,7 +93,8 @@ const BoltStrengthCalculator = () => {
       return
     }
 
-    calculateResults()
+    const updatedResults = calculateBoltStrength(inputs)
+    setResults(updatedResults)
     setDialogOpen(true)
   }
 
@@ -184,12 +115,7 @@ const BoltStrengthCalculator = () => {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
-            type: inputs.type,
-            phi: inputs.phi,
-            k1: inputs.k1,
-            k16: inputs.k16,
-            k17: inputs.k17,
-            qsk: inputs.qsk,
+            ...inputs,
             designStrength: results.designStrength
           })
         }

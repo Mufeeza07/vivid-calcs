@@ -1,4 +1,5 @@
 'use client'
+import { calculateBoltStrength } from '@/utils/calculateBolt'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -84,7 +85,7 @@ const JobDetailsPage = () => {
   const handleUpdateModuleEntry = async (
     module: string,
     entryId: string,
-    updatedNote: string
+    updatedData: any
   ) => {
     const token = localStorage.getItem('token')
 
@@ -102,6 +103,11 @@ const JobDetailsPage = () => {
       console.error(`Unknown module type: ${module}`)
       return
     }
+    let recalculatedData = { ...updatedData }
+
+    if (module === 'boltStrength') {
+      recalculatedData = calculateBoltStrength(updatedData)
+    }
 
     const endpoint = `/api/modules/${apiModule}/update-${apiModule}-details?id=${entryId}`
 
@@ -112,7 +118,7 @@ const JobDetailsPage = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ note: updatedNote })
+        body: JSON.stringify(recalculatedData)
       })
 
       const responseData = await response.json()

@@ -24,17 +24,18 @@ enum Role {
 }
 
 model Job {
-  jobId                 String    @id @default(uuid())
+  jobId                 String       @id @default(uuid())
   address               String
+  windCategory          WindCategory @default(N1_W28N)
   windSpeed             String
   locationFromCoastline String
   councilName           String
-  status                JobStatus @default(PENDING)
+  status                JobStatus    @default(PENDING)
   userId                String
   comments              String?
-  createdAt             DateTime  @default(now())
-  updatedAt             DateTime  @updatedAt
-  user                  User      @relation("UserJobs", fields: [userId], references: [id])
+  createdAt             DateTime     @default(now())
+  updatedAt             DateTime     @updatedAt
+  user                  User         @relation("UserJobs", fields: [userId], references: [id])
 
   nails            Nails[]
   boltStrength     BoltStrength[]
@@ -50,6 +51,19 @@ enum JobStatus {
   IN_PROGRESS
   ON_HOLD
   COMPLETED
+}
+
+enum WindCategory {
+  N1_W28N
+  N2_W33N
+  N3_W41N
+  N4_W50N
+  N5_W60N
+  N6_W70N
+  C1_W41N
+  C2_W50N
+  C3_W60N
+  C4_W70N
 }
 
 model Nails {
