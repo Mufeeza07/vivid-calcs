@@ -2,6 +2,7 @@
 
 import ConfirmationDialog from '@/components/ConfirmationBox'
 import Navbar from '@/components/Navbar'
+import Sidebar from '@/components/Sidebar'
 import { parallelLoadTable, perpendicularLoadTable } from '@/data/boltTables'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
@@ -137,7 +138,14 @@ const BoltStrengthCalculator = () => {
     <>
       <Navbar />
       <ToastContainer />
-      <Container sx={{ marginTop: 2, textAlign: 'center', color: 'white' }}>
+      <Sidebar />
+      <Box
+        sx={{
+          ml: { xs: '60px', sm: '200px' },
+          px: 2,
+          color: 'white'
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
@@ -574,7 +582,7 @@ const BoltStrengthCalculator = () => {
           onClose={() => setDialogOpen(false)}
           onConfirm={handleConfirmSave}
         />
-      </Container>
+      </Box>
     </>
   )
 }
