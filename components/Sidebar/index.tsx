@@ -9,6 +9,11 @@ import {
 import Link from 'next/link'
 import { useState } from 'react'
 import HomeIcon from '@mui/icons-material/Home'
+import InfoIcon from '@mui/icons-material/Info'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
+import AssignmentIcon from '@mui/icons-material/Assignment'
+import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications'
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
@@ -28,76 +33,64 @@ const Sidebar = () => {
         }}
       >
         <List>
-          <Link href='/' passHref>
-            <ListItemButton component='a' sx={{ mt: 2 }}>
-              <ListItemIcon sx={{ color: '#0288d1' }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary='Home'
-                sx={{
-                  display: { xs: expanded ? 'block' : 'none', sm: 'block' }
-                }}
-                primaryTypographyProps={{ color: 'white' }}
-              />
-            </ListItemButton>
-          </Link>
-          <Link href='/' passHref>
-            <ListItemButton component='a' sx={{ mt: 2 }}>
-              <ListItemIcon sx={{ color: '#0288d1' }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary='Home'
-                sx={{
-                  display: { xs: expanded ? 'block' : 'none', sm: 'block' }
-                }}
-                primaryTypographyProps={{ color: 'white' }}
-              />
-            </ListItemButton>
-          </Link>
-          <Link href='/' passHref>
-            <ListItemButton component='a' sx={{ mt: 2 }}>
-              <ListItemIcon sx={{ color: '#0288d1' }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary='Home'
-                sx={{
-                  display: { xs: expanded ? 'block' : 'none', sm: 'block' }
-                }}
-                primaryTypographyProps={{ color: 'white' }}
-              />
-            </ListItemButton>
-          </Link>
-          <Link href='/' passHref>
-            <ListItemButton component='a' sx={{ mt: 2 }}>
-              <ListItemIcon sx={{ color: '#0288d1' }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary='Home'
-                sx={{
-                  display: { xs: expanded ? 'block' : 'none', sm: 'block' }
-                }}
-                primaryTypographyProps={{ color: 'white' }}
-              />
-            </ListItemButton>
-          </Link>
-          <Link href='/' passHref>
-            <ListItemButton component='a' sx={{ mt: 2 }}>
-              <ListItemIcon sx={{ color: '#0288d1' }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText
-                primary='Home'
-                sx={{
-                  display: { xs: expanded ? 'block' : 'none', sm: 'block' }
-                }}
-                primaryTypographyProps={{ color: 'white' }}
-              />
-            </ListItemButton>
-          </Link>
+          <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <InfoIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Details'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white' }}
+            />
+          </ListItemButton>
+
+          <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <ScheduleIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Member Schedule'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white' }}
+            />
+          </ListItemButton>
+
+          <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <AddCircleOutlineIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Add New Calculation'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white' }}
+            />
+          </ListItemButton>
+
+          <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <AssignmentIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Reports'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white' }}
+            />
+          </ListItemButton>
+
+          <ListItemButton
+            component={Link}
+            href='/project-defaults'
+            sx={{ mt: 2 }}
+          >
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <SettingsApplicationsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Project Defaults'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white' }}
+            />
+          </ListItemButton>
         </List>
       </Box>
     </>
