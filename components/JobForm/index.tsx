@@ -12,6 +12,34 @@ import {
   SelectChangeEvent
 } from '@mui/material'
 
+const windCategoryOptions = [
+  { label: 'N1 (W28N)', value: 'N1_W28N', windSpeed: '34.0 m/sec' },
+  { label: 'N2 (W33N)', value: 'N2_W33N', windSpeed: '40.0 m/sec' },
+  { label: 'N3 (W41N)', value: 'N3_W41N', windSpeed: '50.0 m/sec' },
+  { label: 'N4 (W50N)', value: 'N4_W50N', windSpeed: '61.0 m/sec' },
+  {
+    label: 'N5 (W60N)',
+    value: 'N5_W60N',
+    windSpeed: 'Disabled',
+    disabled: true
+  },
+  {
+    label: 'N6 (W70N)',
+    value: 'N6_W70N',
+    windSpeed: 'Disabled',
+    disabled: true
+  },
+  { label: 'C1 (W41N)', value: 'C1_W41N', windSpeed: '50.0 m/sec' },
+  { label: 'C2 (W50N)', value: 'C2_W50N', windSpeed: '61.0 m/sec' },
+  { label: 'C3 (W60N)', value: 'C3_W60N', windSpeed: '74.0 m/sec' },
+  {
+    label: 'C4 (W70N)',
+    value: 'C4_W70N',
+    windSpeed: 'Disabled',
+    disabled: true
+  }
+]
+
 const JobForm = ({
   closeModal,
   onJobAdded
@@ -21,6 +49,7 @@ const JobForm = ({
 }) => {
   const [jobData, setJobData] = useState({
     address: '',
+    windCategory: '',
     windSpeed: '',
     locationFromCoastline: '',
     councilName: ''
@@ -28,10 +57,24 @@ const JobForm = ({
 
   const [errors, setErrors] = useState({
     address: false,
+    windCategory: false,
     windSpeed: false,
     locationFromCoastline: false,
     councilName: false
   })
+
+  const handleWindCategoryChange = (event: SelectChangeEvent) => {
+    const selectedCategory = event.target.value
+    const windSpeed =
+      windCategoryOptions.find(option => option.value === selectedCategory)
+        ?.windSpeed || ''
+
+    setJobData(prevState => ({
+      ...prevState,
+      windCategory: selectedCategory,
+      windSpeed
+    }))
+  }
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | { name?: string; value: unknown }>
@@ -53,6 +96,7 @@ const JobForm = ({
   const handleCreateJob = async () => {
     const formErrors = { ...errors }
     formErrors.address = !jobData.address
+    formErrors.windCategory = !jobData.windCategory
     formErrors.windSpeed = !jobData.windSpeed
     formErrors.locationFromCoastline = !jobData.locationFromCoastline
     formErrors.councilName = !jobData.councilName
@@ -69,6 +113,7 @@ const JobForm = ({
 
       const job = {
         address: jobData.address,
+        windCategory: jobData.windCategory,
         windSpeed: jobData.windSpeed,
         locationFromCoastline: jobData.locationFromCoastline,
         councilName: jobData.councilName
@@ -102,7 +147,14 @@ const JobForm = ({
   return (
     <Box
       component='form'
-      sx={{ display: 'flex', flexDirection: 'column', gap: 3, padding: 3 }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        padding: 3,
+        maxHeight: '90vh',
+        overflowY: 'auto'
+      }}
     >
       <Typography
         variant='h5'
@@ -143,6 +195,44 @@ const JobForm = ({
         }}
       />
 
+      <FormControl
+        fullWidth
+        required
+        error={errors.windCategory}
+        sx={{ marginBottom: 2 }}
+      >
+        <InputLabel>Wind Category</InputLabel>
+        <Select
+          value={jobData.windCategory}
+          label='Wind Category'
+          onChange={handleWindCategoryChange}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '10px',
+              backgroundColor: '#f4f4f4'
+            }
+          }}
+        >
+          {windCategoryOptions.map(option => (
+            <MenuItem
+              key={option.value}
+              value={option.value}
+              disabled={option.disabled}
+            >
+              {option.label}
+            </MenuItem>
+          ))}
+        </Select>
+        {errors.windCategory && (
+          <Typography
+            color='error'
+            sx={{ marginTop: 0.5, fontSize: '0.78rem' }}
+          >
+            Wind category is required
+          </Typography>
+        )}
+      </FormControl>
+
       <TextField
         label='Wind Speed'
         name='windSpeed'
@@ -153,6 +243,7 @@ const JobForm = ({
         sx={{ marginBottom: 2 }}
         error={errors.windSpeed}
         helperText={errors.windSpeed && 'Wind speed is required'}
+        InputProps={{ readOnly: true }}
         FormHelperTextProps={{
           sx: {
             marginLeft: '0px'

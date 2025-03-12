@@ -25,6 +25,34 @@ type JobDetailsProps = {
   handleSaveJobDetails: () => void
 }
 
+const windCategoryOptions = [
+  { label: 'N1 (W28N)', value: 'N1_W28N', windSpeed: '34.0 m/sec' },
+  { label: 'N2 (W33N)', value: 'N2_W33N', windSpeed: '40.0 m/sec' },
+  { label: 'N3 (W41N)', value: 'N3_W41N', windSpeed: '50.0 m/sec' },
+  { label: 'N4 (W50N)', value: 'N4_W50N', windSpeed: '61.0 m/sec' },
+  {
+    label: 'N5 (W60N)',
+    value: 'N5_W60N',
+    windSpeed: 'Disabled',
+    disabled: true
+  },
+  {
+    label: 'N6 (W70N)',
+    value: 'N6_W70N',
+    windSpeed: 'Disabled',
+    disabled: true
+  },
+  { label: 'C1 (W41N)', value: 'C1_W41N', windSpeed: '50.0 m/sec' },
+  { label: 'C2 (W50N)', value: 'C2_W50N', windSpeed: '61.0 m/sec' },
+  { label: 'C3 (W60N)', value: 'C3_W60N', windSpeed: '74.0 m/sec' },
+  {
+    label: 'C4 (W70N)',
+    value: 'C4_W70N',
+    windSpeed: 'Disabled',
+    disabled: true
+  }
+]
+
 const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
   currentJobDetails,
   editableJobDetails,
@@ -35,15 +63,25 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
   handleFieldChange,
   handleSaveJobDetails
 }) => {
-
   const router = useRouter()
 
   const handleViewMore = () => {
-    console.log("current job id", currentJobDetails.jobId)
+    console.log('current job id', currentJobDetails.jobId)
     if (currentJobDetails?.jobId) {
       router.push(`/jobModulesDetails/${currentJobDetails.jobId}`)
     }
   }
+
+  const handleWindCategoryChange = (event: any) => {
+    const selectedCategory = event.target.value
+    const windSpeed =
+      windCategoryOptions.find(option => option.value === selectedCategory)
+        ?.windSpeed || ''
+
+    handleFieldChange('windCategory', selectedCategory)
+    handleFieldChange('windSpeed', windSpeed)
+  }
+
   return (
     <Drawer
       anchor='right'
@@ -113,6 +151,33 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
               isEditing && handleFieldChange('address', e.target.value)
             }
           />
+          <FormControl fullWidth>
+            <InputLabel>Wind Category</InputLabel>
+            <Select
+              label='Wind Category'
+              value={
+                isEditing
+                  ? editableJobDetails?.windCategory || ''
+                  : currentJobDetails?.windCategory || ''
+              }
+              onChange={handleWindCategoryChange}
+              SelectDisplayProps={{
+                style: { pointerEvents: isEditing ? 'auto' : 'none' }
+              }}
+            >
+              {windCategoryOptions.map(option => (
+                <MenuItem
+                  key={option.value}
+                  value={option.value}
+                  disabled={option.disabled}
+                >
+                  {option.label}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          {/* Wind Speed (Read-Only) */}
           <TextField
             label='Wind Speed'
             value={
@@ -121,12 +186,7 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
                 : currentJobDetails?.windSpeed
             }
             fullWidth
-            InputProps={{
-              readOnly: !isEditing
-            }}
-            onChange={e =>
-              isEditing && handleFieldChange('windSpeed', e.target.value)
-            }
+            InputProps={{ readOnly: true }} // Wind Speed is always read-only
           />
           <FormControl fullWidth>
             <InputLabel>Location From Coastline</InputLabel>
@@ -236,7 +296,11 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
               >
                 Edit
               </Button>
-              <Button variant='outlined' color='secondary' onClick={handleViewMore}>
+              <Button
+                variant='outlined'
+                color='secondary'
+                onClick={handleViewMore}
+              >
                 View More Details
               </Button>
             </>
