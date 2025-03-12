@@ -49,7 +49,8 @@ export default async function handler(
       k17,
       designLoad,
       screwPenetration,
-      firstTimberThickness
+      firstTimberThickness,
+      note
     } = req.body
 
     if (
@@ -94,7 +95,8 @@ export default async function handler(
         k17,
         designLoad,
         screwPenetration,
-        firstTimberThickness
+        firstTimberThickness,
+        ...(note && { note })
       }
     })
 

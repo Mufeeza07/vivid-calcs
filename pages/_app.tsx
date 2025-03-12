@@ -1,7 +1,7 @@
 'use client'
 
 import { Provider } from 'react-redux'
-import '../globals.css'
+import '@/styles/globals.css'
 import { AppProps } from 'next/app'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Box } from '@mui/material'
