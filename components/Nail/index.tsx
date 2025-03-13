@@ -1,17 +1,19 @@
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
 import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
-import { calculateBoltStrength } from '@/utils/calculateBolt'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
@@ -334,7 +336,7 @@ const NailCalculator = () => {
                   </Select>
                 </FormControl>
 
-                <FormControl fullWidth sx={{ mt: 2 }}>
+                <FormControl fullWidth>
                   <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                   <Select
                     name='type'
@@ -373,23 +375,38 @@ const NailCalculator = () => {
                   </Select>
                 </FormControl>
 
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                  <Select
-                    name='jdType'
-                    label='jdType'
-                    value={inputs.jdType}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    <MenuItem value='JD1'>JD1</MenuItem>
-                    <MenuItem value='JD2'>JD2</MenuItem>
-                    <MenuItem value='JD3'>JD3</MenuItem>
-                    <MenuItem value='JD4'>JD4</MenuItem>
-                    <MenuItem value='JD5'>JD5</MenuItem>
-                    <MenuItem value='JD6'>JD6</MenuItem>
-                  </Select>
-                </FormControl>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                    <Select
+                      name='jdType'
+                      label='jdType'
+                      value={inputs.jdType}
+                      onChange={handleChange}
+                      sx={dropDownStyle}
+                    >
+                      <MenuItem value='JD1'>JD1</MenuItem>
+                      <MenuItem value='JD2'>JD2</MenuItem>
+                      <MenuItem value='JD3'>JD3</MenuItem>
+                      <MenuItem value='JD4'>JD4</MenuItem>
+                      <MenuItem value='JD5'>JD5</MenuItem>
+                      <MenuItem value='JD6'>JD6</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
+                    <IconButton size='small' sx={{ color: '#0288d1' }}>
+                      <InfoOutlinedIcon fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
 
                 <TextField
                   label='14g Screw'
@@ -400,7 +417,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
 
@@ -432,7 +449,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
             </Box>
@@ -478,7 +495,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
 
@@ -509,7 +526,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
 
@@ -535,7 +552,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   inputProps={{ min: 0 }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
 
                 <TextField
@@ -547,7 +564,7 @@ const NailCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   inputProps={{ min: 0 }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
             </Box>

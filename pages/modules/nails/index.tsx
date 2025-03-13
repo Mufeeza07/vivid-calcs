@@ -8,7 +8,7 @@ const NailsCalculator = () => {
     <>
       <Navbar />
       <Sidebar />
-      <SupportActions />
+      <SupportActions moduleName='nail' />
       <NailCalculator />
     </>
   )

@@ -30,5 +30,8 @@ export const cardStyle = () => ({
   backgroundColor: '#1e1e1e',
   border: '1px solid #0288d1',
   borderRadius: 1,
-  p: 2
+  p: 2,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 2
 })

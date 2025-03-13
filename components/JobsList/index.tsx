@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   fetchJobs,
   selectCompletedJobs,
@@ -40,9 +39,10 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import JobDetailsDrawer from '../JobDetails'
 import JobForm from '../JobForm'
+import { AppDispatch } from '@/redux/store'
 
 const JobList = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
 
   const allJobs = useSelector(selectRecentJobs)
   const completedJobs = useSelector(selectCompletedJobs)
@@ -74,7 +74,7 @@ const JobList = () => {
 
   useEffect(() => {
     const jobsMapping = {
-      '': allJobs,
+      '': { jobs: allJobs },
       PENDING: pendingJobs,
       IN_PROGRESS: inProgressJobs,
       ON_HOLD: onHoldJobs,
