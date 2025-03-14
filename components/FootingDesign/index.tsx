@@ -211,9 +211,9 @@ export const PileDesignAnalysis = () => {
     setDialogOpen(true)
   }
 
-  const handleCloseDialog = () => {
-    setDialogOpen(false)
-  }
+  // const handleCloseDialog = () => {
+  //   setDialogOpen(false)
+  // }
 
   const handleConfirmSave = async () => {
     const token = localStorage.getItem('token')
@@ -369,75 +369,19 @@ export const PileDesignAnalysis = () => {
                   inputProps={{ readOnly: true }}
                   sx={textFieldStyle}
                 />
-              </Paper>
-              {/* 
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>
-                    Nail Diameter
-                  </InputLabel>
-                  <Select
-                    name='nailDiameter'
-                    label='nailDiameter'
-                    value={inputs.nailDiameter}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    <MenuItem value={2.5}>2.5</MenuItem>
-                    <MenuItem value={2.8}>2.8</MenuItem>
-                    <MenuItem value={3.15}>3.15</MenuItem>
-                    <MenuItem value={3.75}>3.75</MenuItem>
-                    <MenuItem value={4.5}>4.5</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
-                    <MenuItem value={5.6}>5.6</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: 1
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                    <Select
-                      name='jdType'
-                      label='jdType'
-                      value={inputs.jdType}
-                      onChange={handleChange}
-                      sx={dropDownStyle}
-                    >
-                      <MenuItem value='JD1'>JD1</MenuItem>
-                      <MenuItem value='JD2'>JD2</MenuItem>
-                      <MenuItem value='JD3'>JD3</MenuItem>
-                      <MenuItem value='JD4'>JD4</MenuItem>
-                      <MenuItem value='JD5'>JD5</MenuItem>
-                      <MenuItem value='JD6'>JD6</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
-                    <IconButton size='small' sx={{ color: '#0288d1' }}>
-                      <InfoOutlinedIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
 
                 <TextField
-                  label='14g Screw'
-                  name='screwJD'
+                  label='Reduction Strength'
+                  name='reductionStrength'
                   type='number'
-                  value={inputs.screwJD}
+                  value={inputs.reductionStrength}
                   onChange={handleChange}
                   onFocus={handleFocus}
                   fullWidth
-                  InputProps={{ readOnly: true }}
+                  inputProps={{ readOnly: true }}
                   sx={textFieldStyle}
                 />
-              </Paper> */}
+              </Paper>
 
               <Paper sx={cardStyle}>
                 <Box
@@ -571,6 +515,18 @@ export const PileDesignAnalysis = () => {
                     </IconButton>
                   </Tooltip>
                 </Box>
+
+                <TextField
+                  label='End Bearing Capacity'
+                  name='endBearing'
+                  type='number'
+                  value={inputs.endBearing}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                  sx={textFieldStyle}
+                />
               </Paper>
             </Box>
 
@@ -654,37 +610,6 @@ export const PileDesignAnalysis = () => {
                   sx={textFieldStyle}
                 />
               </Paper>
-
-              {/* <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
-                  <Select
-                    name='loadType'
-                    label='load type'
-                    value={inputs.loadType}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    {loadTypeOptions.map(option => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  label='K1'
-                  name='k1'
-                  type='number'
-                  value={inputs.k1}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-              </Paper> */}
             </Box>
           </Box>
 
@@ -817,214 +742,6 @@ export const PileDesignAnalysis = () => {
           onConfirm={handleConfirmSave}
         />
       </Box>
-    </>
-  )
-}
-
-export const nw = () => {
-  return (
-    <>
-      <ToastContainer />
-      <Container
-        sx={{ marginTop: 4, textAlign: 'center', color: 'white, px:1' }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-            flex: 1,
-            backgroundColor: '#1e1e1e',
-            color: 'white',
-            border: '1px solid #0288d1'
-          }}
-        >
-          <Typography
-            variant='h5'
-            gutterBottom
-            sx={{ color: '#0288d1', marginBottom: 2 }}
-          >
-            Pile Design
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 2
-            }}
-          >
-            <Box
-              sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
-            >
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>
-                  Friction Angle
-                </InputLabel>
-                <Select
-                  name='frictionAngle'
-                  label='Friction Angle'
-                  value={inputs.frictionAngle}
-                  onChange={handleInputChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  {[
-                    0, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36
-                  ].map(value => (
-                    <MenuItem key={value} value={value.toString()}>
-                      {value}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              {[
-                {
-                  name: 'frictionResistanceAS',
-                  label: 'Friction Resistance A-S (KN)'
-                },
-                {
-                  name: 'frictionResistanceMH',
-                  label: 'Friction Resistance M-H (KN)'
-                },
-                { name: 'weight', label: 'Weight (KN)' },
-                { name: 'cohension', label: 'Cohension (Kpa)' },
-
-                { name: 'reductionStrength', label: 'Reduction Strength' },
-                { name: 'endBearing', label: 'End Bearing Capacity' }
-              ].map(({ name, label }) => (
-                <TextField
-                  key={name}
-                  label={label}
-                  name={name}
-                  type='number'
-                  variant='outlined'
-                  fullWidth
-                  InputProps={{
-                    readOnly: [
-                      'reductionStrength',
-
-                      'frictionResistanceAS',
-                      'frictionResistanceMH',
-                      'endBearing'
-                    ].includes(name)
-                  }}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' },
-                    '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline':
-                      {
-                        borderColor: '#0288d1'
-                      },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    }
-                  }}
-                />
-              ))}
-            </Box>
-
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: 2
-              }}
-            >
-              {[
-                {
-                  label: 'Total Uplift Resistance',
-                  value: results.totalUpliftResistance
-                },
-                {
-                  label: 'Total Pile Capacity (A-S)',
-                  value: results.totalPileCapacityAS
-                },
-                {
-                  label: 'Total Pile Capacity (M-H-E)',
-                  value: results.totalPileCapacityMH
-                }
-              ].map(({ label, value }) => (
-                <TextField
-                  key={label}
-                  label={label}
-                  value={value !== null ? value.toFixed(2) : ''}
-                  InputProps={{
-                    readOnly: true
-                  }}
-                  variant='filled'
-                  fullWidth
-                  sx={{
-                    '& .MuiFilledInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' }
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-          <Box
-            sx={{
-              marginTop: 3,
-              display: 'flex',
-              justifyContent: 'space-between',
-              gap: 2
-            }}
-          >
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={calculateResults}
-              sx={{
-                backgroundColor: '#0288d1',
-                '&:hover': {
-                  backgroundColor: '#026aa1'
-                }
-              }}
-            >
-              Calculate
-            </Button>
-
-            <Button
-              variant='contained'
-              color='secondary'
-              onClick={handleSave}
-              sx={{
-                backgroundColor: '#7b1fa2',
-                '&:hover': {
-                  backgroundColor: '#4a148c'
-                }
-              }}
-            >
-              Save
-            </Button>
-          </Box>
-        </Paper>
-
-        <ConfirmationDialog
-          open={dialogOpen}
-          title='Pile Analysis'
-          onClose={handleCloseDialog}
-          onConfirm={handleConfirmSave}
-        />
-      </Container>
     </>
   )
 }

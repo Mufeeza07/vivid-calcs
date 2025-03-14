@@ -51,7 +51,8 @@ export default async function handler(
       qk,
       designLoad,
       screwPenetration,
-      firstTimberThickness
+      firstTimberThickness,
+      note
     } = req.body
 
     if (!type || !screwType || !category) {
@@ -79,11 +80,12 @@ export default async function handler(
         k17,
         screwJD,
         shankDiameter,
-        lp,
-        qk,
         designLoad,
         screwPenetration,
-        firstTimberThickness
+        firstTimberThickness,
+        ...(note && { note }),
+        ...(lp && { lp }),
+        ...(qk && { qk })
       }
     })
 

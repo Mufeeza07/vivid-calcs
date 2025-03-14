@@ -1,5 +1,9 @@
 import { Box, Typography } from '@mui/material'
-import { NailModuleContent } from '../Content'
+import {
+  NailModuleContent,
+  PileModuleContent,
+  ScrewModuleContent
+} from '../Content'
 
 interface Props {
   moduleName: string
@@ -10,6 +14,10 @@ const InformationContent = ({ moduleName }: Props) => {
     switch (moduleName) {
       case 'nail':
         return <NailModuleContent />
+      case 'pile':
+        return <PileModuleContent />
+      case 'screw':
+        return <ScrewModuleContent />
 
       default:
         return (

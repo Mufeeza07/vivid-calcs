@@ -1,9 +1,11 @@
 'use client'
 
+import { PileDesignAnalysis } from '@/components/FootingDesign'
 import Navbar from '@/components/Navbar'
+import Sidebar from '@/components/Sidebar'
+import SupportActions from '@/components/SupportActions'
 import {
   Box,
-  Container,
   FormControl,
   InputLabel,
   MenuItem,
@@ -12,20 +14,11 @@ import {
   SelectChangeEvent,
   Typography
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import InfoIcon from '@mui/icons-material/Info'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { PileDesignAnalysis } from '@/components/FootingDesign'
-import PileInfoTable from '@/components/PileInfoTable'
-import Sidebar from '@/components/Sidebar'
-import SupportActions from '@/components/SupportActions'
 
 const BaseDesignAnalysis = () => {
-  const router = useRouter()
-
   const [selectedType, setSelectedType] = useState('')
-  const [openTable, setOpenTable] = useState(false)
+
   const handleTypeChange = (e: SelectChangeEvent<string>) => {
     setSelectedType(e.target.value)
   }
@@ -33,7 +26,7 @@ const BaseDesignAnalysis = () => {
     <>
       <Navbar />
       <Sidebar />
-      <SupportActions moduleName='nail' />
+      <SupportActions moduleName='pile' />
       <Box
         sx={{
           mt: 2,
