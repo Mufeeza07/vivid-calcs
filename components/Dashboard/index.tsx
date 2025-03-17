@@ -1,5 +1,3 @@
-/* eslint-disable react-hooks/rules-of-hooks */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   fetchJobs,
   selectCompletedJobs,
@@ -9,11 +7,12 @@ import {
   selectPendingJobs,
   selectRecentJobs
 } from '@/redux/slice/jobSlice'
+import { AppDispatch } from '@/redux/store'
 import {
+  Apps,
   AssignmentTurnedIn,
   BusinessCenter,
-  Notifications,
-  Apps
+  Notifications
 } from '@mui/icons-material'
 import {
   Box,
@@ -23,10 +22,11 @@ import {
   CircularProgress,
   Container,
   Grid,
-  Link,
   Paper,
   Typography
 } from '@mui/material'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
@@ -37,8 +37,6 @@ import {
   XAxis,
   YAxis
 } from 'recharts'
-import jwt from 'jsonwebtoken'
-import { useRouter } from 'next/navigation'
 
 const mockStats = {
   ongoingProjects: 5,
@@ -49,7 +47,7 @@ const mockStats = {
 const UserDashboard = () => {
   const router = useRouter()
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<AppDispatch>()
   const completedJobs = useSelector(selectCompletedJobs)
   const inProgressJobs = useSelector(selectInProgressJobs)
   const pendingJobs = useSelector(selectPendingJobs)
@@ -64,9 +62,9 @@ const UserDashboard = () => {
     dispatch(fetchJobs({ status: 'COMPLETED' }))
     dispatch(fetchJobs({ status: 'IN_PROGRESS' }))
     dispatch(fetchJobs({ status: 'ON_HOLD' }))
-    dispatch(fetchJobs())
+    dispatch(fetchJobs({}))
 
-    const user = JSON.parse(localStorage.getItem('user'))
+    const user = JSON.parse(localStorage.getItem('user') ?? '{}')
 
     if (user) {
       setUserName(user.name)
@@ -190,7 +188,7 @@ const UserDashboard = () => {
                         'In Progress': 'IP',
                         Completed: 'C'
                       }
-                      return initial[status] || status
+                      return initial[status as keyof typeof initial] || status
                     }
                     return status
                   }}
@@ -208,7 +206,7 @@ const UserDashboard = () => {
           <Card variant='outlined'>
             <CardContent>
               <Typography variant='h6'>Recent Jobs</Typography>
-              {recentJobs?.jobs?.slice(0, 2).map((job, index) => (
+              {recentJobs?.slice(0, 2).map((job, index) => (
                 <Box key={job.jobId} mb={2}>
                   <Typography variant='subtitle1'>{`Job ${index + 1}: ${job.address}`}</Typography>
                   <Typography variant='subtitle2' color='textSecondary'>

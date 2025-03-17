@@ -1,9 +1,11 @@
 'use client'
 
+import { PileDesignAnalysis } from '@/components/FootingDesign'
 import Navbar from '@/components/Navbar'
+import Sidebar from '@/components/Sidebar'
+import SupportActions from '@/components/SupportActions'
 import {
   Box,
-  Container,
   FormControl,
   InputLabel,
   MenuItem,
@@ -12,76 +14,46 @@ import {
   SelectChangeEvent,
   Typography
 } from '@mui/material'
-import ArrowBackIcon from '@mui/icons-material/ArrowBack'
-import InfoIcon from '@mui/icons-material/Info'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { PileDesignAnalysis } from '@/components/FootingDesign'
-import PileInfoTable from '@/components/PileInfoTable'
 
 const BaseDesignAnalysis = () => {
-  const router = useRouter()
-
   const [selectedType, setSelectedType] = useState('')
-  const [openTable, setOpenTable] = useState(false)
+
   const handleTypeChange = (e: SelectChangeEvent<string>) => {
     setSelectedType(e.target.value)
   }
   return (
     <>
       <Navbar />
-      <Container
+      <Sidebar />
+      <SupportActions moduleName='pile' />
+      <Box
         sx={{
+          mt: 2,
+          ml: { xs: '50px', sm: '200px' },
+          mr: { xs: '36px', sm: '60px' },
+          px: 2,
           display: 'flex',
-          justifyContent: 'center',
-          marginTop: 4,
-          textAlign: 'center',
-          color: 'white',
-          px: 1
+          justifyContent: 'center'
         }}
       >
         <Paper
           elevation={3}
           sx={{
-            padding: 4,
-            flex: 1,
+            width: '100%',
             maxWidth: 900,
             backgroundColor: '#1e1e1e',
             color: 'white',
-            border: '1px solid #0288d1'
+            border: '1px solid #0288d1',
+            p: 4
           }}
         >
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              mb: 2
-            }}
+          <Typography
+            variant='h5'
+            sx={{ color: '#0288d1', textAlign: 'center', mb: 2 }}
           >
-            <ArrowBackIcon
-              onClick={() => router.back()}
-              sx={{
-                cursor: 'pointer',
-                color: '#0288d1',
-                '&:hover': { color: '#026aa1' }
-              }}
-            />
-            <Typography
-              variant='h5'
-              sx={{ color: '#0288d1', textAlign: 'center' }}
-            >
-              Footing Design Analysis
-            </Typography>
-            <InfoIcon
-              onClick={() => setOpenTable(true)}
-              sx={{
-                cursor: 'pointer',
-                color: '#0288d1',
-                '&:hover': { color: '#026aa1' }
-              }}
-            />
-          </Box>
+            Footing Design Analysis
+          </Typography>
 
           <FormControl fullWidth>
             <InputLabel sx={{ color: '#0288d1' }}>Design Analysis</InputLabel>
@@ -107,11 +79,9 @@ const BaseDesignAnalysis = () => {
               <MenuItem value='slab'>Slab Design</MenuItem>
             </Select>
           </FormControl>
-          {selectedType === 'pile' && <PileDesignAnalysis />}
         </Paper>
-      </Container>
-
-      <PileInfoTable open={openTable} onClose={() => setOpenTable(false)} />
+      </Box>
+      {selectedType === 'pile' && <PileDesignAnalysis />}
     </>
   )
 }

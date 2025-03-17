@@ -6,7 +6,11 @@ import ContactContent from '../ContactUs'
 import DrawerWrapper from '../DrawerWrapper'
 import InformationContent from '../InformationContent'
 
-const SupportActions = () => {
+interface SupportActionsProps {
+  moduleName: string
+}
+
+const SupportActions = ({ moduleName }: SupportActionsProps) => {
   const [openDrawer, setOpenDrawer] = useState<'info' | 'contact' | null>(null)
 
   const handleOpen = (type: 'info' | 'contact') => setOpenDrawer(type)
@@ -54,7 +58,7 @@ const SupportActions = () => {
       </Box>
       {openDrawer === 'info' && (
         <DrawerWrapper open onClose={handleClose} title='Support & Learn'>
-          <InformationContent />
+          <InformationContent moduleName={moduleName} />
         </DrawerWrapper>
       )}
 

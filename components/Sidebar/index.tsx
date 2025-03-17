@@ -14,9 +14,12 @@ import ScheduleIcon from '@mui/icons-material/Schedule'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications'
+import { useRouter } from 'next/navigation'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
+  const router = useRouter()
   return (
     <>
       <Box
@@ -33,6 +36,27 @@ const Sidebar = () => {
         }}
       >
         <List>
+          <ListItemButton
+            onClick={() => router.back()}
+            sx={{
+              mt: 2,
+              backgroundColor: '#2a2a2a',
+              borderLeft: '4px solid #0288d1',
+              '&:hover': {
+                backgroundColor: '#333333'
+              }
+            }}
+          >
+            <ListItemIcon sx={{ color: '#0288d1' }}>
+              <ArrowBackIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary='Back'
+              sx={{ display: { xs: expanded ? 'block' : 'none', sm: 'block' } }}
+              primaryTypographyProps={{ color: 'white', fontWeight: 'bold' }}
+            />
+          </ListItemButton>
+
           <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
             <ListItemIcon sx={{ color: '#0288d1' }}>
               <InfoIcon />

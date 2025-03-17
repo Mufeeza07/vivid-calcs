@@ -1,17 +1,19 @@
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
 import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
-import { calculateBoltStrength } from '@/utils/calculateBolt'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
@@ -57,7 +59,7 @@ const loadTypeOptions = [
   { value: 'FIRE', label: 'Fire' }
 ]
 
-const BoltCalculator = () => {
+const NailCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
   const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -72,24 +74,27 @@ const BoltCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
-    phi: 0,
-    k1: 0,
-    k16: 1,
-    k17: 1,
-    qsk: 0,
-    type: '',
-    jobId: '',
     category: '',
+    jdType: '',
     load: '',
     loadType: '',
-    jdType: '',
-    boltSize: '',
-    timberThickness: '',
+    nailDiameter: '',
+    k13: 0,
+    screwJD: 0,
+    phi: 0,
+    k1: 0,
+    k14: 1,
+    k16: 1,
+    k17: 1,
+    type: '',
+    jobId: '',
     note: ''
   })
 
   const [results, setResults] = useState({
-    designStrength: null as number | null
+    designLoad: null as number | null,
+    screwPenetration: null as number | null,
+    firstTimberThickness: null as number | null
   })
 
   const handleChange = (
@@ -100,8 +105,89 @@ const BoltCalculator = () => {
     const { name, value } = event.target
 
     setInputs(prev => {
-      let updatedState = { ...prev, [name as keyof typeof inputs]: value }
-      updatedState = calculateBoltStrength(updatedState)
+      const updatedValue =
+        name === 'jobId' ||
+        name === 'type' ||
+        name === 'category' ||
+        name === 'screwSize' ||
+        name === 'jdType' ||
+        name === 'load' ||
+        name === 'loadType'
+          ? value
+          : value === ''
+            ? ''
+            : Math.max(0, parseFloat(value) || 0)
+
+      let updatedState = { ...prev, [name!]: updatedValue }
+
+      if (name === 'category') {
+        const phiValue =
+          value === 'AFFECTED_AREA_LESS_25M2'
+            ? 0.85
+            : value === 'AFFECTED_AREA_GREATER_25M2'
+              ? 0.8
+              : value === 'POST_DISASTER_BUILDING'
+                ? 0.75
+                : 0
+
+        updatedState.phi = phiValue
+      }
+
+      const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
+      const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
+
+      const jdValues = [
+        [1285, 1565, 1920, 2610, 3570, 4310, 5250],
+        [975, 1180, 1445, 1960, 2700, 3245, 3955],
+        [765, 930, 1135, 1550, 2125, 2565, 3125],
+        [545, 665, 810, 1110, 1520, 1830, 2225],
+        [445, 545, 680, 915, 1255, 1505, 1830],
+        [340, 415, 500, 695, 945, 1135, 1385]
+      ]
+
+      if (
+        (name === 'nailDiameter' || name === 'jdType') &&
+        updatedState.nailDiameter &&
+        updatedState.jdType
+      ) {
+        const jdIndex = jdTypes.indexOf(updatedState.jdType)
+        const nailIndex = nailDiameterValues.indexOf(
+          parseFloat(updatedState.nailDiameter)
+        )
+
+        if (jdIndex !== -1 && nailIndex !== -1) {
+          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
+        } else {
+          updatedState.screwJD = 0
+        }
+      }
+
+      if (name === 'load') {
+        updatedState.k13 =
+          value === 'PARALLEL_TO_GRAINS'
+            ? 1
+            : value === 'PERPENDICULAR_TO_GRAINS'
+              ? 0.6
+              : 0
+      }
+
+      const k1Values = {
+        PERMANENT_ACTION: 0.57,
+        ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
+        ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
+        FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
+        FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
+        PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
+        PERMANENT_WIND_IMPOSED_ACTION: 1.14,
+        PERMANENT_WIND_ACTION_REVERSAL: 1.14,
+        PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
+        FIRE: 0.77
+      }
+
+      if (name === 'loadType') {
+        updatedState.k1 = k1Values[value as keyof typeof k1Values] || 0
+      }
+
       return updatedState
     })
   }
@@ -111,29 +197,31 @@ const BoltCalculator = () => {
   }
 
   const calculateResults = () => {
-    const updatedResults = calculateBoltStrength(inputs)
-    setResults(updatedResults)
+    const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
+
+    const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
+    const screwPenetration = parseFloat(nailDiameter) * 7
+    const firstTimberThickness = parseFloat(nailDiameter) * 10
+
+    setResults({
+      designLoad,
+      screwPenetration,
+      firstTimberThickness
+    })
   }
 
   const handleSave = () => {
-    const requiredFields: (keyof typeof inputs)[] = [
-      'jobId',
-      'type',
-      'phi',
-      'k1',
-      'k16',
-      'k17',
-      'qsk'
-    ]
-    const missingFields = requiredFields.filter(field => !inputs[field])
+    const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
+    const missingFields = requiredFields
+      .filter(field => field !== 'note')
+      .filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')
       return
     }
 
-    const updatedResults = calculateBoltStrength(inputs)
-    setResults(updatedResults)
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -142,7 +230,7 @@ const BoltCalculator = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/bolt/create-bolt-details?jobId=${inputs.jobId}`,
+        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`,
         {
           method: 'POST',
           headers: {
@@ -150,21 +238,39 @@ const BoltCalculator = () => {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
-            ...inputs,
-            designStrength: results.designStrength
+            type: inputs.type,
+            k13: inputs.k13,
+            category: inputs.category,
+            load: inputs.load,
+            loadType: inputs.loadType,
+            jdType: inputs.jdType,
+            nailDiameter: inputs.nailDiameter,
+            screwJD: inputs.screwJD,
+            phi: inputs.phi,
+            k1: inputs.k1,
+            k14: inputs.k14,
+            k16: inputs.k16,
+            k17: inputs.k17,
+            note: inputs.note,
+            designLoad: results.designLoad,
+            screwPenetration: results.screwPenetration,
+            firstTimberThickness: results.firstTimberThickness
           })
         }
       )
 
       const responseData = await response.json()
+
       if (!response.ok) {
         toast.error(`Error: ${responseData.message}`)
         return
       }
+
       toast.success(responseData.message)
       setDialogOpen(false)
     } catch (error) {
-      toast.error('Failed to save data')
+      console.error('Error saving nail calculations:', error)
+      toast.error('Failed to save data.')
     }
   }
 
@@ -193,7 +299,7 @@ const BoltCalculator = () => {
               mb: 2
             }}
           >
-            Bolt Strength Calculator
+            Nail Calculator
           </Typography>
 
           <Box
@@ -232,7 +338,7 @@ const BoltCalculator = () => {
                   </Select>
                 </FormControl>
 
-                <FormControl fullWidth sx={{ mt: 2 }}>
+                <FormControl fullWidth>
                   <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                   <Select
                     name='type'
@@ -247,6 +353,74 @@ const BoltCalculator = () => {
                     <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
                   </Select>
                 </FormControl>
+              </Paper>
+
+              <Paper sx={cardStyle}>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#0288d1' }}>
+                    Nail Diameter
+                  </InputLabel>
+                  <Select
+                    name='nailDiameter'
+                    label='nailDiameter'
+                    value={inputs.nailDiameter}
+                    onChange={handleChange}
+                    sx={dropDownStyle}
+                  >
+                    <MenuItem value={2.5}>2.5</MenuItem>
+                    <MenuItem value={2.8}>2.8</MenuItem>
+                    <MenuItem value={3.15}>3.15</MenuItem>
+                    <MenuItem value={3.75}>3.75</MenuItem>
+                    <MenuItem value={4.5}>4.5</MenuItem>
+                    <MenuItem value={5}>5</MenuItem>
+                    <MenuItem value={5.6}>5.6</MenuItem>
+                  </Select>
+                </FormControl>
+
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 1
+                  }}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                    <Select
+                      name='jdType'
+                      label='jdType'
+                      value={inputs.jdType}
+                      onChange={handleChange}
+                      sx={dropDownStyle}
+                    >
+                      <MenuItem value='JD1'>JD1</MenuItem>
+                      <MenuItem value='JD2'>JD2</MenuItem>
+                      <MenuItem value='JD3'>JD3</MenuItem>
+                      <MenuItem value='JD4'>JD4</MenuItem>
+                      <MenuItem value='JD5'>JD5</MenuItem>
+                      <MenuItem value='JD6'>JD6</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
+                    <IconButton size='small' sx={{ color: '#0288d1' }}>
+                      <InfoOutlinedIcon fontSize='small' />
+                    </IconButton>
+                  </Tooltip>
+                </Box>
+
+                <TextField
+                  label='14g Screw'
+                  name='screwJD'
+                  type='number'
+                  value={inputs.screwJD}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  InputProps={{ readOnly: true }}
+                  sx={textFieldStyle}
+                />
               </Paper>
 
               <Paper sx={cardStyle}>
@@ -268,79 +442,16 @@ const BoltCalculator = () => {
                   </Select>
                 </FormControl>
 
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel sx={{ color: '#0288d1' }}>
-                    Timber Thickness (mm)
-                  </InputLabel>
-                  <Select
-                    name='timberThickness'
-                    label='Timber Thickness (mm)'
-                    value={inputs.timberThickness}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={35}>35</MenuItem>
-                    <MenuItem value={40}>40</MenuItem>
-                    <MenuItem value={45}>45</MenuItem>
-                    <MenuItem value={70}>70</MenuItem>
-                    <MenuItem value={90}>90</MenuItem>
-                    <MenuItem value={105}>105</MenuItem>
-                    <MenuItem value={120}>120</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
-                  <Select
-                    name='boltSize'
-                    label='Bolt Size '
-                    value={inputs.boltSize}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    <MenuItem value='M6'>M6</MenuItem>
-                    <MenuItem value='M8'>M8</MenuItem>
-                    <MenuItem value='M10'>M10</MenuItem>
-                    <MenuItem value='M12'>M12</MenuItem>
-                    <MenuItem value='M16'>M16</MenuItem>
-                    <MenuItem value='M20'>M20</MenuItem>
-                    <MenuItem value='M24'>M24</MenuItem>
-                    <MenuItem value='M30'>M30</MenuItem>
-                    <MenuItem value='M36'>M36</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth sx={{ mt: 2 }}>
-                  <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                  <Select
-                    name='jdType'
-                    label='jdType'
-                    value={inputs.jdType}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    <MenuItem value='JD1'>JD1</MenuItem>
-                    <MenuItem value='JD2'>JD2</MenuItem>
-                    <MenuItem value='JD3'>JD3</MenuItem>
-                    <MenuItem value='JD4'>JD4</MenuItem>
-                    <MenuItem value='JD5'>JD5</MenuItem>
-                    {inputs.load === 'PARALLEL_TO_GRAINS' && (
-                      <MenuItem value='JD6'>JD6</MenuItem>
-                    )}
-                  </Select>
-                </FormControl>
-
                 <TextField
-                  label='Qsk'
-                  name='qsk'
+                  label='K13'
+                  name='k13'
                   type='number'
-                  value={inputs.qsk}
+                  value={inputs.k13}
                   onChange={handleChange}
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
             </Box>
@@ -386,7 +497,7 @@ const BoltCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
 
@@ -417,11 +528,23 @@ const BoltCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   InputProps={{ readOnly: true }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
 
               <Paper sx={cardStyle}>
+                <TextField
+                  label='K14'
+                  name='k14'
+                  type='number'
+                  value={inputs.k14}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  inputProps={{ min: 0 }}
+                  sx={textFieldStyle}
+                />
+
                 <TextField
                   label='K16'
                   name='k16'
@@ -443,7 +566,7 @@ const BoltCalculator = () => {
                   onFocus={handleFocus}
                   fullWidth
                   inputProps={{ min: 0 }}
-                  sx={{ mt: 2, ...textFieldStyle() }}
+                  sx={textFieldStyle}
                 />
               </Paper>
             </Box>
@@ -458,27 +581,36 @@ const BoltCalculator = () => {
               gap: 2
             }}
           >
-            <TextField
-              label='Design Strength'
-              value={
-                results.designStrength !== null
-                  ? results.designStrength.toFixed(2)
-                  : ''
+            {[
+              { label: 'Design Load', value: results.designLoad },
+              {
+                label: 'Screw Penetration in Second Timber',
+                value: results.screwPenetration
+              },
+              {
+                label: 'First Timber Thickness',
+                value: results.firstTimberThickness
               }
-              InputProps={{
-                readOnly: true
-              }}
-              variant='filled'
-              fullWidth
-              sx={{
-                mt: 2,
-                '& .MuiFilledInput-root': {
-                  backgroundColor: '#282828',
-                  color: 'white'
-                },
-                '& .MuiInputLabel-root': { color: '#0288d1' }
-              }}
-            />
+            ].map(({ label, value }) => (
+              <TextField
+                key={label}
+                label={label}
+                value={value !== null ? value.toFixed(2) : ''}
+                InputProps={{
+                  readOnly: true
+                }}
+                variant='filled'
+                fullWidth
+                sx={{
+                  mt: 2,
+                  '& .MuiFilledInput-root': {
+                    backgroundColor: '#282828',
+                    color: 'white'
+                  },
+                  '& .MuiInputLabel-root': { color: '#0288d1' }
+                }}
+              />
+            ))}
           </Box>
 
           <Box sx={{ mt: 4 }}>
@@ -561,7 +693,7 @@ const BoltCalculator = () => {
 
         <ConfirmationDialog
           open={dialogOpen}
-          title='Bolt Strength'
+          title='Nail Calculations'
           onClose={() => setDialogOpen(false)}
           onConfirm={handleConfirmSave}
         />
@@ -570,4 +702,4 @@ const BoltCalculator = () => {
   )
 }
 
-export default BoltCalculator
+export default NailCalculator
