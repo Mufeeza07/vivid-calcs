@@ -45,11 +45,15 @@ export const calculateBoltStrength = (inputs: any) => {
   }
 
   if (inputs.loadType) {
-    updatedState.k1 = k1Values[inputs.loadType] || 0
+    updatedState.k1 = k1Values[inputs.loadType as keyof typeof k1Values] || 0
   }
 
-  // Calculate Design Strength
-  updatedState.designStrength = phi * k1 * k16 * k17 * qsk
+  updatedState.designStrength =
+    updatedState.phi *
+    updatedState.k1 *
+    updatedState.k16 *
+    updatedState.k17 *
+    updatedState.qsk
 
   return updatedState
 }

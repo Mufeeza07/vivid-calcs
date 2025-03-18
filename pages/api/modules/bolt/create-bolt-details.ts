@@ -29,7 +29,22 @@ export default async function handler(
         status: 400
       })
     }
-    const { type, phi, k1, k16, k17, qsk, designStrength, note } = req.body
+    const {
+      type,
+      phi,
+      k1,
+      k16,
+      k17,
+      qsk,
+      designStrength,
+      note,
+      category,
+      load,
+      loadType,
+      jdType,
+      boltSize,
+      timberThickness
+    } = req.body
 
     if (!type || !phi || !k1 || !k16 || !k17 || !qsk || !designStrength) {
       return res.status(400).json({
@@ -48,6 +63,12 @@ export default async function handler(
         k17,
         qsk,
         designStrength,
+        ...(category && { category }),
+        ...(load && { load }),
+        ...(loadType && { loadType }),
+        ...(jdType && { jdType }),
+        ...(boltSize && { boltSize }),
+        ...(timberThickness && { timberThickness }),
         ...(note && { note })
       }
     })

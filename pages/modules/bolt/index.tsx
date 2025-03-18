@@ -7,9 +7,8 @@ const Bolt = () => {
   return (
     <>
       <Navbar />
-      {/* <ToastContainer /> */}
       <Sidebar />
-      <SupportActions />
+      <SupportActions moduleName='bolt' />
       <BoltCalculator />
     </>
   )

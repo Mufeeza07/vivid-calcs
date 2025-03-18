@@ -22,42 +22,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../ConfirmationBox'
 
-const loadTypeOptions = [
-  { value: 'PERMANENT_ACTION', label: 'Permanent Action (Dead Load)' },
-  {
-    value: 'ROOF_LIVE_LOAD_DISTRIBUTED',
-    label: 'Roof Live Load - Distributed'
-  },
-  {
-    value: 'ROOF_LIVE_LOAD_CONCENTRATED',
-    label: 'Roof Live Load - Concentrated'
-  },
-  {
-    value: 'FLOOR_LIVE_LOADS_DISTRIBUTED',
-    label: 'Floor Live Loads - Distributed'
-  },
-  {
-    value: 'FLOOR_LIVE_LOADS_CONCENTRATED',
-    label: 'Floor Live Loads - Concentrated'
-  },
-  {
-    value: 'PERMANENT_LONG_TERM_IMPOSED_ACTION',
-    label: 'Permanent and Long-Term Imposed Action'
-  },
-  {
-    value: 'PERMANENT_WIND_IMPOSED_ACTION',
-    label: 'Permanent, Wind and Imposed Action'
-  },
-  {
-    value: 'PERMANENT_WIND_ACTION_REVERSAL',
-    label: 'Permanent and Wind Action Reversal'
-  },
-  {
-    value: 'PERMANENT_EARTHQUAKE_IMPOSED_ACTION',
-    label: 'Permanent, Earthquake and Imposed Action'
-  },
-  { value: 'FIRE', label: 'Fire' }
-]
+import {
+  calculateNailStrength,
+  categoryOptions,
+  jdTypeOptions,
+  loadDirectionOptions,
+  loadTypeOptions,
+  nailDiameterOptions,
+  nailTypeOptions
+} from '@/utils/calculateNail'
 
 const NailCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -97,6 +70,101 @@ const NailCalculator = () => {
     firstTimberThickness: null as number | null
   })
 
+  // const handleChange = (
+  //   event:
+  //     | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  //     | SelectChangeEvent<string>
+  // ) => {
+  //   const { name, value } = event.target
+
+  //   setInputs(prev => {
+  //     const updatedValue =
+  //       name === 'jobId' ||
+  //       name === 'type' ||
+  //       name === 'category' ||
+  //       name === 'screwSize' ||
+  //       name === 'jdType' ||
+  //       name === 'load' ||
+  //       name === 'loadType'
+  //         ? value
+  //         : value === ''
+  //           ? ''
+  //           : Math.max(0, parseFloat(value) || 0)
+
+  //     let updatedState = { ...prev, [name!]: updatedValue }
+
+  //     if (name === 'category') {
+  //       const phiValue =
+  //         value === 'AFFECTED_AREA_LESS_25M2'
+  //           ? 0.85
+  //           : value === 'AFFECTED_AREA_GREATER_25M2'
+  //             ? 0.8
+  //             : value === 'POST_DISASTER_BUILDING'
+  //               ? 0.75
+  //               : 0
+
+  //       updatedState.phi = phiValue
+  //     }
+
+  //     const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
+  //     const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
+
+  //     const jdValues = [
+  //       [1285, 1565, 1920, 2610, 3570, 4310, 5250],
+  //       [975, 1180, 1445, 1960, 2700, 3245, 3955],
+  //       [765, 930, 1135, 1550, 2125, 2565, 3125],
+  //       [545, 665, 810, 1110, 1520, 1830, 2225],
+  //       [445, 545, 680, 915, 1255, 1505, 1830],
+  //       [340, 415, 500, 695, 945, 1135, 1385]
+  //     ]
+
+  //     if (
+  //       (name === 'nailDiameter' || name === 'jdType') &&
+  //       updatedState.nailDiameter &&
+  //       updatedState.jdType
+  //     ) {
+  //       const jdIndex = jdTypes.indexOf(updatedState.jdType)
+  //       const nailIndex = nailDiameterValues.indexOf(
+  //         parseFloat(updatedState.nailDiameter)
+  //       )
+
+  //       if (jdIndex !== -1 && nailIndex !== -1) {
+  //         updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
+  //       } else {
+  //         updatedState.screwJD = 0
+  //       }
+  //     }
+
+  //     if (name === 'load') {
+  //       updatedState.k13 =
+  //         value === 'PARALLEL_TO_GRAINS'
+  //           ? 1
+  //           : value === 'PERPENDICULAR_TO_GRAINS'
+  //             ? 0.6
+  //             : 0
+  //     }
+
+  //     const k1Values = {
+  //       PERMANENT_ACTION: 0.57,
+  //       ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
+  //       ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
+  //       FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
+  //       FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
+  //       PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
+  //       PERMANENT_WIND_IMPOSED_ACTION: 1.14,
+  //       PERMANENT_WIND_ACTION_REVERSAL: 1.14,
+  //       PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
+  //       FIRE: 0.77
+  //     }
+
+  //     if (name === 'loadType') {
+  //       updatedState.k1 = k1Values[value as keyof typeof k1Values] || 0
+  //     }
+
+  //     return updatedState
+  //   })
+  // }
+
   const handleChange = (
     event:
       | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -105,90 +173,21 @@ const NailCalculator = () => {
     const { name, value } = event.target
 
     setInputs(prev => {
-      const updatedValue =
-        name === 'jobId' ||
-        name === 'type' ||
-        name === 'category' ||
-        name === 'screwSize' ||
-        name === 'jdType' ||
-        name === 'load' ||
-        name === 'loadType'
-          ? value
-          : value === ''
-            ? ''
-            : Math.max(0, parseFloat(value) || 0)
+      const updatedValue = [
+        'jobId',
+        'type',
+        'category',
+        'jdType',
+        'load',
+        'loadType'
+      ].includes(name)
+        ? value
+        : value === ''
+          ? ''
+          : Math.max(0, parseFloat(value) || 0)
 
-      let updatedState = { ...prev, [name!]: updatedValue }
-
-      if (name === 'category') {
-        const phiValue =
-          value === 'AFFECTED_AREA_LESS_25M2'
-            ? 0.85
-            : value === 'AFFECTED_AREA_GREATER_25M2'
-              ? 0.8
-              : value === 'POST_DISASTER_BUILDING'
-                ? 0.75
-                : 0
-
-        updatedState.phi = phiValue
-      }
-
-      const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
-      const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
-
-      const jdValues = [
-        [1285, 1565, 1920, 2610, 3570, 4310, 5250],
-        [975, 1180, 1445, 1960, 2700, 3245, 3955],
-        [765, 930, 1135, 1550, 2125, 2565, 3125],
-        [545, 665, 810, 1110, 1520, 1830, 2225],
-        [445, 545, 680, 915, 1255, 1505, 1830],
-        [340, 415, 500, 695, 945, 1135, 1385]
-      ]
-
-      if (
-        (name === 'nailDiameter' || name === 'jdType') &&
-        updatedState.nailDiameter &&
-        updatedState.jdType
-      ) {
-        const jdIndex = jdTypes.indexOf(updatedState.jdType)
-        const nailIndex = nailDiameterValues.indexOf(
-          parseFloat(updatedState.nailDiameter)
-        )
-
-        if (jdIndex !== -1 && nailIndex !== -1) {
-          updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
-        } else {
-          updatedState.screwJD = 0
-        }
-      }
-
-      if (name === 'load') {
-        updatedState.k13 =
-          value === 'PARALLEL_TO_GRAINS'
-            ? 1
-            : value === 'PERPENDICULAR_TO_GRAINS'
-              ? 0.6
-              : 0
-      }
-
-      const k1Values = {
-        PERMANENT_ACTION: 0.57,
-        ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
-        ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
-        FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
-        FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
-        PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
-        PERMANENT_WIND_IMPOSED_ACTION: 1.14,
-        PERMANENT_WIND_ACTION_REVERSAL: 1.14,
-        PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
-        FIRE: 0.77
-      }
-
-      if (name === 'loadType') {
-        updatedState.k1 = k1Values[value as keyof typeof k1Values] || 0
-      }
-
-      return updatedState
+      const newState = { ...prev, [name]: updatedValue }
+      return calculateNailStrength(newState)
     })
   }
 
@@ -196,17 +195,27 @@ const NailCalculator = () => {
     e.target.select()
   }
 
+  // const calculateResults = () => {
+  //   const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
+
+  //   const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
+  //   const screwPenetration = parseFloat(nailDiameter) * 7
+  //   const firstTimberThickness = parseFloat(nailDiameter) * 10
+
+  //   setResults({
+  //     designLoad,
+  //     screwPenetration,
+  //     firstTimberThickness
+  //   })
+  // }
+
   const calculateResults = () => {
-    const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
-
-    const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
-    const screwPenetration = parseFloat(nailDiameter) * 7
-    const firstTimberThickness = parseFloat(nailDiameter) * 10
-
+    const updated = calculateNailStrength(inputs)
+    setInputs(updated)
     setResults({
-      designLoad,
-      screwPenetration,
-      firstTimberThickness
+      designLoad: updated.designLoad ?? null,
+      screwPenetration: updated.screwPenetration ?? null,
+      firstTimberThickness: updated.firstTimberThickness ?? null
     })
   }
 
@@ -221,7 +230,7 @@ const NailCalculator = () => {
       return
     }
 
-    calculateResults()
+    // calculateResults()
     setDialogOpen(true)
   }
 
@@ -347,10 +356,11 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle()}
                   >
-                    <MenuItem value='TIMBER_TO_TIMBER'>
-                      Timber to Timber
-                    </MenuItem>
-                    <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
+                    {nailTypeOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Paper>
@@ -367,12 +377,11 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value={2.5}>2.5</MenuItem>
-                    <MenuItem value={2.8}>2.8</MenuItem>
-                    <MenuItem value={3.15}>3.15</MenuItem>
-                    <MenuItem value={3.75}>3.75</MenuItem>
-                    <MenuItem value={4.5}>4.5</MenuItem>
-                    <MenuItem value={5}>5</MenuItem>
+                    {nailDiameterOptions.map(value => (
+                      <MenuItem key={value} value={value}>
+                        {value}
+                      </MenuItem>
+                    ))}
                     <MenuItem value={5.6}>5.6</MenuItem>
                   </Select>
                 </FormControl>
@@ -394,12 +403,11 @@ const NailCalculator = () => {
                       onChange={handleChange}
                       sx={dropDownStyle}
                     >
-                      <MenuItem value='JD1'>JD1</MenuItem>
-                      <MenuItem value='JD2'>JD2</MenuItem>
-                      <MenuItem value='JD3'>JD3</MenuItem>
-                      <MenuItem value='JD4'>JD4</MenuItem>
-                      <MenuItem value='JD5'>JD5</MenuItem>
-                      <MenuItem value='JD6'>JD6</MenuItem>
+                      {jdTypeOptions.map(value => (
+                        <MenuItem key={value} value={value}>
+                          {value}
+                        </MenuItem>
+                      ))}
                     </Select>
                   </FormControl>
 
@@ -433,12 +441,11 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value='PARALLEL_TO_GRAINS'>
-                      Parallel to grains
-                    </MenuItem>
-                    <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                      Perpendicular to grains
-                    </MenuItem>
+                    {loadDirectionOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -476,15 +483,11 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle()}
                   >
-                    <MenuItem value='AFFECTED_AREA_LESS_25M2'>
-                      Affected Area Less Than 25m²
-                    </MenuItem>
-                    <MenuItem value='AFFECTED_AREA_GREATER_25M2'>
-                      Affected Area Greater Than 25m²
-                    </MenuItem>
-                    <MenuItem value='POST_DISASTER_BUILDING'>
-                      Post Disaster Building
-                    </MenuItem>
+                    {categoryOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 

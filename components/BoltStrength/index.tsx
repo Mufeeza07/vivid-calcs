@@ -116,24 +116,16 @@ const BoltCalculator = () => {
   }
 
   const handleSave = () => {
-    const requiredFields: (keyof typeof inputs)[] = [
-      'jobId',
-      'type',
-      'phi',
-      'k1',
-      'k16',
-      'k17',
-      'qsk'
-    ]
-    const missingFields = requiredFields.filter(field => !inputs[field])
+    const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
+    const missingFields = requiredFields
+      .filter(field => field !== 'note')
+      .filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')
       return
     }
 
-    const updatedResults = calculateBoltStrength(inputs)
-    setResults(updatedResults)
     setDialogOpen(true)
   }
 
@@ -279,14 +271,14 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={35}>35</MenuItem>
-                    <MenuItem value={40}>40</MenuItem>
-                    <MenuItem value={45}>45</MenuItem>
-                    <MenuItem value={70}>70</MenuItem>
-                    <MenuItem value={90}>90</MenuItem>
-                    <MenuItem value={105}>105</MenuItem>
-                    <MenuItem value={120}>120</MenuItem>
+                    <MenuItem value='TT_25'>25</MenuItem>
+                    <MenuItem value='TT_35'>35</MenuItem>
+                    <MenuItem value='TT_40'>40</MenuItem>
+                    <MenuItem value='TT_45'>45</MenuItem>
+                    <MenuItem value='TT_70'>70</MenuItem>
+                    <MenuItem value='TT_90'>90</MenuItem>
+                    <MenuItem value='TT_105'>105</MenuItem>
+                    <MenuItem value='TT_120'>120</MenuItem>
                   </Select>
                 </FormControl>
 
