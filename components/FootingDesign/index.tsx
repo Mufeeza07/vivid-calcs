@@ -201,7 +201,9 @@ export const PileDesignAnalysis = () => {
 
   const handleSave = () => {
     const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
-    const missingFields = requiredFields.filter(field => !inputs[field])
+    const missingFields = requiredFields
+      .filter(field => field !== 'note')
+      .filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')

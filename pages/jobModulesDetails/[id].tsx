@@ -1,5 +1,6 @@
 'use client'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
+import { calculateNailStrength } from '@/utils/calculateNail'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -7,13 +8,28 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
 import {
+  loadTypeOptions,
+  categoryOptions,
+  jdTypeOptions,
+  nailDiameterOptions,
+  loadDirectionOptions,
+  typeOptions,
+  timberThicknessOptions,
+  boltSizeOptions
+} from '@/utils/dropdownValues'
+
+import {
   Box,
   Button,
   CircularProgress,
   Container,
   Divider,
+  FormControl,
   IconButton,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   TextField,
   Typography
 } from '@mui/material'
@@ -28,7 +44,7 @@ const JobDetailsPage = () => {
   const [loading, setLoading] = useState(true)
   const pdfRef = useRef<HTMLDivElement>(null)
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null)
-  const [editableNote, setEditableNote] = useState<string>('')
+  const [editableEntryData, setEditableEntryData] = useState<any>({})
 
   useEffect(() => {
     fetchJobDetails()
@@ -70,16 +86,27 @@ const JobDetailsPage = () => {
   }
   const handleEditEntry = (entry: any) => {
     setEditingEntryId(entry.id)
-    setEditableNote(entry.note || '')
-  }
-
-  const handleNoteChange = (value: string) => {
-    setEditableNote(value)
+    setEditableEntryData({ ...entry })
   }
 
   const handleCancelEdit = () => {
     setEditingEntryId(null)
-    setEditableNote('')
+    setEditableEntryData({})
+  }
+
+  const handleFieldChange = (key: string, value: string, module: string) => {
+    const updated = {
+      ...editableEntryData,
+      [key]: isNaN(Number(value)) || value === '' ? value : parseFloat(value)
+    }
+
+    if (module === 'nails') {
+      setEditableEntryData(calculateNailStrength(updated))
+    } else if (module === 'boltStrength') {
+      setEditableEntryData(calculateBoltStrength(updated))
+    } else {
+      setEditableEntryData(updated)
+    }
   }
 
   const handleUpdateModuleEntry = async (
@@ -103,11 +130,6 @@ const JobDetailsPage = () => {
       console.error(`Unknown module type: ${module}`)
       return
     }
-    let recalculatedData = { ...updatedData }
-
-    if (module === 'boltStrength') {
-      recalculatedData = calculateBoltStrength(updatedData)
-    }
 
     const endpoint = `/api/modules/${apiModule}/update-${apiModule}-details?id=${entryId}`
 
@@ -118,7 +140,7 @@ const JobDetailsPage = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(recalculatedData)
+        body: JSON.stringify(updatedData)
       })
 
       const responseData = await response.json()
@@ -128,7 +150,7 @@ const JobDetailsPage = () => {
         toast.success(responseData.message || 'Entry updated successfully.')
         fetchJobDetails()
         setEditingEntryId(null)
-        setEditableNote('')
+        setEditableEntryData({})
       } else {
         console.error(`Failed to update ${module} entry.`)
         toast.error(responseData.message || 'Failed to update entry.')
@@ -181,12 +203,22 @@ const JobDetailsPage = () => {
     }
   }
 
+  const dropdownOptions: Record<string, { value: any; label: string }[]> = {
+    category: categoryOptions,
+    loadType: loadTypeOptions,
+    load: loadDirectionOptions,
+    jdType: jdTypeOptions,
+    nailDiameter: nailDiameterOptions,
+    type: typeOptions,
+    timberThickness: timberThicknessOptions,
+    boltSize: boltSizeOptions
+  }
+
   if (loading)
     return <CircularProgress sx={{ display: 'block', margin: 'auto', mt: 4 }} />
 
   return (
     <>
-      {' '}
       <ToastContainer />
       <Container maxWidth='md' sx={{ mt: 4 }}>
         <Button
@@ -338,7 +370,7 @@ const JobDetailsPage = () => {
                                         handleUpdateModuleEntry(
                                           module,
                                           entry.id,
-                                          editableNote
+                                          editableEntryData
                                         )
                                       }
                                     >
@@ -380,41 +412,72 @@ const JobDetailsPage = () => {
                               key !== 'jobId' &&
                               key !== 'createdAt' &&
                               key !== 'updatedAt' ? (
-                                <TextField
-                                  key={key}
-                                  label={key.replace(/([A-Z])/g, ' $1').trim()}
-                                  value={
-                                    key === 'note' &&
-                                    editingEntryId === entry.id
-                                      ? editableNote
-                                      : entry[key] || ''
-                                  }
-                                  fullWidth
-                                  disabled={
-                                    !(
-                                      key === 'note' &&
-                                      editingEntryId === entry.id
-                                    )
-                                  }
-                                  onChange={e =>
-                                    key === 'note'
-                                      ? handleNoteChange(e.target.value)
-                                      : null
-                                  }
-                                  sx={{
-                                    mt: 2,
-                                    '& .MuiInputBase-input': {
-                                      color: '#333'
-                                    },
-                                    '& .MuiInputLabel-root': {
-                                      color: '#555'
-                                    },
-                                    '& .MuiOutlinedInput-root.Mui-disabled .MuiOutlinedInput-notchedOutline':
-                                      {
-                                        borderColor: '#aaa'
+                                editingEntryId === entry.id ? (
+                                  dropdownOptions[key] ? (
+                                    // Editable dropdown field
+                                    <FormControl
+                                      fullWidth
+                                      sx={{ mt: 2 }}
+                                      key={key}
+                                    >
+                                      <InputLabel>
+                                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                                      </InputLabel>
+                                      <Select
+                                        value={editableEntryData[key] || ''}
+                                        onChange={e =>
+                                          handleFieldChange(
+                                            key,
+                                            e.target.value,
+                                            module
+                                          )
+                                        }
+                                        label={key
+                                          .replace(/([A-Z])/g, ' $1')
+                                          .trim()}
+                                      >
+                                        {dropdownOptions[key].map(opt => (
+                                          <MenuItem
+                                            key={opt.value}
+                                            value={opt.value}
+                                          >
+                                            {opt.label}
+                                          </MenuItem>
+                                        ))}
+                                      </Select>
+                                    </FormControl>
+                                  ) : (
+                                    // Editable text field
+                                    <TextField
+                                      key={key}
+                                      label={key
+                                        .replace(/([A-Z])/g, ' $1')
+                                        .trim()}
+                                      fullWidth
+                                      value={editableEntryData[key] ?? ''}
+                                      onChange={e =>
+                                        handleFieldChange(
+                                          key,
+                                          e.target.value,
+                                          module
+                                        )
                                       }
-                                  }}
-                                />
+                                      sx={{ mt: 2 }}
+                                    />
+                                  )
+                                ) : (
+                                  // Read-only field
+                                  <TextField
+                                    key={key}
+                                    label={key
+                                      .replace(/([A-Z])/g, ' $1')
+                                      .trim()}
+                                    fullWidth
+                                    value={entry[key] ?? ''}
+                                    disabled
+                                    sx={{ mt: 2 }}
+                                  />
+                                )
                               ) : null
                             )}
                           </Box>

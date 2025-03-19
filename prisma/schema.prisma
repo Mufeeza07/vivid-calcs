@@ -100,20 +100,49 @@ enum Type {
 }
 
 model BoltStrength {
-  id             String   @id @default(uuid())
-  jobId          String
-  type           Type
-  phi            Float
-  k1             Float
-  k16            Float
-  k17            Float
-  qsk            Float
-  designStrength Float
-  note           String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String           @id @default(uuid())
+  jobId           String
+  type            Type
+  phi             Float
+  k1              Float
+  k16             Float
+  k17             Float
+  qsk             Float
+  category        Category?
+  load            Load?
+  loadType        LoadType?
+  jdType          JDType?
+  boltSize        BoltSize?
+  timberThickness TimberThickness?
+  designStrength  Float
+  note            String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
 
   job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+}
+
+enum BoltSize {
+  M6
+  M8
+  M10
+  M12
+  M16
+  M20
+  M24
+  M30
+  M36
+}
+
+enum TimberThickness {
+  TT_25
+  TT_35
+  TT_40
+  TT_45
+  TT_70
+  TT_90
+  TT_105
+  TT_120
 }
 
 model Weld {

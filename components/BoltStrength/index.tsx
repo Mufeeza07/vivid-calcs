@@ -19,43 +19,15 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../ConfirmationBox'
-
-const loadTypeOptions = [
-  { value: 'PERMANENT_ACTION', label: 'Permanent Action (Dead Load)' },
-  {
-    value: 'ROOF_LIVE_LOAD_DISTRIBUTED',
-    label: 'Roof Live Load - Distributed'
-  },
-  {
-    value: 'ROOF_LIVE_LOAD_CONCENTRATED',
-    label: 'Roof Live Load - Concentrated'
-  },
-  {
-    value: 'FLOOR_LIVE_LOADS_DISTRIBUTED',
-    label: 'Floor Live Loads - Distributed'
-  },
-  {
-    value: 'FLOOR_LIVE_LOADS_CONCENTRATED',
-    label: 'Floor Live Loads - Concentrated'
-  },
-  {
-    value: 'PERMANENT_LONG_TERM_IMPOSED_ACTION',
-    label: 'Permanent and Long-Term Imposed Action'
-  },
-  {
-    value: 'PERMANENT_WIND_IMPOSED_ACTION',
-    label: 'Permanent, Wind and Imposed Action'
-  },
-  {
-    value: 'PERMANENT_WIND_ACTION_REVERSAL',
-    label: 'Permanent and Wind Action Reversal'
-  },
-  {
-    value: 'PERMANENT_EARTHQUAKE_IMPOSED_ACTION',
-    label: 'Permanent, Earthquake and Imposed Action'
-  },
-  { value: 'FIRE', label: 'Fire' }
-]
+import {
+  boltSizeOptions,
+  categoryOptions,
+  jdTypeOptions,
+  loadDirectionOptions,
+  loadTypeOptions,
+  timberThicknessOptions,
+  typeOptions
+} from '@/utils/dropdownValues'
 
 const BoltCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -116,24 +88,16 @@ const BoltCalculator = () => {
   }
 
   const handleSave = () => {
-    const requiredFields: (keyof typeof inputs)[] = [
-      'jobId',
-      'type',
-      'phi',
-      'k1',
-      'k16',
-      'k17',
-      'qsk'
-    ]
-    const missingFields = requiredFields.filter(field => !inputs[field])
+    const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
+    const missingFields = requiredFields
+      .filter(field => field !== 'note')
+      .filter(field => !inputs[field])
 
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')
       return
     }
-
-    const updatedResults = calculateBoltStrength(inputs)
-    setResults(updatedResults)
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -241,10 +205,11 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle()}
                   >
-                    <MenuItem value='TIMBER_TO_TIMBER'>
-                      Timber to Timber
-                    </MenuItem>
-                    <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
+                    {typeOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
               </Paper>
@@ -259,12 +224,11 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value='PARALLEL_TO_GRAINS'>
-                      Parallel to grains
-                    </MenuItem>
-                    <MenuItem value='PERPENDICULAR_TO_GRAINS'>
-                      Perpendicular to grains
-                    </MenuItem>
+                    {loadDirectionOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -279,14 +243,11 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value={25}>25</MenuItem>
-                    <MenuItem value={35}>35</MenuItem>
-                    <MenuItem value={40}>40</MenuItem>
-                    <MenuItem value={45}>45</MenuItem>
-                    <MenuItem value={70}>70</MenuItem>
-                    <MenuItem value={90}>90</MenuItem>
-                    <MenuItem value={105}>105</MenuItem>
-                    <MenuItem value={120}>120</MenuItem>
+                    {timberThicknessOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -299,15 +260,11 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value='M6'>M6</MenuItem>
-                    <MenuItem value='M8'>M8</MenuItem>
-                    <MenuItem value='M10'>M10</MenuItem>
-                    <MenuItem value='M12'>M12</MenuItem>
-                    <MenuItem value='M16'>M16</MenuItem>
-                    <MenuItem value='M20'>M20</MenuItem>
-                    <MenuItem value='M24'>M24</MenuItem>
-                    <MenuItem value='M30'>M30</MenuItem>
-                    <MenuItem value='M36'>M36</MenuItem>
+                    {boltSizeOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -320,14 +277,17 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    <MenuItem value='JD1'>JD1</MenuItem>
-                    <MenuItem value='JD2'>JD2</MenuItem>
-                    <MenuItem value='JD3'>JD3</MenuItem>
-                    <MenuItem value='JD4'>JD4</MenuItem>
-                    <MenuItem value='JD5'>JD5</MenuItem>
-                    {inputs.load === 'PARALLEL_TO_GRAINS' && (
-                      <MenuItem value='JD6'>JD6</MenuItem>
-                    )}
+                    {jdTypeOptions
+                      .filter(
+                        opt =>
+                          opt.value !== 'JD6' ||
+                          inputs.load === 'PARALLEL_TO_GRAINS'
+                      )
+                      .map(opt => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
 
@@ -365,15 +325,11 @@ const BoltCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle()}
                   >
-                    <MenuItem value='AFFECTED_AREA_LESS_25M2'>
-                      Affected Area Less Than 25m²
-                    </MenuItem>
-                    <MenuItem value='AFFECTED_AREA_GREATER_25M2'>
-                      Affected Area Greater Than 25m²
-                    </MenuItem>
-                    <MenuItem value='POST_DISASTER_BUILDING'>
-                      Post Disaster Building
-                    </MenuItem>
+                    {categoryOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 

@@ -88,7 +88,7 @@ const ScrewStrength = () => {
       </Box>
       <Box mt={3}>
         {selectedType === 'shear' && <ShearScrewCalculator screwType='SHEAR' />}
-        {selectedType === 'pullout' && <UpliftScrewCalculator />}
+        {selectedType === 'pullout' && <UpliftScrewCalculator screwType='PULLOUT' />}
       </Box>
     </>
   )
