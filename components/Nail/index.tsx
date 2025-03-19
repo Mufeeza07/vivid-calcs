@@ -23,14 +23,14 @@ import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../ConfirmationBox'
 
 import {
-  calculateNailStrength,
   categoryOptions,
   jdTypeOptions,
   loadDirectionOptions,
   loadTypeOptions,
   nailDiameterOptions,
-  nailTypeOptions
-} from '@/utils/calculateNail'
+  typeOptions
+} from '@/utils/dropdownValues'
+import { calculateNailStrength } from '@/utils/calculateNail'
 
 const NailCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -70,101 +70,6 @@ const NailCalculator = () => {
     firstTimberThickness: null as number | null
   })
 
-  // const handleChange = (
-  //   event:
-  //     | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  //     | SelectChangeEvent<string>
-  // ) => {
-  //   const { name, value } = event.target
-
-  //   setInputs(prev => {
-  //     const updatedValue =
-  //       name === 'jobId' ||
-  //       name === 'type' ||
-  //       name === 'category' ||
-  //       name === 'screwSize' ||
-  //       name === 'jdType' ||
-  //       name === 'load' ||
-  //       name === 'loadType'
-  //         ? value
-  //         : value === ''
-  //           ? ''
-  //           : Math.max(0, parseFloat(value) || 0)
-
-  //     let updatedState = { ...prev, [name!]: updatedValue }
-
-  //     if (name === 'category') {
-  //       const phiValue =
-  //         value === 'AFFECTED_AREA_LESS_25M2'
-  //           ? 0.85
-  //           : value === 'AFFECTED_AREA_GREATER_25M2'
-  //             ? 0.8
-  //             : value === 'POST_DISASTER_BUILDING'
-  //               ? 0.75
-  //               : 0
-
-  //       updatedState.phi = phiValue
-  //     }
-
-  //     const nailDiameterValues = [2.5, 2.8, 3.15, 3.75, 4.5, 5, 5.6]
-  //     const jdTypes = ['JD1', 'JD2', 'JD3', 'JD4', 'JD5', 'JD6']
-
-  //     const jdValues = [
-  //       [1285, 1565, 1920, 2610, 3570, 4310, 5250],
-  //       [975, 1180, 1445, 1960, 2700, 3245, 3955],
-  //       [765, 930, 1135, 1550, 2125, 2565, 3125],
-  //       [545, 665, 810, 1110, 1520, 1830, 2225],
-  //       [445, 545, 680, 915, 1255, 1505, 1830],
-  //       [340, 415, 500, 695, 945, 1135, 1385]
-  //     ]
-
-  //     if (
-  //       (name === 'nailDiameter' || name === 'jdType') &&
-  //       updatedState.nailDiameter &&
-  //       updatedState.jdType
-  //     ) {
-  //       const jdIndex = jdTypes.indexOf(updatedState.jdType)
-  //       const nailIndex = nailDiameterValues.indexOf(
-  //         parseFloat(updatedState.nailDiameter)
-  //       )
-
-  //       if (jdIndex !== -1 && nailIndex !== -1) {
-  //         updatedState.screwJD = jdValues[jdIndex][nailIndex] / 1000
-  //       } else {
-  //         updatedState.screwJD = 0
-  //       }
-  //     }
-
-  //     if (name === 'load') {
-  //       updatedState.k13 =
-  //         value === 'PARALLEL_TO_GRAINS'
-  //           ? 1
-  //           : value === 'PERPENDICULAR_TO_GRAINS'
-  //             ? 0.6
-  //             : 0
-  //     }
-
-  //     const k1Values = {
-  //       PERMANENT_ACTION: 0.57,
-  //       ROOF_LIVE_LOAD_DISTRIBUTED: 0.77,
-  //       ROOF_LIVE_LOAD_CONCENTRATED: 0.86,
-  //       FLOOR_LIVE_LOADS_DISTRIBUTED: 0.69,
-  //       FLOOR_LIVE_LOADS_CONCENTRATED: 0.77,
-  //       PERMANENT_LONG_TERM_IMPOSED_ACTION: 0.57,
-  //       PERMANENT_WIND_IMPOSED_ACTION: 1.14,
-  //       PERMANENT_WIND_ACTION_REVERSAL: 1.14,
-  //       PERMANENT_EARTHQUAKE_IMPOSED_ACTION: 1.14,
-  //       FIRE: 0.77
-  //     }
-
-  //     if (name === 'loadType') {
-  //       updatedState.k1 = k1Values[value as keyof typeof k1Values] || 0
-  //     }
-
-  //     return updatedState
-  //   })
-  // }
-
   const handleChange = (
     event:
       | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -195,20 +100,6 @@ const NailCalculator = () => {
     e.target.select()
   }
 
-  // const calculateResults = () => {
-  //   const { k13, nailDiameter, screwJD, phi, k1, k14, k16, k17 } = inputs
-
-  //   const designLoad = k13 * screwJD * phi * k14 * k16 * k17 * k1
-  //   const screwPenetration = parseFloat(nailDiameter) * 7
-  //   const firstTimberThickness = parseFloat(nailDiameter) * 10
-
-  //   setResults({
-  //     designLoad,
-  //     screwPenetration,
-  //     firstTimberThickness
-  //   })
-  // }
-
   const calculateResults = () => {
     const updated = calculateNailStrength(inputs)
     setInputs(updated)
@@ -230,7 +121,7 @@ const NailCalculator = () => {
       return
     }
 
-    // calculateResults()
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -356,7 +247,7 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle()}
                   >
-                    {nailTypeOptions.map(opt => (
+                    {typeOptions.map(opt => (
                       <MenuItem key={opt.value} value={opt.value}>
                         {opt.label}
                       </MenuItem>
@@ -377,9 +268,9 @@ const NailCalculator = () => {
                     onChange={handleChange}
                     sx={dropDownStyle}
                   >
-                    {nailDiameterOptions.map(value => (
-                      <MenuItem key={value} value={value}>
-                        {value}
+                    {nailDiameterOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
                       </MenuItem>
                     ))}
                     <MenuItem value={5.6}>5.6</MenuItem>
@@ -403,9 +294,9 @@ const NailCalculator = () => {
                       onChange={handleChange}
                       sx={dropDownStyle}
                     >
-                      {jdTypeOptions.map(value => (
-                        <MenuItem key={value} value={value}>
-                          {value}
+                      {jdTypeOptions.map(opt => (
+                        <MenuItem key={opt.value} value={opt.value}>
+                          {opt.label}
                         </MenuItem>
                       ))}
                     </Select>

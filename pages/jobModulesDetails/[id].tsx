@@ -13,8 +13,10 @@ import {
   jdTypeOptions,
   nailDiameterOptions,
   loadDirectionOptions,
-  nailTypeOptions
-} from '@/utils/calculateNail'
+  typeOptions,
+  timberThicknessOptions,
+  boltSizeOptions
+} from '@/utils/dropdownValues'
 
 import {
   Box,
@@ -205,12 +207,11 @@ const JobDetailsPage = () => {
     category: categoryOptions,
     loadType: loadTypeOptions,
     load: loadDirectionOptions,
-    jdType: jdTypeOptions.map(val => ({ value: val, label: val })),
-    nailDiameter: nailDiameterOptions.map(val => ({
-      value: val,
-      label: val.toString()
-    })),
-    type: nailTypeOptions
+    jdType: jdTypeOptions,
+    nailDiameter: nailDiameterOptions,
+    type: typeOptions,
+    timberThickness: timberThicknessOptions,
+    boltSize: boltSizeOptions
   }
 
   if (loading)
