@@ -1,6 +1,7 @@
 export const dropDownStyle = () => ({
   backgroundColor: '#282828',
   color: 'white',
+
   '& .MuiOutlinedInput-notchedOutline': {
     borderColor: '#0288d1'
   },
@@ -33,5 +34,6 @@ export const cardStyle = () => ({
   p: 2,
   display: 'flex',
   flexDirection: 'column',
+  flexWrap: 'wrap',
   gap: 2
 })

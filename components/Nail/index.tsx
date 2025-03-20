@@ -177,421 +177,407 @@ const NailCalculator = () => {
   return (
     <>
       <ToastContainer />
-      <Box
-        sx={{
-          mt: 2,
-          ml: { xs: '50px', sm: '200px' },
-          mr: { xs: '36px', sm: '60px' },
-          px: 2,
-          pb: 2
-        }}
-      >
-        <Box sx={{ maxWidth: '1200px', mx: 'auto' }}>
-          <Typography
-            variant='h5'
-            sx={{
-              color: '#0288d1',
-              backgroundColor: '#1e1e1e',
-              textAlign: 'center',
-              p: 2,
-              border: '1px solid #0288d1',
-              borderRadius: 1,
-              mb: 2
-            }}
-          >
-            Nail Calculator
-          </Typography>
+      <Box>
+        <Typography
+          variant='h5'
+          sx={{
+            color: '#0288d1',
+            backgroundColor: '#1e1e1e',
+            textAlign: 'center',
+            p: 2,
+            border: '1px solid #0288d1',
+            borderRadius: 1,
+            mb: 2
+          }}
+        >
+          Nail Calculator
+        </Typography>
 
-          <Box
-            sx={{
-              display: 'flex',
-              gap: 2,
-              flexDirection: { xs: 'column', sm: 'row' },
-              alignItems: 'flex-start'
-            }}
-          >
-            {/* Left Column */}
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                width: { xs: '100%', sm: 'auto' }
-              }}
-            >
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                  <Select
-                    name='jobId'
-                    label='job'
-                    value={inputs.jobId}
-                    onChange={handleChange}
-                    sx={dropDownStyle()}
-                  >
-                    {jobOptions?.map(job => (
-                      <MenuItem key={job.id} value={job.id}>
-                        {job.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
-                  <Select
-                    name='type'
-                    label='type'
-                    value={inputs.type}
-                    onChange={handleChange}
-                    sx={dropDownStyle()}
-                  >
-                    {typeOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Paper>
-
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>
-                    Nail Diameter
-                  </InputLabel>
-                  <Select
-                    name='nailDiameter'
-                    label='nailDiameter'
-                    value={inputs.nailDiameter}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    {nailDiameterOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                    <MenuItem value={5.6}>5.6</MenuItem>
-                  </Select>
-                </FormControl>
-
-                <Box
-                  sx={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: 1
-                  }}
-                >
-                  <FormControl fullWidth>
-                    <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                    <Select
-                      name='jdType'
-                      label='jdType'
-                      value={inputs.jdType}
-                      onChange={handleChange}
-                      sx={dropDownStyle}
-                    >
-                      {jdTypeOptions.map(opt => (
-                        <MenuItem key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-                  <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
-                    <IconButton size='small' sx={{ color: '#0288d1' }}>
-                      <InfoOutlinedIcon fontSize='small' />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-
-                <TextField
-                  label='14g Screw'
-                  name='screwJD'
-                  type='number'
-                  value={inputs.screwJD}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-              </Paper>
-
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
-                  <Select
-                    name='load'
-                    label='load'
-                    value={inputs.load}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    {loadDirectionOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  label='K13'
-                  name='k13'
-                  type='number'
-                  value={inputs.k13}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-              </Paper>
-            </Box>
-
-            {/* Right Column */}
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-                width: { xs: '100%', sm: 'auto' }
-              }}
-            >
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Category</InputLabel>
-                  <Select
-                    name='category'
-                    label='category'
-                    value={inputs.category}
-                    onChange={handleChange}
-                    sx={dropDownStyle()}
-                  >
-                    {categoryOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  label='Phi'
-                  name='phi'
-                  type='number'
-                  value={inputs.phi}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-              </Paper>
-
-              <Paper sx={cardStyle}>
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
-                  <Select
-                    name='loadType'
-                    label='load type'
-                    value={inputs.loadType}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    {loadTypeOptions.map(option => (
-                      <MenuItem key={option.value} value={option.value}>
-                        {option.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <TextField
-                  label='K1'
-                  name='k1'
-                  type='number'
-                  value={inputs.k1}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-              </Paper>
-
-              <Paper sx={cardStyle}>
-                <TextField
-                  label='K14'
-                  name='k14'
-                  type='number'
-                  value={inputs.k14}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  inputProps={{ min: 0 }}
-                  sx={textFieldStyle}
-                />
-
-                <TextField
-                  label='K16'
-                  name='k16'
-                  type='number'
-                  value={inputs.k16}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  inputProps={{ min: 0 }}
-                  sx={textFieldStyle}
-                />
-
-                <TextField
-                  label='K17'
-                  name='k17'
-                  type='number'
-                  value={inputs.k17}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  inputProps={{ min: 0 }}
-                  sx={textFieldStyle}
-                />
-              </Paper>
-            </Box>
-          </Box>
-
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            flexDirection: { xs: 'column', md: 'row' }
+          }}
+        >
+          {/* Left Column */}
           <Box
             sx={{
               flex: 1,
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
-              gap: 2
+              gap: 2,
+              width: { xs: '100%', sm: 'auto' }
             }}
           >
-            {[
-              { label: 'Design Load', value: results.designLoad },
-              {
-                label: 'Screw Penetration in Second Timber',
-                value: results.screwPenetration
-              },
-              {
-                label: 'First Timber Thickness',
-                value: results.firstTimberThickness
-              }
-            ].map(({ label, value }) => (
-              <TextField
-                key={label}
-                label={label}
-                value={value !== null ? value.toFixed(2) : ''}
-                InputProps={{
-                  readOnly: true
-                }}
-                variant='filled'
-                fullWidth
-                sx={{
-                  mt: 2,
-                  '& .MuiFilledInput-root': {
-                    backgroundColor: '#282828',
-                    color: 'white'
-                  },
-                  '& .MuiInputLabel-root': { color: '#0288d1' }
-                }}
-              />
-            ))}
-          </Box>
+            <Paper sx={cardStyle}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
+                <Select
+                  name='jobId'
+                  label='job'
+                  value={inputs.jobId}
+                  onChange={handleChange}
+                  sx={dropDownStyle()}
+                >
+                  {jobOptions?.map(job => (
+                    <MenuItem key={job.id} value={job.id}>
+                      {job.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-          <Box sx={{ mt: 4 }}>
-            <Paper
-              elevation={2}
-              sx={{
-                backgroundColor: '#1e1e1e',
-                border: '1px solid #0288d1',
-                borderRadius: 1,
-                p: 2
-              }}
-            >
-              <Typography
-                variant='subtitle1'
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
+                <Select
+                  name='type'
+                  label='type'
+                  value={inputs.type}
+                  onChange={handleChange}
+                  sx={dropDownStyle()}
+                >
+                  {typeOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Nail Diameter</InputLabel>
+                <Select
+                  name='nailDiameter'
+                  label='nailDiameter'
+                  value={inputs.nailDiameter}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {nailDiameterOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <Box
                 sx={{
-                  mb: 2,
-                  fontWeight: 600,
-                  color: '#0288d1'
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 1
                 }}
               >
-                Notes
-              </Typography>
+                <FormControl fullWidth>
+                  <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                  <Select
+                    name='jdType'
+                    label='jdType'
+                    value={inputs.jdType}
+                    onChange={handleChange}
+                    sx={dropDownStyle}
+                  >
+                    {jdTypeOptions.map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+
+                <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
+                  <IconButton size='small' sx={{ color: '#0288d1' }}>
+                    <InfoOutlinedIcon fontSize='small' />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
               <TextField
-                name='note'
-                multiline
-                minRows={3}
-                maxRows={6}
+                label='14g Screw'
+                name='screwJD'
+                type='number'
+                value={inputs.screwJD}
+                onChange={handleChange}
+                onFocus={handleFocus}
                 fullWidth
-                variant='outlined'
-                placeholder='Write your notes here...'
+                InputProps={{ readOnly: true }}
                 sx={textFieldStyle}
-                onChange={e =>
-                  setInputs(prev => ({
-                    ...prev,
-                    note: e.target.value
-                  }))
-                }
-                value={inputs.note || ''}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
+                <Select
+                  name='load'
+                  label='load'
+                  value={inputs.load}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {loadDirectionOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                label='K13'
+                name='k13'
+                type='number'
+                value={inputs.k13}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
               />
             </Paper>
           </Box>
 
+          {/* Right Column */}
           <Box
             sx={{
-              marginTop: 3,
+              flex: 1,
               display: 'flex',
-              justifyContent: 'space-between'
+              flexDirection: 'column',
+              gap: 2,
+              width: { xs: '100%', sm: 'auto' }
             }}
           >
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={calculateResults}
-              sx={{
-                backgroundColor: '#0288d1',
-                '&:hover': {
-                  backgroundColor: '#026aa1'
-                }
-              }}
-            >
-              Calculate
-            </Button>
+            <Paper sx={cardStyle}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Category</InputLabel>
+                <Select
+                  name='category'
+                  label='category'
+                  value={inputs.category}
+                  onChange={handleChange}
+                  sx={dropDownStyle()}
+                >
+                  {categoryOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
 
-            <Button
-              variant='contained'
-              color='secondary'
-              onClick={handleSave}
-              sx={{
-                backgroundColor: '#7b1fa2',
-                '&:hover': {
-                  backgroundColor: '#4a148c'
-                }
-              }}
-            >
-              Save
-            </Button>
+              <TextField
+                label='Phi'
+                name='phi'
+                type='number'
+                value={inputs.phi}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
+                <Select
+                  name='loadType'
+                  label='load type'
+                  value={inputs.loadType}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {loadTypeOptions.map(option => (
+                    <MenuItem key={option.value} value={option.value}>
+                      {option.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <TextField
+                label='K1'
+                name='k1'
+                type='number'
+                value={inputs.k1}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='K14'
+                name='k14'
+                type='number'
+                value={inputs.k14}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='K16'
+                name='k16'
+                type='number'
+                value={inputs.k16}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='K17'
+                name='k17'
+                type='number'
+                value={inputs.k17}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+            </Paper>
           </Box>
         </Box>
 
-        <ConfirmationDialog
-          open={dialogOpen}
-          title='Nail Calculations'
-          onClose={() => setDialogOpen(false)}
-          onConfirm={handleConfirmSave}
-        />
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 2
+          }}
+        >
+          {[
+            { label: 'Design Load', value: results.designLoad },
+            {
+              label: 'Screw Penetration in Second Timber',
+              value: results.screwPenetration
+            },
+            {
+              label: 'First Timber Thickness',
+              value: results.firstTimberThickness
+            }
+          ].map(({ label, value }) => (
+            <TextField
+              key={label}
+              label={label}
+              value={value !== null ? value.toFixed(2) : ''}
+              InputProps={{
+                readOnly: true
+              }}
+              variant='filled'
+              fullWidth
+              sx={{
+                mt: 2,
+                '& .MuiFilledInput-root': {
+                  backgroundColor: '#282828',
+                  color: 'white'
+                },
+                '& .MuiInputLabel-root': { color: '#0288d1' }
+              }}
+            />
+          ))}
+        </Box>
+
+        <Box sx={{ mt: 4 }}>
+          <Paper
+            elevation={2}
+            sx={{
+              backgroundColor: '#1e1e1e',
+              border: '1px solid #0288d1',
+              borderRadius: 1,
+              p: 2
+            }}
+          >
+            <Typography
+              variant='subtitle1'
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+                color: '#0288d1'
+              }}
+            >
+              Notes
+            </Typography>
+
+            <TextField
+              name='note'
+              multiline
+              minRows={3}
+              maxRows={6}
+              fullWidth
+              variant='outlined'
+              placeholder='Write your notes here...'
+              sx={textFieldStyle}
+              onChange={e =>
+                setInputs(prev => ({
+                  ...prev,
+                  note: e.target.value
+                }))
+              }
+              value={inputs.note || ''}
+            />
+          </Paper>
+        </Box>
+
+        <Box
+          sx={{
+            marginTop: 3,
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={calculateResults}
+            sx={{
+              backgroundColor: '#0288d1',
+              '&:hover': {
+                backgroundColor: '#026aa1'
+              }
+            }}
+          >
+            Calculate
+          </Button>
+
+          <Button
+            variant='contained'
+            color='secondary'
+            onClick={handleSave}
+            sx={{
+              backgroundColor: '#7b1fa2',
+              '&:hover': {
+                backgroundColor: '#4a148c'
+              }
+            }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
+
+      <ConfirmationDialog
+        open={dialogOpen}
+        title='Nail Calculations'
+        onClose={() => setDialogOpen(false)}
+        onConfirm={handleConfirmSave}
+      />
     </>
   )
 }

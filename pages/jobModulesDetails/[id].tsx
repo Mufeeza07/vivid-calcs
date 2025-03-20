@@ -36,6 +36,7 @@ import {
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
+import { calculateShearScrewStrength } from '@/utils/calculateScrew'
 
 const JobDetailsPage = () => {
   const router = useRouter()
@@ -104,6 +105,14 @@ const JobDetailsPage = () => {
       setEditableEntryData(calculateNailStrength(updated))
     } else if (module === 'boltStrength') {
       setEditableEntryData(calculateBoltStrength(updated))
+    } else if (module === 'screwStrength') {
+      const screwType = editableEntryData?.screwType
+
+      if (screwType === 'SHEAR') {
+        setEditableEntryData(calculateShearScrewStrength(updated))
+      } else if (screwType === 'PULLOUT') {
+        // setEditableEntryData(calculateUpliftScrewStrength(updated))
+      }
     } else {
       setEditableEntryData(updated)
     }
@@ -407,54 +416,44 @@ const JobDetailsPage = () => {
                                 )}
                               </Box>
                             </Box>
-                            {Object.keys(entry).map(key =>
-                              key !== 'id' &&
-                              key !== 'jobId' &&
-                              key !== 'createdAt' &&
-                              key !== 'updatedAt' ? (
-                                editingEntryId === entry.id ? (
-                                  dropdownOptions[key] ? (
-                                    // Editable dropdown field
-                                    <FormControl
-                                      fullWidth
-                                      sx={{ mt: 2 }}
-                                      key={key}
-                                    >
-                                      <InputLabel>
-                                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                                      </InputLabel>
-                                      <Select
-                                        value={editableEntryData[key] || ''}
-                                        onChange={e =>
-                                          handleFieldChange(
-                                            key,
-                                            e.target.value,
-                                            module
-                                          )
-                                        }
-                                        label={key
-                                          .replace(/([A-Z])/g, ' $1')
-                                          .trim()}
-                                      >
-                                        {dropdownOptions[key].map(opt => (
-                                          <MenuItem
-                                            key={opt.value}
-                                            value={opt.value}
-                                          >
-                                            {opt.label}
-                                          </MenuItem>
-                                        ))}
-                                      </Select>
-                                    </FormControl>
-                                  ) : (
-                                    // Editable text field
-                                    <TextField
-                                      key={key}
-                                      label={key
-                                        .replace(/([A-Z])/g, ' $1')
-                                        .trim()}
-                                      fullWidth
-                                      value={editableEntryData[key] ?? ''}
+                            {Object.keys(entry).map(key => {
+                              const alwaysShowFields = ['note']
+                              const value =
+                                editingEntryId === entry.id
+                                  ? editableEntryData[key]
+                                  : entry[key]
+
+                              if (
+                                [
+                                  'id',
+                                  'jobId',
+                                  'createdAt',
+                                  'updatedAt'
+                                ].includes(key) ||
+                                (!alwaysShowFields.includes(key) &&
+                                  (value === null ||
+                                    value === undefined ||
+                                    value === ''))
+                              ) {
+                                return null
+                              }
+
+                              const label = key
+                                .replace(/([A-Z])/g, ' $1')
+                                .trim()
+
+                              const isEditing = editingEntryId === entry.id
+
+                              if (isEditing) {
+                                return dropdownOptions[key] ? (
+                                  <FormControl
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    key={key}
+                                  >
+                                    <InputLabel>{label}</InputLabel>
+                                    <Select
+                                      value={editableEntryData[key] || ''}
                                       onChange={e =>
                                         handleFieldChange(
                                           key,
@@ -462,24 +461,47 @@ const JobDetailsPage = () => {
                                           module
                                         )
                                       }
-                                      sx={{ mt: 2 }}
-                                    />
-                                  )
+                                      label={label}
+                                    >
+                                      {dropdownOptions[key].map(opt => (
+                                        <MenuItem
+                                          key={opt.value}
+                                          value={opt.value}
+                                        >
+                                          {opt.label}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
                                 ) : (
-                                  // Read-only field
                                   <TextField
                                     key={key}
-                                    label={key
-                                      .replace(/([A-Z])/g, ' $1')
-                                      .trim()}
+                                    label={label}
                                     fullWidth
-                                    value={entry[key] ?? ''}
+                                    value={editableEntryData[key] ?? ''}
+                                    onChange={e =>
+                                      handleFieldChange(
+                                        key,
+                                        e.target.value,
+                                        module
+                                      )
+                                    }
+                                    sx={{ mt: 2 }}
+                                  />
+                                )
+                              } else {
+                                return (
+                                  <TextField
+                                    key={key}
+                                    label={label}
+                                    fullWidth
+                                    value={value ?? ''}
                                     disabled
                                     sx={{ mt: 2 }}
                                   />
                                 )
-                              ) : null
-                            )}
+                              }
+                            })}
                           </Box>
                         ))}
                       </Box>

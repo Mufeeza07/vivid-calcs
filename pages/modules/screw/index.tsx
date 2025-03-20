@@ -15,6 +15,7 @@ import {
   Paper,
   Select,
   SelectChangeEvent,
+  TextField,
   Typography
 } from '@mui/material'
 import { useState } from 'react'
@@ -30,8 +31,6 @@ const ScrewStrength = () => {
     <>
       <Navbar />
       <Sidebar />
-      <SupportActions moduleName='screw' />
-
       <Box
         sx={{
           display: 'flex',
@@ -46,21 +45,21 @@ const ScrewStrength = () => {
           elevation={3}
           sx={{
             width: '100%',
-            maxWidth: '900px',
             backgroundColor: '#1e1e1e',
             color: 'white',
             border: '1px solid #0288d1',
-            p: 3
+            p: 3,
+            overflowX: 'auto'
           }}
         >
           <Typography
             variant='h6'
-            sx={{ color: '#0288d1', textAlign: 'center', flexGrow: 1 }}
+            sx={{ color: '#0288d1', textAlign: 'center', flexGrow: 1, mb: 2 }}
           >
             Screw Type
           </Typography>
 
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel sx={{ color: '#0288d1' }}>Screw Type</InputLabel>
             <Select
               label='Screw Type'
@@ -84,12 +83,16 @@ const ScrewStrength = () => {
               <MenuItem value='pullout'>Pullout Screw Strength</MenuItem>
             </Select>
           </FormControl>
+
+          {selectedType === 'shear' && (
+            <ShearScrewCalculator screwType='SHEAR' />
+          )}
+          {selectedType === 'pullout' && (
+            <UpliftScrewCalculator screwType='PULLOUT' />
+          )}
         </Paper>
       </Box>
-      <Box mt={3}>
-        {selectedType === 'shear' && <ShearScrewCalculator screwType='SHEAR' />}
-        {selectedType === 'pullout' && <UpliftScrewCalculator screwType='PULLOUT' />}
-      </Box>
+      <SupportActions moduleName='screw' />
     </>
   )
 }
