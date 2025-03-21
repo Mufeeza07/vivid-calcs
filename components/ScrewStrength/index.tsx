@@ -1,6 +1,14 @@
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
-import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
+import {
+  buttonsBarStyle,
+  calculateButtonStyle,
+  cardStyle,
+  dropDownStyle,
+  resultFieldStyle,
+  saveButtonStyle,
+  textFieldStyle
+} from '@/styles/moduleStyle'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
@@ -47,7 +55,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
-  const jobOptions = allJobs?.map((job: Job) => ({
+  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
@@ -505,14 +513,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
               }}
               variant='filled'
               fullWidth
-              sx={{
-                mt: 2,
-                '& .MuiFilledInput-root': {
-                  backgroundColor: '#282828',
-                  color: 'white'
-                },
-                '& .MuiInputLabel-root': { color: '#0288d1' }
-              }}
+              sx={resultFieldStyle}
             />
           ))}
         </Box>
@@ -558,25 +559,12 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
           </Paper>
         </Box>
 
-        <Box
-          sx={{
-            marginTop: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2
-          }}
-        >
+        <Box sx={buttonsBarStyle}>
           <Button
             variant='contained'
             color='primary'
             onClick={calculateResults}
-            sx={{
-              backgroundColor: '#0288d1',
-              '&:hover': {
-                backgroundColor: '#026aa1'
-              }
-            }}
+            sx={calculateButtonStyle}
           >
             Calculate
           </Button>
@@ -585,12 +573,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
             variant='contained'
             color='secondary'
             onClick={handleSave}
-            sx={{
-              backgroundColor: '#7b1fa2',
-              '&:hover': {
-                backgroundColor: '#4a148c'
-              }
-            }}
+            sx={saveButtonStyle}
           >
             Save
           </Button>
@@ -616,7 +599,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
-  const jobOptions = allJobs?.map((job: Job) => ({
+  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
@@ -994,14 +977,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
             }}
             variant='filled'
             fullWidth
-            sx={{
-              mt: 2,
-              '& .MuiFilledInput-root': {
-                backgroundColor: '#282828',
-                color: 'white'
-              },
-              '& .MuiInputLabel-root': { color: '#0288d1' }
-            }}
+            sx={resultFieldStyle}
           />
         </Box>
 
@@ -1046,25 +1022,12 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
           </Paper>
         </Box>
 
-        <Box
-          sx={{
-            marginTop: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2
-          }}
-        >
+        <Box sx={buttonsBarStyle}>
           <Button
             variant='contained'
             color='primary'
             onClick={calculateResults}
-            sx={{
-              backgroundColor: '#0288d1',
-              '&:hover': {
-                backgroundColor: '#026aa1'
-              }
-            }}
+            sx={calculateButtonStyle}
           >
             Calculate
           </Button>
@@ -1073,12 +1036,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
             variant='contained'
             color='secondary'
             onClick={handleSave}
-            sx={{
-              backgroundColor: '#7b1fa2',
-              '&:hover': {
-                backgroundColor: '#4a148c'
-              }
-            }}
+            sx={saveButtonStyle}
           >
             Save
           </Button>

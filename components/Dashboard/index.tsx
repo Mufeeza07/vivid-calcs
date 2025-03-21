@@ -120,7 +120,7 @@ const UserDashboard = () => {
               <Button
                 variant='outlined'
                 sx={{ mt: 2 }}
-                onClick={() => router.push('/ongoingJobsDetails')}
+                onClick={() => router.push('/jobs?status=IN_PROGRESS')}
               >
                 View Details
               </Button>
@@ -148,7 +148,7 @@ const UserDashboard = () => {
               <Button
                 variant='outlined'
                 sx={{ mt: 2 }}
-                onClick={() => router.push('/completedJobsDetails')}
+                onClick={() => router.push('/jobs?status=COMPLETED')}
               >
                 View Details
               </Button>
@@ -214,7 +214,7 @@ const UserDashboard = () => {
           <Card variant='outlined'>
             <CardContent>
               <Typography variant='h6'>Recent Jobs</Typography>
-              {recentJobs?.slice(0, 2).map((job, index) => (
+              {recentJobs?.jobs?.slice(0, 2).map((job, index) => (
                 <Box key={job.jobId} mb={2}>
                   <Typography variant='subtitle1'>{`Job ${index + 1}: ${job.address}`}</Typography>
                   <Typography variant='subtitle2' color='textSecondary'>

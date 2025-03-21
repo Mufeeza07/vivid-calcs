@@ -27,6 +27,15 @@ export const textFieldStyle = () => ({
   }
 })
 
+export const resultFieldStyle = () => ({
+  mt: 2,
+  '& .MuiFilledInput-root': {
+    backgroundColor: '#282828',
+    color: 'white'
+  },
+  '& .MuiInputLabel-root': { color: '#0288d1' }
+})
+
 export const cardStyle = () => ({
   backgroundColor: '#1e1e1e',
   border: '1px solid #0288d1',
@@ -36,4 +45,26 @@ export const cardStyle = () => ({
   flexDirection: 'column',
   flexWrap: 'wrap',
   gap: 2
+})
+
+export const buttonsBarStyle = () => ({
+  marginTop: 3,
+  display: 'flex',
+  justifyContent: 'space-between',
+  flexDirection: { xs: 'column', sm: 'row' },
+  gap: 2
+})
+
+export const calculateButtonStyle = () => ({
+  backgroundColor: '#0288d1',
+  '&:hover': {
+    backgroundColor: '#026aa1'
+  }
+})
+
+export const saveButtonStyle = () => ({
+  backgroundColor: '#7b1fa2',
+  '&:hover': {
+    backgroundColor: '#4a148c'
+  }
 })

@@ -96,3 +96,10 @@ export const screwSizeOptions = [
   value: size,
   label: size.replace('SIZE_', '')
 }))
+
+export const frictionAngleOptions = [
+  0, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36
+].map(value => ({
+  value: value.toString(),
+  label: value.toString()
+}))

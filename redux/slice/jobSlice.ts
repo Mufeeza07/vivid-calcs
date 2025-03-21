@@ -85,7 +85,7 @@ const jobSlice = createSlice({
         } else if (status === 'PENDING') {
           state.pendingJobs = action.payload.data
         } else {
-          state.recentJobs = action.payload.data.jobs
+          state.recentJobs = action.payload.data
         }
 
         state.loading = false

@@ -7,6 +7,7 @@ import {
   selectPendingJobs,
   selectRecentJobs
 } from '@/redux/slice/jobSlice'
+import { AppDispatch } from '@/redux/store'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DescriptionIcon from '@mui/icons-material/Description'
 import {
@@ -39,10 +40,12 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import JobDetailsDrawer from '../JobDetails'
 import JobForm from '../JobForm'
-import { AppDispatch } from '@/redux/store'
+import { useSearchParams } from 'next/navigation'
 
 const JobList = () => {
   const dispatch = useDispatch<AppDispatch>()
+  const searchParams = useSearchParams()
+  const initialStatus = searchParams.get('status') || ''
 
   const allJobs = useSelector(selectRecentJobs)
   const completedJobs = useSelector(selectCompletedJobs)
@@ -65,7 +68,7 @@ const JobList = () => {
     totalPages: 1
   })
 
-  const [statusFilter, setStatusFilter] = useState('')
+  const [statusFilter, setStatusFilter] = useState(initialStatus)
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
@@ -74,7 +77,7 @@ const JobList = () => {
 
   useEffect(() => {
     const jobsMapping = {
-      '': { jobs: allJobs },
+      '':  allJobs ,
       PENDING: pendingJobs,
       IN_PROGRESS: inProgressJobs,
       ON_HOLD: onHoldJobs,

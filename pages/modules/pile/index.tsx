@@ -26,36 +26,35 @@ const BaseDesignAnalysis = () => {
     <>
       <Navbar />
       <Sidebar />
-      <SupportActions moduleName='pile' />
       <Box
         sx={{
-          mt: 2,
-          ml: { xs: '50px', sm: '200px' },
-          mr: { xs: '36px', sm: '60px' },
-          px: 2,
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          mt: 3,
+          px: 2,
+          ml: { xs: '50px', sm: '200px' },
+          mr: { xs: '40px', sm: '80px' }
         }}
       >
         <Paper
           elevation={3}
           sx={{
             width: '100%',
-            maxWidth: 900,
             backgroundColor: '#1e1e1e',
             color: 'white',
             border: '1px solid #0288d1',
-            p: 4
+            p: 3,
+            overflowX: 'auto'
           }}
         >
           <Typography
-            variant='h5'
-            sx={{ color: '#0288d1', textAlign: 'center', mb: 2 }}
+            variant='h6'
+            sx={{ color: '#0288d1', textAlign: 'center', flexGrow: 1, mb: 2 }}
           >
             Footing Design Analysis
           </Typography>
 
-          <FormControl fullWidth>
+          <FormControl fullWidth sx={{ mb: 3 }}>
             <InputLabel sx={{ color: '#0288d1' }}>Design Analysis</InputLabel>
             <Select
               label='Design Analysis'
@@ -79,9 +78,11 @@ const BaseDesignAnalysis = () => {
               <MenuItem value='slab'>Slab Design</MenuItem>
             </Select>
           </FormControl>
+
+          {selectedType === 'pile' && <PileDesignAnalysis />}
         </Paper>
       </Box>
-      {selectedType === 'pile' && <PileDesignAnalysis />}
+      <SupportActions moduleName='pile' />
     </>
   )
 }
