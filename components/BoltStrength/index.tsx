@@ -1,6 +1,14 @@
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
-import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
+import {
+  buttonsBarStyle,
+  calculateButtonStyle,
+  cardStyle,
+  dropDownStyle,
+  resultFieldStyle,
+  saveButtonStyle,
+  textFieldStyle
+} from '@/styles/moduleStyle'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
 import {
   Box,
@@ -38,7 +46,9 @@ const BoltCalculator = () => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
-  const jobOptions = allJobs?.map((job: Job) => ({
+  // console.log('all jobs', allJobs)
+
+  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
@@ -416,14 +426,7 @@ const BoltCalculator = () => {
             }}
             variant='filled'
             fullWidth
-            sx={{
-              mt: 2,
-              '& .MuiFilledInput-root': {
-                backgroundColor: '#282828',
-                color: 'white'
-              },
-              '& .MuiInputLabel-root': { color: '#0288d1' }
-            }}
+            sx={resultFieldStyle}
           />
         </Box>
 
@@ -468,25 +471,12 @@ const BoltCalculator = () => {
           </Paper>
         </Box>
 
-        <Box
-          sx={{
-            marginTop: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2
-          }}
-        >
+        <Box sx={buttonsBarStyle}>
           <Button
             variant='contained'
             color='primary'
             onClick={calculateResults}
-            sx={{
-              backgroundColor: '#0288d1',
-              '&:hover': {
-                backgroundColor: '#026aa1'
-              }
-            }}
+            sx={calculateButtonStyle}
           >
             Calculate
           </Button>
@@ -495,12 +485,7 @@ const BoltCalculator = () => {
             variant='contained'
             color='secondary'
             onClick={handleSave}
-            sx={{
-              backgroundColor: '#7b1fa2',
-              '&:hover': {
-                backgroundColor: '#4a148c'
-              }
-            }}
+            sx={saveButtonStyle}
           >
             Save
           </Button>

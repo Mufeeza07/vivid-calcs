@@ -1,6 +1,13 @@
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
-import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
+import {
+  buttonsBarStyle,
+  calculateButtonStyle,
+  cardStyle,
+  dropDownStyle,
+  saveButtonStyle,
+  textFieldStyle
+} from '@/styles/moduleStyle'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
@@ -41,7 +48,7 @@ const NailCalculator = () => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
-  const jobOptions = allJobs?.map((job: Job) => ({
+  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
@@ -535,25 +542,12 @@ const NailCalculator = () => {
           </Paper>
         </Box>
 
-        <Box
-          sx={{
-            marginTop: 3,
-            display: 'flex',
-            justifyContent: 'space-between',
-            flexDirection: { xs: 'column', sm: 'row' },
-            gap: 2
-          }}
-        >
+        <Box sx={buttonsBarStyle}>
           <Button
             variant='contained'
             color='primary'
             onClick={calculateResults}
-            sx={{
-              backgroundColor: '#0288d1',
-              '&:hover': {
-                backgroundColor: '#026aa1'
-              }
-            }}
+            sx={calculateButtonStyle}
           >
             Calculate
           </Button>
@@ -562,12 +556,7 @@ const NailCalculator = () => {
             variant='contained'
             color='secondary'
             onClick={handleSave}
-            sx={{
-              backgroundColor: '#7b1fa2',
-              '&:hover': {
-                backgroundColor: '#4a148c'
-              }
-            }}
+            sx={saveButtonStyle}
           >
             Save
           </Button>
