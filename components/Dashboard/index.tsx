@@ -117,7 +117,11 @@ const UserDashboard = () => {
               <Typography color='textSecondary'>
                 Total ongoing projects.
               </Typography>
-              <Button variant='outlined' sx={{ mt: 2 }}>
+              <Button
+                variant='outlined'
+                sx={{ mt: 2 }}
+                onClick={() => router.push('/ongoingJobsDetails')}
+              >
                 View Details
               </Button>
             </CardContent>
@@ -141,7 +145,11 @@ const UserDashboard = () => {
               <Typography color='textSecondary'>
                 Total jobs completed.
               </Typography>
-              <Button variant='outlined' sx={{ mt: 2 }}>
+              <Button
+                variant='outlined'
+                sx={{ mt: 2 }}
+                onClick={() => router.push('/completedJobsDetails')}
+              >
                 View Details
               </Button>
             </CardContent>

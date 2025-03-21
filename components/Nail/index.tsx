@@ -539,7 +539,9 @@ const NailCalculator = () => {
           sx={{
             marginTop: 3,
             display: 'flex',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2
           }}
         >
           <Button

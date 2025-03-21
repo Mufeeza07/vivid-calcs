@@ -1,23 +1,28 @@
 'use client'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
 import { calculateNailStrength } from '@/utils/calculateNail'
+import {
+  boltSizeOptions,
+  categoryOptions,
+  jdTypeOptions,
+  loadDirectionOptions,
+  loadTypeOptions,
+  nailDiameterOptions,
+  screwSizeOptions,
+  timberThicknessOptions,
+  typeOptions
+} from '@/utils/dropdownValues'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import {
-  loadTypeOptions,
-  categoryOptions,
-  jdTypeOptions,
-  nailDiameterOptions,
-  loadDirectionOptions,
-  typeOptions,
-  timberThicknessOptions,
-  boltSizeOptions
-} from '@/utils/dropdownValues'
 
+import {
+  calculateShearScrewStrength,
+  calculateUpliftScrewStrength
+} from '@/utils/calculateScrew'
 import {
   Box,
   Button,
@@ -36,7 +41,6 @@ import {
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
-import { calculateShearScrewStrength } from '@/utils/calculateScrew'
 
 const JobDetailsPage = () => {
   const router = useRouter()
@@ -48,8 +52,9 @@ const JobDetailsPage = () => {
   const [editableEntryData, setEditableEntryData] = useState<any>({})
 
   useEffect(() => {
+    if (!router.isReady || !id) return
     fetchJobDetails()
-  }, [])
+  }, [router.isReady, id])
 
   const fetchJobDetails = async () => {
     const token = localStorage.getItem('token')
@@ -111,7 +116,7 @@ const JobDetailsPage = () => {
       if (screwType === 'SHEAR') {
         setEditableEntryData(calculateShearScrewStrength(updated))
       } else if (screwType === 'PULLOUT') {
-        // setEditableEntryData(calculateUpliftScrewStrength(updated))
+        setEditableEntryData(calculateUpliftScrewStrength(updated))
       }
     } else {
       setEditableEntryData(updated)
@@ -220,7 +225,8 @@ const JobDetailsPage = () => {
     nailDiameter: nailDiameterOptions,
     type: typeOptions,
     timberThickness: timberThicknessOptions,
-    boltSize: boltSizeOptions
+    boltSize: boltSizeOptions,
+    screwSize: screwSizeOptions
   }
 
   if (loading)
