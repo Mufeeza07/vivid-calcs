@@ -186,7 +186,7 @@ const BoltCalculator = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
                 <Select
                   name='type'
@@ -222,7 +222,7 @@ const BoltCalculator = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>
                   Timber Thickness (mm)
                 </InputLabel>
@@ -241,7 +241,7 @@ const BoltCalculator = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
                 <Select
                   name='boltSize'
@@ -258,7 +258,7 @@ const BoltCalculator = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
                 <Select
                   name='jdType'
@@ -290,7 +290,7 @@ const BoltCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={{ mt: 2, ...textFieldStyle() }}
+                sx={textFieldStyle()}
               />
             </Paper>
           </Box>
@@ -332,7 +332,7 @@ const BoltCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={{ mt: 2, ...textFieldStyle() }}
+                sx={textFieldStyle()}
               />
             </Paper>
 
@@ -363,7 +363,7 @@ const BoltCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={{ mt: 2, ...textFieldStyle() }}
+                sx={textFieldStyle()}
               />
             </Paper>
 
@@ -389,7 +389,7 @@ const BoltCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 inputProps={{ min: 0 }}
-                sx={{ mt: 2, ...textFieldStyle() }}
+                sx={textFieldStyle()}
               />
             </Paper>
           </Box>
@@ -472,7 +472,9 @@ const BoltCalculator = () => {
           sx={{
             marginTop: 3,
             display: 'flex',
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
+            flexDirection: { xs: 'column', sm: 'row' },
+            gap: 2
           }}
         >
           <Button
