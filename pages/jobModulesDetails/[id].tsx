@@ -1,23 +1,28 @@
 'use client'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
 import { calculateNailStrength } from '@/utils/calculateNail'
+import {
+  boltSizeOptions,
+  categoryOptions,
+  jdTypeOptions,
+  loadDirectionOptions,
+  loadTypeOptions,
+  nailDiameterOptions,
+  screwSizeOptions,
+  timberThicknessOptions,
+  typeOptions
+} from '@/utils/dropdownValues'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
 import DeleteIcon from '@mui/icons-material/Delete'
 import EditIcon from '@mui/icons-material/Edit'
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf'
-import {
-  loadTypeOptions,
-  categoryOptions,
-  jdTypeOptions,
-  nailDiameterOptions,
-  loadDirectionOptions,
-  typeOptions,
-  timberThicknessOptions,
-  boltSizeOptions
-} from '@/utils/dropdownValues'
 
+import {
+  calculateShearScrewStrength,
+  calculateUpliftScrewStrength
+} from '@/utils/calculateScrew'
 import {
   Box,
   Button,
@@ -47,8 +52,9 @@ const JobDetailsPage = () => {
   const [editableEntryData, setEditableEntryData] = useState<any>({})
 
   useEffect(() => {
+    if (!router.isReady || !id) return
     fetchJobDetails()
-  }, [])
+  }, [router.isReady, id])
 
   const fetchJobDetails = async () => {
     const token = localStorage.getItem('token')
@@ -104,6 +110,14 @@ const JobDetailsPage = () => {
       setEditableEntryData(calculateNailStrength(updated))
     } else if (module === 'boltStrength') {
       setEditableEntryData(calculateBoltStrength(updated))
+    } else if (module === 'screwStrength') {
+      const screwType = editableEntryData?.screwType
+
+      if (screwType === 'SHEAR') {
+        setEditableEntryData(calculateShearScrewStrength(updated))
+      } else if (screwType === 'PULLOUT') {
+        setEditableEntryData(calculateUpliftScrewStrength(updated))
+      }
     } else {
       setEditableEntryData(updated)
     }
@@ -211,7 +225,8 @@ const JobDetailsPage = () => {
     nailDiameter: nailDiameterOptions,
     type: typeOptions,
     timberThickness: timberThicknessOptions,
-    boltSize: boltSizeOptions
+    boltSize: boltSizeOptions,
+    screwSize: screwSizeOptions
   }
 
   if (loading)
@@ -407,54 +422,44 @@ const JobDetailsPage = () => {
                                 )}
                               </Box>
                             </Box>
-                            {Object.keys(entry).map(key =>
-                              key !== 'id' &&
-                              key !== 'jobId' &&
-                              key !== 'createdAt' &&
-                              key !== 'updatedAt' ? (
-                                editingEntryId === entry.id ? (
-                                  dropdownOptions[key] ? (
-                                    // Editable dropdown field
-                                    <FormControl
-                                      fullWidth
-                                      sx={{ mt: 2 }}
-                                      key={key}
-                                    >
-                                      <InputLabel>
-                                        {key.replace(/([A-Z])/g, ' $1').trim()}
-                                      </InputLabel>
-                                      <Select
-                                        value={editableEntryData[key] || ''}
-                                        onChange={e =>
-                                          handleFieldChange(
-                                            key,
-                                            e.target.value,
-                                            module
-                                          )
-                                        }
-                                        label={key
-                                          .replace(/([A-Z])/g, ' $1')
-                                          .trim()}
-                                      >
-                                        {dropdownOptions[key].map(opt => (
-                                          <MenuItem
-                                            key={opt.value}
-                                            value={opt.value}
-                                          >
-                                            {opt.label}
-                                          </MenuItem>
-                                        ))}
-                                      </Select>
-                                    </FormControl>
-                                  ) : (
-                                    // Editable text field
-                                    <TextField
-                                      key={key}
-                                      label={key
-                                        .replace(/([A-Z])/g, ' $1')
-                                        .trim()}
-                                      fullWidth
-                                      value={editableEntryData[key] ?? ''}
+                            {Object.keys(entry).map(key => {
+                              const alwaysShowFields = ['note']
+                              const value =
+                                editingEntryId === entry.id
+                                  ? editableEntryData[key]
+                                  : entry[key]
+
+                              if (
+                                [
+                                  'id',
+                                  'jobId',
+                                  'createdAt',
+                                  'updatedAt'
+                                ].includes(key) ||
+                                (!alwaysShowFields.includes(key) &&
+                                  (value === null ||
+                                    value === undefined ||
+                                    value === ''))
+                              ) {
+                                return null
+                              }
+
+                              const label = key
+                                .replace(/([A-Z])/g, ' $1')
+                                .trim()
+
+                              const isEditing = editingEntryId === entry.id
+
+                              if (isEditing) {
+                                return dropdownOptions[key] ? (
+                                  <FormControl
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    key={key}
+                                  >
+                                    <InputLabel>{label}</InputLabel>
+                                    <Select
+                                      value={editableEntryData[key] || ''}
                                       onChange={e =>
                                         handleFieldChange(
                                           key,
@@ -462,24 +467,47 @@ const JobDetailsPage = () => {
                                           module
                                         )
                                       }
-                                      sx={{ mt: 2 }}
-                                    />
-                                  )
+                                      label={label}
+                                    >
+                                      {dropdownOptions[key].map(opt => (
+                                        <MenuItem
+                                          key={opt.value}
+                                          value={opt.value}
+                                        >
+                                          {opt.label}
+                                        </MenuItem>
+                                      ))}
+                                    </Select>
+                                  </FormControl>
                                 ) : (
-                                  // Read-only field
                                   <TextField
                                     key={key}
-                                    label={key
-                                      .replace(/([A-Z])/g, ' $1')
-                                      .trim()}
+                                    label={label}
                                     fullWidth
-                                    value={entry[key] ?? ''}
+                                    value={editableEntryData[key] ?? ''}
+                                    onChange={e =>
+                                      handleFieldChange(
+                                        key,
+                                        e.target.value,
+                                        module
+                                      )
+                                    }
+                                    sx={{ mt: 2 }}
+                                  />
+                                )
+                              } else {
+                                return (
+                                  <TextField
+                                    key={key}
+                                    label={label}
+                                    fullWidth
+                                    value={value ?? ''}
                                     disabled
                                     sx={{ mt: 2 }}
                                   />
                                 )
-                              ) : null
-                            )}
+                              }
+                            })}
                           </Box>
                         ))}
                       </Box>

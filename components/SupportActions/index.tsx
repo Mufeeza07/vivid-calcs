@@ -20,11 +20,19 @@ const SupportActions = ({ moduleName }: SupportActionsProps) => {
       <Box
         sx={{
           position: 'fixed',
-          top: '100px',
-          right: { xs: '8px', sm: '18px' },
+          top: '90px',
+          right: 0,
+          width: { xs: 50, sm: 80 },
+          height: 'calc(100vh - 80px)',
+          backgroundColor: '#1e1e1e',
+          color: '#0288d1',
+          borderLeft: '1px solid #0288d1',
           zIndex: 1100,
           display: 'flex',
           flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'flex-start',
+          paddingTop: 2,
           gap: 2
         }}
       >
@@ -32,10 +40,17 @@ const SupportActions = ({ moduleName }: SupportActionsProps) => {
           <IconButton
             onClick={() => handleOpen('info')}
             sx={{
-              color: '#0288d1',
-              backgroundColor: '#1e1e1e',
+              color: '#1e1e1e',
+              backgroundColor: '#0288d1',
               width: { xs: 36, sm: 40 },
-              height: { xs: 36, sm: 40 }
+              height: { xs: 36, sm: 40 },
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                backgroundColor: '#0288d1',
+                color: '#1e1e1e',
+                boxShadow: '0 0 0 3px rgba(159, 211, 240, 0.3)',
+                transform: 'scale(1.05)'
+              }
             }}
           >
             <HelpOutlineIcon />
@@ -46,10 +61,17 @@ const SupportActions = ({ moduleName }: SupportActionsProps) => {
           <IconButton
             onClick={() => handleOpen('contact')}
             sx={{
-              color: '#0288d1',
-              backgroundColor: '#1e1e1e',
+              color: '#1e1e1e',
+              backgroundColor: '#0288d1',
               width: { xs: 36, sm: 40 },
-              height: { xs: 36, sm: 40 }
+              height: { xs: 36, sm: 40 },
+              transition: 'all 0.2s ease-in-out',
+              '&:hover': {
+                backgroundColor: '#0288d1',
+                color: '#1e1e1e',
+                boxShadow: '0 0 0 3px rgba(159, 211, 240, 0.3)',
+                transform: 'scale(1.05)'
+              }
             }}
           >
             <NearMeIcon />

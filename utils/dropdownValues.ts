@@ -83,3 +83,16 @@ export const boltSizeOptions = [
   'M30',
   'M36'
 ].map(size => ({ value: size, label: size }))
+
+export const screwSizeOptions = [
+  'SIZE_4',
+  'SIZE_6',
+  'SIZE_8',
+  'SIZE_10',
+  'SIZE_12',
+  'SIZE_14',
+  'SIZE_18'
+].map(size => ({
+  value: size,
+  label: size.replace('SIZE_', '')
+}))
