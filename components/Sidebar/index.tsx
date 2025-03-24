@@ -79,7 +79,7 @@ const Sidebar = () => {
             />
           </ListItemButton>
 
-          <ListItemButton component={Link} href='/' sx={{ mt: 2 }}>
+          <ListItemButton component={Link} href='/modules/nails' sx={{ mt: 2 }}>
             <ListItemIcon sx={{ color: '#0288d1' }}>
               <AddCircleOutlineIcon />
             </ListItemIcon>
