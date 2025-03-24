@@ -1,4 +1,3 @@
-import { frictionAngleMapping } from '@/data/pileTable'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
 import {
@@ -9,6 +8,8 @@ import {
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
+import { calculatePileStrength } from '@/utils/calculatePile'
+import { frictionAngleOptions, typeOptions } from '@/utils/dropdownValues'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
@@ -29,8 +30,6 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../ConfirmationBox'
-import { frictionAngleOptions, typeOptions } from '@/utils/dropdownValues'
-import { calculatePileStrength } from '@/utils/calculatePile'
 
 export const PileDesignAnalysis = () => {
   const dispatch = useDispatch<AppDispatch>()
