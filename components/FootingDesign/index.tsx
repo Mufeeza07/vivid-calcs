@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 import ConfirmationDialog from '../ConfirmationBox'
 import { frictionAngleOptions, typeOptions } from '@/utils/dropdownValues'
+import { calculatePileStrength } from '@/utils/calculatePile'
 
 export const PileDesignAnalysis = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -40,7 +41,7 @@ export const PileDesignAnalysis = () => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
-  const jobOptions =allJobs?.jobs?.map((job: Job) => ({
+  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
@@ -88,103 +89,7 @@ export const PileDesignAnalysis = () => {
             : Math.max(0, parseFloat(value) || 0)
 
       let updatedState = { ...prev, [name!]: updatedValue }
-
-      if (name === 'frictionAngle' && value) {
-        const frictionAngle = parseFloat(value)
-        if (!isNaN(frictionAngle)) {
-          const factor =
-            0.5 * Math.PI * Math.tan((frictionAngle * Math.PI) / 180)
-          updatedState.factor = parseFloat(factor.toFixed(5))
-
-          const mapping = frictionAngleMapping[frictionAngle]
-          if (mapping) {
-            updatedState.nc = mapping.nc
-            updatedState.nq = mapping.nq
-          } else {
-            updatedState.nc = 0
-            updatedState.nq = 0
-          }
-        }
-      }
-
-      const {
-        safetyFactor,
-        soilDensity,
-        pileHeight,
-        ks,
-        factor,
-        pileDiameter,
-        nc,
-        nq,
-        cohension,
-        reductionStrength
-      } = updatedState
-
-      if (
-        safetyFactor &&
-        soilDensity &&
-        pileHeight &&
-        ks &&
-        factor &&
-        pileDiameter
-      ) {
-        const frictionResistanceAS =
-          (safetyFactor *
-            soilDensity *
-            pileHeight *
-            ks *
-            factor *
-            pileDiameter *
-            pileHeight) /
-          1000000000
-
-        updatedState.frictionResistanceAS = parseFloat(
-          frictionResistanceAS.toFixed(2)
-        )
-
-        const effectivePileHeight = Math.max(0, pileHeight - 1500)
-        const frictionResistanceMH =
-          (safetyFactor *
-            soilDensity *
-            pileHeight *
-            ks *
-            factor *
-            pileDiameter *
-            effectivePileHeight) /
-          1000000000
-
-        updatedState.frictionResistanceMH = parseFloat(
-          frictionResistanceMH.toFixed(2)
-        )
-
-        const weight =
-          (0.9 * 24 * Math.pow(pileDiameter, 2) * Math.PI * pileHeight) /
-          4000000000
-        updatedState.weight = parseFloat(weight.toFixed(2))
-      }
-
-      if (
-        reductionStrength &&
-        pileDiameter &&
-        nc &&
-        cohension &&
-        nq &&
-        pileHeight &&
-        soilDensity
-      ) {
-        const diameterFactor = (pileDiameter / 2000) * (pileDiameter / 2000)
-
-        const term1 = 1.3 * nc * cohension
-        const term2 = (nq * pileHeight * soilDensity) / 1000
-        const term3 = (0.3 * soilDensity * pileDiameter * 11.7) / 1000
-
-        const endBearing =
-          reductionStrength * Math.PI * diameterFactor * (term1 + term2 + term3)
-
-        updatedState.endBearing = parseFloat(endBearing.toFixed(2))
-      }
-
-      return updatedState
+      return calculatePileStrength(updatedState)
     })
   }
 
@@ -193,17 +98,12 @@ export const PileDesignAnalysis = () => {
   }
 
   const calculateResults = () => {
-    const { weight, frictionResistanceAS, frictionResistanceMH, endBearing } =
-      inputs
-
-    const totalUpliftResistance = weight * 0.9 + frictionResistanceAS
-    const totalCapacityAS = frictionResistanceAS + endBearing
-    const totalCapacityMH = frictionResistanceMH + endBearing
-
+    const updated = calculatePileStrength(inputs)
+    setInputs(updated)
     setResults({
-      totalUpliftResistance: parseFloat(totalUpliftResistance.toFixed(2)),
-      totalPileCapacityAS: parseFloat(totalCapacityAS.toFixed(2)),
-      totalPileCapacityMH: parseFloat(totalCapacityMH.toFixed(2))
+      totalUpliftResistance: updated.totalUpliftResistance,
+      totalPileCapacityAS: updated.totalPileCapacityAS,
+      totalPileCapacityMH: updated.totalPileCapacityMH
     })
   }
 
@@ -302,7 +202,7 @@ export const PileDesignAnalysis = () => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {jobOptions?.map(job => (
+                  {jobOptions?.map((job: any) => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>
