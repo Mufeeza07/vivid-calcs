@@ -14,12 +14,15 @@ import ScheduleIcon from '@mui/icons-material/Schedule'
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline'
 import AssignmentIcon from '@mui/icons-material/Assignment'
 import SettingsApplicationsIcon from '@mui/icons-material/SettingsApplications'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 
 const Sidebar = () => {
   const [expanded, setExpanded] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
+
+  const currentModule = pathname?.split('/')[2] || ''
   return (
     <>
       <Box
@@ -79,7 +82,14 @@ const Sidebar = () => {
             />
           </ListItemButton>
 
-          <ListItemButton component={Link} href='/modules/nails' sx={{ mt: 2 }}>
+          <ListItemButton
+            component={Link}
+            href={`/modules/${currentModule}`}
+            // onClick={() => {
+            //   console.log('Redirecting to:', `/modules/${currentModule}`)
+            // }}
+            sx={{ mt: 2 }}
+          >
             <ListItemIcon sx={{ color: '#0288d1' }}>
               <AddCircleOutlineIcon />
             </ListItemIcon>
