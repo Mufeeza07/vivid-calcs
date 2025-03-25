@@ -1,4 +1,3 @@
-import BoltCalculator from '@/components/BoltStrength'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SoilCalculatorForm from '@/components/Soil'
