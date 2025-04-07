@@ -1,10 +1,9 @@
-import NailCalculator from '@/components/Calculators/Nail'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'
 import { Box, Paper } from '@mui/material'
 
-const NailsPage = () => {
+const BeamSteelPage = () => {
   return (
     <>
       <Navbar />
@@ -30,13 +29,11 @@ const NailsPage = () => {
             p: 3,
             overflowX: 'auto'
           }}
-        >
-          <NailCalculator />
-        </Paper>
+        ></Paper>
       </Box>
-      <SupportActions moduleName='nail' />
+      <SupportActions moduleName='bolt' />
     </>
   )
 }
 
-export default NailsPage
+export default BeamSteelPage

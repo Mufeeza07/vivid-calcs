@@ -1,6 +1,6 @@
 'use client'
 
-import { PileDesignAnalysis } from '@/components/FootingDesign'
+import { PileDesignAnalysis } from '@/components/Calculators/FootingDesign'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'

@@ -1,7 +1,7 @@
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'
-import WeldStrengthCalculator from '@/components/Weld'
+import WeldStrengthCalculator from '@/components/Calculators/Weld'
 import { Box, Paper } from '@mui/material'
 
 const WeldStrengthPage = () => {

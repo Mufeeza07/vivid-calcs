@@ -1,4 +1,4 @@
-import BoltCalculator from '@/components/BoltStrength'
+import BoltCalculator from '@/components/Calculators/BoltStrength'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'

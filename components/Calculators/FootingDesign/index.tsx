@@ -1,3 +1,4 @@
+import ConfirmationDialog from '@/components/ConfirmationBox'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
 import {
@@ -29,7 +30,6 @@ import { Job } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../ConfirmationBox'
 
 export const PileDesignAnalysis = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -225,44 +225,6 @@ export const PileDesignAnalysis = () => {
                   ))}
                 </Select>
               </FormControl>
-            </Paper>
-
-            <Paper sx={cardStyle}>
-              <TextField
-                label='Safety Factor'
-                name='safetyFactor'
-                type='number'
-                value={inputs.safetyFactor}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-
-              <TextField
-                label='Ks'
-                name='ks'
-                type='number'
-                value={inputs.ks}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-
-              <TextField
-                label='Reduction Strength'
-                name='reductionStrength'
-                type='number'
-                value={inputs.reductionStrength}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -475,6 +437,44 @@ export const PileDesignAnalysis = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='Safety Factor'
+                name='safetyFactor'
+                type='number'
+                value={inputs.safetyFactor}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Ks'
+                name='ks'
+                type='number'
+                value={inputs.ks}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Reduction Strength'
+                name='reductionStrength'
+                type='number'
+                value={inputs.reductionStrength}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ readOnly: true }}
                 sx={textFieldStyle}
               />
             </Paper>

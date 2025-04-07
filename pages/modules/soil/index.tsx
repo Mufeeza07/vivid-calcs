@@ -1,6 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
-import SoilCalculatorForm from '@/components/Soil'
+import SoilCalculatorForm from '@/components/Calculators/Soil'
 import SupportActions from '@/components/SupportActions'
 import { Box, Paper } from '@mui/material'
 

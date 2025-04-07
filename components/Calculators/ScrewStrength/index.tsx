@@ -28,7 +28,7 @@ import { Job } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../ConfirmationBox'
+
 import {
   calculateShearScrewStrength,
   calculateUpliftScrewStrength
@@ -41,6 +41,7 @@ import {
   screwSizeOptions,
   typeOptions
 } from '@/utils/dropdownValues'
+import ConfirmationDialog from '@/components/ConfirmationBox'
 
 interface CalculatorProps {
   screwType: string
@@ -237,7 +238,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {jobOptions?.map(job => (
+                  {jobOptions?.map((job: any) => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>
@@ -766,7 +767,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {jobOptions?.map(job => (
+                  {jobOptions?.map((job: any) => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>

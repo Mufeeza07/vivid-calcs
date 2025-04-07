@@ -5,41 +5,40 @@ import {
   calculateButtonStyle,
   cardStyle,
   dropDownStyle,
+  resultFieldStyle,
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
+import { calculateBoltStrength } from '@/utils/calculateBolt'
 import {
   Box,
   Button,
   FormControl,
-  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
   TextField,
-  Tooltip,
   Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../ConfirmationBox'
 
 import {
+  boltSizeOptions,
   categoryOptions,
   jdTypeOptions,
   loadDirectionOptions,
   loadTypeOptions,
-  nailDiameterOptions,
+  timberThicknessOptions,
   typeOptions
 } from '@/utils/dropdownValues'
-import { calculateNailStrength } from '@/utils/calculateNail'
+import ConfirmationDialog from '@/components/ConfirmationBox'
 
-const NailCalculator = () => {
+const BoltCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
   const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -48,33 +47,32 @@ const NailCalculator = () => {
     dispatch(fetchJobs({}))
   }, [dispatch])
 
+  // console.log('all jobs', allJobs)
+
   const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
     name: job.address
   }))
 
   const [inputs, setInputs] = useState({
-    category: '',
-    jdType: '',
-    load: '',
-    loadType: '',
-    nailDiameter: '',
-    k13: 0,
-    screwJD: 0,
     phi: 0,
     k1: 0,
-    k14: 1,
     k16: 1,
     k17: 1,
+    qsk: 0,
     type: '',
     jobId: '',
+    category: '',
+    load: '',
+    loadType: '',
+    jdType: '',
+    boltSize: '',
+    timberThickness: '',
     note: ''
   })
 
   const [results, setResults] = useState({
-    designLoad: null as number | null,
-    screwPenetration: null as number | null,
-    firstTimberThickness: null as number | null
+    designStrength: null as number | null
   })
 
   const handleChange = (
@@ -85,21 +83,9 @@ const NailCalculator = () => {
     const { name, value } = event.target
 
     setInputs(prev => {
-      const updatedValue = [
-        'jobId',
-        'type',
-        'category',
-        'jdType',
-        'load',
-        'loadType'
-      ].includes(name)
-        ? value
-        : value === ''
-          ? ''
-          : Math.max(0, parseFloat(value) || 0)
-
-      const newState = { ...prev, [name]: updatedValue }
-      return calculateNailStrength(newState)
+      let updatedState = { ...prev, [name as keyof typeof inputs]: value }
+      updatedState = calculateBoltStrength(updatedState)
+      return updatedState
     })
   }
 
@@ -108,13 +94,8 @@ const NailCalculator = () => {
   }
 
   const calculateResults = () => {
-    const updated = calculateNailStrength(inputs)
-    setInputs(updated)
-    setResults({
-      designLoad: updated.designLoad ?? null,
-      screwPenetration: updated.screwPenetration ?? null,
-      firstTimberThickness: updated.firstTimberThickness ?? null
-    })
+    const updatedResults = calculateBoltStrength(inputs)
+    setResults(updatedResults)
   }
 
   const handleSave = () => {
@@ -127,7 +108,6 @@ const NailCalculator = () => {
       toast.error('Please fill in all required fields')
       return
     }
-
     calculateResults()
     setDialogOpen(true)
   }
@@ -137,7 +117,7 @@ const NailCalculator = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`,
+        `/api/modules/bolt/create-bolt-details?jobId=${inputs.jobId}`,
         {
           method: 'POST',
           headers: {
@@ -145,39 +125,21 @@ const NailCalculator = () => {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
-            type: inputs.type,
-            k13: inputs.k13,
-            category: inputs.category,
-            load: inputs.load,
-            loadType: inputs.loadType,
-            jdType: inputs.jdType,
-            nailDiameter: inputs.nailDiameter,
-            screwJD: inputs.screwJD,
-            phi: inputs.phi,
-            k1: inputs.k1,
-            k14: inputs.k14,
-            k16: inputs.k16,
-            k17: inputs.k17,
-            note: inputs.note,
-            designLoad: results.designLoad,
-            screwPenetration: results.screwPenetration,
-            firstTimberThickness: results.firstTimberThickness
+            ...inputs,
+            designStrength: results.designStrength
           })
         }
       )
 
       const responseData = await response.json()
-
       if (!response.ok) {
         toast.error(`Error: ${responseData.message}`)
         return
       }
-
       toast.success(responseData.message)
       setDialogOpen(false)
     } catch (error) {
-      console.error('Error saving nail calculations:', error)
-      toast.error('Failed to save data.')
+      toast.error('Failed to save data')
     }
   }
 
@@ -197,7 +159,7 @@ const NailCalculator = () => {
             mb: 2
           }}
         >
-          Nail Calculator
+          Bolt Strength Calculator
         </Typography>
 
         <Box
@@ -227,7 +189,7 @@ const NailCalculator = () => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {jobOptions?.map(job => (
+                  {jobOptions?.map((job: any) => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>
@@ -255,69 +217,6 @@ const NailCalculator = () => {
 
             <Paper sx={cardStyle}>
               <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Nail Diameter</InputLabel>
-                <Select
-                  name='nailDiameter'
-                  label='nailDiameter'
-                  value={inputs.nailDiameter}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {nailDiameterOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 1
-                }}
-              >
-                <FormControl fullWidth>
-                  <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                  <Select
-                    name='jdType'
-                    label='jdType'
-                    value={inputs.jdType}
-                    onChange={handleChange}
-                    sx={dropDownStyle}
-                  >
-                    {jdTypeOptions.map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-
-                <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
-                  <IconButton size='small' sx={{ color: '#0288d1' }}>
-                    <InfoOutlinedIcon fontSize='small' />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-
-              <TextField
-                label='14g Screw'
-                name='screwJD'
-                type='number'
-                value={inputs.screwJD}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-            </Paper>
-
-            <Paper sx={cardStyle}>
-              <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
                 <Select
                   name='load'
@@ -334,16 +233,75 @@ const NailCalculator = () => {
                 </Select>
               </FormControl>
 
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>
+                  Timber Thickness (mm)
+                </InputLabel>
+                <Select
+                  name='timberThickness'
+                  label='Timber Thickness (mm)'
+                  value={inputs.timberThickness}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {timberThicknessOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
+                <Select
+                  name='boltSize'
+                  label='Bolt Size '
+                  value={inputs.boltSize}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {boltSizeOptions.map(opt => (
+                    <MenuItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
+                <Select
+                  name='jdType'
+                  label='jdType'
+                  value={inputs.jdType}
+                  onChange={handleChange}
+                  sx={dropDownStyle}
+                >
+                  {jdTypeOptions
+                    .filter(
+                      opt =>
+                        opt.value !== 'JD6' ||
+                        inputs.load === 'PARALLEL_TO_GRAINS'
+                    )
+                    .map(opt => (
+                      <MenuItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </MenuItem>
+                    ))}
+                </Select>
+              </FormControl>
+
               <TextField
-                label='K13'
-                name='k13'
+                label='Qsk'
+                name='qsk'
                 type='number'
-                value={inputs.k13}
+                value={inputs.qsk}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
+                sx={textFieldStyle()}
               />
             </Paper>
           </Box>
@@ -385,7 +343,7 @@ const NailCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
+                sx={textFieldStyle()}
               />
             </Paper>
 
@@ -416,23 +374,11 @@ const NailCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
+                sx={textFieldStyle()}
               />
             </Paper>
 
             <Paper sx={cardStyle}>
-              <TextField
-                label='K14'
-                name='k14'
-                type='number'
-                value={inputs.k14}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ min: 0 }}
-                sx={textFieldStyle}
-              />
-
               <TextField
                 label='K16'
                 name='k16'
@@ -454,7 +400,7 @@ const NailCalculator = () => {
                 onFocus={handleFocus}
                 fullWidth
                 inputProps={{ min: 0 }}
-                sx={textFieldStyle}
+                sx={textFieldStyle()}
               />
             </Paper>
           </Box>
@@ -469,36 +415,20 @@ const NailCalculator = () => {
             gap: 2
           }}
         >
-          {[
-            { label: 'Design Load', value: results.designLoad },
-            {
-              label: 'Screw Penetration in Second Timber',
-              value: results.screwPenetration
-            },
-            {
-              label: 'First Timber Thickness',
-              value: results.firstTimberThickness
+          <TextField
+            label='Design Strength'
+            value={
+              results.designStrength !== null
+                ? results.designStrength.toFixed(2)
+                : ''
             }
-          ].map(({ label, value }) => (
-            <TextField
-              key={label}
-              label={label}
-              value={value !== null ? value.toFixed(2) : ''}
-              InputProps={{
-                readOnly: true
-              }}
-              variant='filled'
-              fullWidth
-              sx={{
-                mt: 2,
-                '& .MuiFilledInput-root': {
-                  backgroundColor: '#282828',
-                  color: 'white'
-                },
-                '& .MuiInputLabel-root': { color: '#0288d1' }
-              }}
-            />
-          ))}
+            InputProps={{
+              readOnly: true
+            }}
+            variant='filled'
+            fullWidth
+            sx={resultFieldStyle}
+          />
         </Box>
 
         <Box sx={{ mt: 4 }}>
@@ -565,7 +495,7 @@ const NailCalculator = () => {
 
       <ConfirmationDialog
         open={dialogOpen}
-        title='Nail Calculations'
+        title='Bolt Strength'
         onClose={() => setDialogOpen(false)}
         onConfirm={handleConfirmSave}
       />
@@ -573,4 +503,4 @@ const NailCalculator = () => {
   )
 }
 
-export default NailCalculator
+export default BoltCalculator

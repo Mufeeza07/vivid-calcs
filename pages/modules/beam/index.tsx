@@ -1,11 +1,10 @@
 'use client'
 
-import { BeamAnalysis, SlabAnalysis } from '@/components/BeamAndSlab'
-import Navbar from '@/components/Navbar'
 import {
-  ShearScrewCalculator,
-  UpliftScrewCalculator
-} from '@/components/ScrewStrength'
+  BeamAnalysis,
+  SlabAnalysis
+} from '@/components/Calculators/BeamAndSlab'
+import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'
 import {
@@ -16,7 +15,6 @@ import {
   Paper,
   Select,
   SelectChangeEvent,
-  TextField,
   Typography
 } from '@mui/material'
 import { useState } from 'react'

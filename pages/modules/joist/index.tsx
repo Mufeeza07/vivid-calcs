@@ -1,4 +1,4 @@
-import JoistVibrationCalculator from '@/components/JoistVibration'
+import JoistVibrationCalculator from '@/components/Calculators/JoistVibration'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'
