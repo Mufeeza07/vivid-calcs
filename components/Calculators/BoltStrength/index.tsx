@@ -14,18 +14,21 @@ import {
   Box,
   Button,
   FormControl,
+  IconButton,
   InputLabel,
   MenuItem,
   Paper,
   Select,
   SelectChangeEvent,
   TextField,
+  Tooltip,
   Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 
 import {
   boltSizeOptions,
@@ -379,17 +382,32 @@ const BoltCalculator = () => {
             </Paper>
 
             <Paper sx={cardStyle}>
-              <TextField
-                label='K16'
-                name='k16'
-                type='number'
-                value={inputs.k16}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ min: 0 }}
-                sx={textFieldStyle}
-              />
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 1
+                }}
+              >
+                <TextField
+                  label='K16'
+                  name='k16'
+                  type='number'
+                  value={inputs.k16}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  inputProps={{ min: 0 }}
+                  sx={textFieldStyle}
+                />
+
+                <Tooltip title='1.2 if there is metal plate on both sides, otherwise 1.'>
+                  <IconButton size='small' sx={{ color: '#0288d1' }}>
+                    <InfoOutlinedIcon fontSize='small' />
+                  </IconButton>
+                </Tooltip>
+              </Box>
 
               <TextField
                 label='K17'
