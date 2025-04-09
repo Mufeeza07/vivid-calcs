@@ -1,333 +1,43 @@
-'use client'
-
-import ConfirmationDialog from '@/components/ConfirmationBox'
+import BoltCalculator from '@/components/BoltStrength'
 import Navbar from '@/components/Navbar'
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import {
-  Box,
-  Button,
-  Container,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  TextField,
-  Typography
-} from '@mui/material'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { toast, ToastContainer } from 'react-toastify'
+import Sidebar from '@/components/Sidebar'
+import SoilCalculatorForm from '@/components/Soil'
+import SupportActions from '@/components/SupportActions'
+import { Box, Paper } from '@mui/material'
 
-const SoilCalculator = () => {
-  const dispatch = useDispatch()
-  const allJobs = useSelector(selectRecentJobs)
-
-  useEffect(() => {
-    dispatch(fetchJobs())
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map(job => ({
-    id: job.jobId,
-    name: job.address
-  }))
-
-  const [inputs, setInputs] = useState({
-    jobId: '',
-    type: '',
-    shrinkageIndex: 0,
-    lateralRestraint: 0,
-    suctionChange: 0,
-    layerThickness: 0
-  })
-
-  const [results, setResults] = useState({
-    instabilityIndex: null as number | null,
-    surfaceMovement: null as number | null
-  })
-  const [dialogOpen, setDialogOpen] = useState(false)
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setInputs(prev => ({
-      ...prev,
-      [name]:
-        name === 'jobId' || name === 'type'
-          ? value
-          : value === ''
-            ? ''
-            : Math.max(0, parseFloat(value) || 0)
-    }))
-  }
-
-  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    e.target.select()
-  }
-
-  const calculateResults = () => {
-    const { shrinkageIndex, lateralRestraint, suctionChange, layerThickness } =
-      inputs
-
-    const instabilityIndex = shrinkageIndex * lateralRestraint
-    const surfaceMovement =
-      (instabilityIndex * suctionChange * layerThickness) / 100
-
-    setResults({
-      instabilityIndex,
-      surfaceMovement
-    })
-  }
-
-  const handleSave = () => {
-    const requiredFields = [
-      'jobId',
-      'type',
-      'shrinkageIndex',
-      'lateralRestraint',
-      'suctionChange',
-      'layerThickness'
-    ]
-
-    const missingFields = requiredFields.filter(field => !inputs[field])
-    if (missingFields.length > 0) {
-      toast.error('Please fill in all required fields')
-      return
-    }
-    setDialogOpen(true)
-  }
-
-  const handleCloseDialog = () => {
-    setDialogOpen(false)
-  }
-
-  const handleConfirmSave = async () => {
-    const token = localStorage.getItem('token')
-    try {
-      const response = await fetch(
-        `/api/modules/soil/create-soil-details?jobId=${inputs.jobId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            type: inputs.type,
-            shrinkageIndex: inputs.shrinkageIndex,
-            lateralRestraint: inputs.lateralRestraint,
-            suctionChange: inputs.suctionChange,
-            layerThickness: inputs.layerThickness,
-            instabilityIndex: results.instabilityIndex,
-            surfaceMovement: results.surfaceMovement
-          })
-        }
-      )
-
-      const responseData = await response.json()
-
-      if (!response.ok) {
-        toast.error(`Error: ${responseData.message || 'Failed to save data'}`)
-        return
-      }
-
-      toast.success(responseData.message)
-      setDialogOpen(false)
-    } catch (error) {
-      toast.error('Failed to save data')
-      return
-    }
-  }
-
+const SoilCalculatorPage = () => {
   return (
     <>
       <Navbar />
-      <ToastContainer />
-      <Container sx={{ marginTop: 8, textAlign: 'center', color: 'white' }}>
+      <Sidebar />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          mt: 3,
+          px: 2,
+          ml: { xs: '50px', sm: '200px' },
+          mr: { xs: '40px', sm: '80px' }
+        }}
+      >
         <Paper
           elevation={3}
           sx={{
-            padding: 4,
-            maxWidth: 600,
-            margin: 'auto',
+            width: '100%',
+            maxWidth: '1200px',
             backgroundColor: '#1e1e1e',
             color: 'white',
-            border: '1px solid #0288d1'
+            border: '1px solid #0288d1',
+            p: 3,
+            overflowX: 'auto'
           }}
         >
-          <Typography variant='h4' gutterBottom sx={{ color: '#0288d1' }}>
-            Soil Calculator
-          </Typography>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: { xs: 'column', sm: 'row' },
-              gap: 4
-            }}
-          >
-            <Box
-              sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}
-            >
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  {jobOptions?.map(job => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
-                <Select
-                  name='type'
-                  label='type'
-                  value={inputs.type}
-                  onChange={handleChange}
-                  sx={{
-                    backgroundColor: '#282828',
-                    color: 'white',
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    },
-                    '& .MuiSelect-icon': {
-                      color: '#0288d1'
-                    }
-                  }}
-                >
-                  {' '}
-                  <MenuItem value='STEEL_TO_STEEL'>Steel to Steel</MenuItem>
-                  <MenuItem value='TIMBER_TO_TIMBER'>Timber to Timber</MenuItem>
-                  <MenuItem value='TIMBER_TO_STEEL'>Timber to Steel</MenuItem>
-                </Select>
-              </FormControl>
-              {[
-                { name: 'shrinkageIndex', label: 'Soil Shrinkage Index' },
-                { name: 'lateralRestraint', label: 'Lateral Restraint Factor' },
-                { name: 'suctionChange', label: 'Soil Suction Change' },
-                { name: 'layerThickness', label: 'Thickness of Layer' }
-              ].map(({ name, label }) => (
-                <TextField
-                  key={name}
-                  label={label}
-                  name={name}
-                  type='number'
-                  variant='outlined'
-                  value={inputs[name as keyof typeof inputs]}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' },
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: '#0288d1'
-                    }
-                  }}
-                />
-              ))}
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                gap: 2
-              }}
-            >
-              {[
-                { label: 'Instability Index', value: results.instabilityIndex },
-                {
-                  label: 'Char. Surface Movement',
-                  value: results.surfaceMovement
-                }
-              ].map(({ label, value }) => (
-                <TextField
-                  key={label}
-                  label={label}
-                  value={value !== null ? value.toFixed(2) : ''}
-                  InputProps={{ readOnly: true }}
-                  variant='filled'
-                  fullWidth
-                  sx={{
-                    '& .MuiFilledInput-root': {
-                      backgroundColor: '#282828',
-                      color: 'white'
-                    },
-                    '& .MuiInputLabel-root': { color: '#0288d1' }
-                  }}
-                />
-              ))}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              marginTop: 3,
-              display: 'flex',
-              justifyContent: 'space-between'
-            }}
-          >
-            <Button
-              variant='contained'
-              color='primary'
-              onClick={calculateResults}
-              sx={{
-                backgroundColor: '#0288d1',
-                '&:hover': { backgroundColor: '#026aa1' }
-              }}
-            >
-              Calculate
-            </Button>
-            <Button
-              variant='contained'
-              color='secondary'
-              onClick={handleSave}
-              sx={{
-                backgroundColor: '#7b1fa2',
-                '&:hover': { backgroundColor: '#4a148c' }
-              }}
-            >
-              Save
-            </Button>
-          </Box>
+          <SoilCalculatorForm />
         </Paper>
-
-        <ConfirmationDialog
-          open={dialogOpen}
-          title='Soil Calculation'
-          onClose={() => setDialogOpen(false)}
-          onConfirm={handleConfirmSave}
-        />
-      </Container>
+      </Box>
+      <SupportActions moduleName='soil' />
     </>
   )
 }
 
-export default SoilCalculator
+export default SoilCalculatorPage
