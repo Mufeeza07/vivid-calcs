@@ -1,3 +1,4 @@
+import SpanBeam from '@/components/Calculators/SpanBeam'
 import Navbar from '@/components/Navbar'
 import Sidebar from '@/components/Sidebar'
 import SupportActions from '@/components/SupportActions'
@@ -29,7 +30,9 @@ const BeamSteelPage = () => {
             p: 3,
             overflowX: 'auto'
           }}
-        ></Paper>
+        >
+          <SpanBeam />
+        </Paper>
       </Box>
       <SupportActions moduleName='bolt' />
     </>
