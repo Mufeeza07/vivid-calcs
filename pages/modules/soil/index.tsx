@@ -23,7 +23,6 @@ const SoilCalculatorPage = () => {
           elevation={3}
           sx={{
             width: '100%',
-            maxWidth: '1200px',
             backgroundColor: '#1e1e1e',
             color: 'white',
             border: '1px solid #0288d1',
