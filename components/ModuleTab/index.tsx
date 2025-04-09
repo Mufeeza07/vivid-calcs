@@ -22,6 +22,8 @@ import {
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import AgricultureIcon from '@mui/icons-material/Agriculture'
+import Schema from '@mui/icons-material/Schema'
+
 
 const ModuleTabs = () => {
   const router = useRouter()
@@ -74,10 +76,10 @@ const ModuleTabs = () => {
       icon: <Calculate fontSize='large' />
     },
     {
-      label: 'Flow Velocity',
-      description: 'Calculate the flow velocity',
-      path: 'flow',
-      icon: <Speed fontSize='large' />
+      label: 'Steel Beam',
+      description: 'Calculate the Steel Beam',
+      path: 'steelBeam',
+      icon: <Schema fontSize='large' />
     },
     {
       label: 'Pile Design',

@@ -8,8 +8,6 @@ import {
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
-import { calculatePileStrength } from '@/utils/calculatePile'
-import { frictionAngleOptions, typeOptions } from '@/utils/dropdownValues'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
@@ -29,9 +27,19 @@ import { Job } from '@prisma/client'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../ConfirmationBox'
 
-export const PileDesignAnalysis = () => {
+import {
+  categoryOptions,
+  jdTypeOptions,
+  loadDirectionOptions,
+  loadTypeOptions,
+  nailDiameterOptions,
+  typeOptions
+} from '@/utils/dropdownValues'
+import { calculateNailStrength } from '@/utils/calculateNail'
+import ConfirmationDialog from '@/components/ConfirmationBox'
+
+const SpanBeam = () => {
   const dispatch = useDispatch<AppDispatch>()
   const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -48,28 +56,31 @@ export const PileDesignAnalysis = () => {
   const [inputs, setInputs] = useState({
     jobId: '',
     type: '',
-    frictionAngle: '',
-    safetyFactor: 0.55,
-    ks: 1.5,
-    soilDensity: 18,
-    pileHeight: 0,
-    factor: 0,
-    pileDiameter: 450,
-    frictionResistanceAS: 0,
-    frictionResistanceMH: 0,
-    weight: 0,
-    cohension: 10,
-    nq: 0,
-    nc: 0,
-    reductionStrength: 0.61,
-    endBearing: 0,
+    beamSpan: '',
+    floorLoadWidth: '',
+    roofLoadWidth: '',
+    wallHeight: '',
+    pointFloorLoadArea: 0,
+    pointRoofLoadArea: 0,
+    floorDeadLoad: 0,
+    roofDeadLoad: 0,
+    floorLiveLoad: 0,
+    wallLoad: 0,
+    steelUdlWeight: 0,
+    steelPointWeight: 0,
+    udlDeadLoad: 0,
+    udlLiveLoad: 0,
+    pointDeadLoad: 0,
+    pointLiveLoad: 0,
+    pointServiceLoad: 0,
+    udlServiceLoad: 0,
+    deflectionLimit: 0,
     note: ''
   })
 
   const [results, setResults] = useState({
-    totalUpliftResistance: null as number | null,
-    totalPileCapacityAS: null as number | null,
-    totalPileCapacityMH: null as number | null
+    momentOfInertia: null as number | null,
+    moment: null as number | null
   })
 
   const handleChange = (
@@ -79,17 +90,19 @@ export const PileDesignAnalysis = () => {
   ) => {
     const { name, value } = event.target
 
-    setInputs(prev => {
-      const updatedValue =
-        name === 'jobId' || name === 'type' || name === 'frictionAngle'
-          ? value
-          : value === ''
-            ? ''
-            : Math.max(0, parseFloat(value) || 0)
+    const updatedValue =
+      name === 'jobId' || name === 'type'
+        ? value
+        : value === ''
+          ? ''
+          : Math.max(0, parseFloat(value) || 0)
 
-      let updatedState = { ...prev, [name!]: updatedValue }
-      return calculatePileStrength(updatedState)
-    })
+    const updatedInputs = {
+      ...inputs,
+      [name]: updatedValue
+    }
+
+    setInputs(updatedInputs)
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -97,13 +110,12 @@ export const PileDesignAnalysis = () => {
   }
 
   const calculateResults = () => {
-    const updated = calculatePileStrength(inputs)
-    setInputs(updated)
-    setResults({
-      totalUpliftResistance: updated.totalUpliftResistance,
-      totalPileCapacityAS: updated.totalPileCapacityAS,
-      totalPileCapacityMH: updated.totalPileCapacityMH
-    })
+    // const updated = calculateNailStrength(inputs)
+    // setInputs(updated)
+    // setResults({
+    //   momentOfInertia: updated.momentOfInertia ?? null,
+    //   moment: updated.moment ?? null
+    // })
   }
 
   const handleSave = () => {
@@ -117,6 +129,7 @@ export const PileDesignAnalysis = () => {
       return
     }
 
+    calculateResults()
     setDialogOpen(true)
   }
 
@@ -125,47 +138,47 @@ export const PileDesignAnalysis = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/pile/create-pile-details?jobId=${inputs.jobId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            type: inputs.type,
-            frictionAngle: inputs.frictionAngle,
-            safetyFactor: inputs.safetyFactor,
-            ks: inputs.ks,
-            soilDensity: inputs.soilDensity,
-            pileHeight: inputs.pileHeight,
-            factor: inputs.factor,
-            pileDiameter: inputs.pileDiameter,
-            frictionResistanceAS: inputs.frictionResistanceAS,
-            frictionResistanceMH: inputs.frictionResistanceMH,
-            weight: inputs.weight,
-            cohension: inputs.cohension,
-            nq: inputs.nq,
-            nc: inputs.nc,
-            reductionStrength: inputs.reductionStrength,
-            endBearing: inputs.endBearing,
-            totalUpliftResistance: results.totalUpliftResistance,
-            totalPileCapacityAS: results.totalPileCapacityAS,
-            totalPileCapacityMH: results.totalPileCapacityMH
-          })
-        }
+        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`
+        // {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //     Authorization: `Bearer ${token}`
+        //   },
+        //   body: JSON.stringify({
+        //     type: inputs.type,
+        //     k13: inputs.k13,
+        //     category: inputs.category,
+        //     load: inputs.load,
+        //     loadType: inputs.loadType,
+        //     jdType: inputs.jdType,
+        //     nailDiameter: inputs.nailDiameter,
+        //     screwJD: inputs.screwJD,
+        //     phi: inputs.phi,
+        //     k1: inputs.k1,
+        //     k14: inputs.k14,
+        //     k16: inputs.k16,
+        //     k17: inputs.k17,
+        //     note: inputs.note,
+        //     designLoad: results.designLoad,
+        //     screwPenetration: results.screwPenetration,
+        //     firstTimberThickness: results.firstTimberThickness
+        //   })
+        // }
       )
 
       const responseData = await response.json()
+
       if (!response.ok) {
         toast.error(`Error: ${responseData.message}`)
         return
       }
+
       toast.success(responseData.message)
       setDialogOpen(false)
-    } catch (error: any) {
-      console.error('Error saving pile calculations:', error.message)
-      toast.error('Failed to save data.', error)
+    } catch (error) {
+      console.error('Error saving 9calculations:', error)
+      toast.error('Failed to save data.')
     }
   }
 
@@ -173,12 +186,26 @@ export const PileDesignAnalysis = () => {
     <>
       <ToastContainer />
       <Box>
+        <Typography
+          variant='h5'
+          sx={{
+            color: '#0288d1',
+            backgroundColor: '#1e1e1e',
+            textAlign: 'center',
+            p: 2,
+            border: '1px solid #0288d1',
+            borderRadius: 1,
+            mb: 2
+          }}
+        >
+          Steel Beam Calculator
+        </Typography>
+
         <Box
           sx={{
             display: 'flex',
             gap: 2,
-            flexDirection: { xs: 'column', sm: 'row' },
-            alignItems: 'flex-start'
+            flexDirection: { xs: 'column', md: 'row' }
           }}
         >
           {/* Left Column */}
@@ -218,7 +245,7 @@ export const PileDesignAnalysis = () => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {typeOptions?.map(opt => (
+                  {typeOptions.map(opt => (
                     <MenuItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </MenuItem>
@@ -228,44 +255,6 @@ export const PileDesignAnalysis = () => {
             </Paper>
 
             <Paper sx={cardStyle}>
-              <TextField
-                label='Safety Factor'
-                name='safetyFactor'
-                type='number'
-                value={inputs.safetyFactor}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                InputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-
-              <TextField
-                label='Ks'
-                name='ks'
-                type='number'
-                value={inputs.ks}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-
-              <TextField
-                label='Reduction Strength'
-                name='reductionStrength'
-                type='number'
-                value={inputs.reductionStrength}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ readOnly: true }}
-                sx={textFieldStyle}
-              />
-            </Paper>
-
-            <Paper sx={cardStyle}>
               <Box
                 sx={{
                   display: 'flex',
@@ -275,10 +264,10 @@ export const PileDesignAnalysis = () => {
                 }}
               >
                 <TextField
-                  label='Pile Diameter (mm)'
-                  name='pileDiameter'
+                  label='Beam Span'
+                  name='beamSpan'
                   type='number'
-                  value={inputs.pileDiameter}
+                  value={inputs.beamSpan}
                   onChange={handleChange}
                   onFocus={handleFocus}
                   fullWidth
@@ -286,7 +275,7 @@ export const PileDesignAnalysis = () => {
                   sx={textFieldStyle}
                 />
 
-                <Tooltip title='Select the pile diameter in mm. This impacts strength and spacing.'>
+                <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
                   <IconButton size='small' sx={{ color: '#0288d1' }}>
                     <InfoOutlinedIcon fontSize='small' />
                   </IconButton>
@@ -294,10 +283,10 @@ export const PileDesignAnalysis = () => {
               </Box>
 
               <TextField
-                label='Soil Density'
-                name='soilDensity'
+                label='Floor Load Width'
+                name='floorLoadWidth'
                 type='number'
-                value={inputs.soilDensity}
+                value={inputs.floorLoadWidth}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
@@ -306,10 +295,36 @@ export const PileDesignAnalysis = () => {
               />
 
               <TextField
-                label='Pile Height (mm)'
-                name='pileHeight'
+                label='Roof Load Width'
+                name='roofLoadWidth'
                 type='number'
-                value={inputs.pileHeight}
+                value={inputs.roofLoadWidth}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='Wall Height'
+                name='wallHeight'
+                type='number'
+                value={inputs.wallHeight}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Wall Load'
+                name='wallLoad'
+                type='number'
+                value={inputs.wallLoad}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
@@ -326,72 +341,18 @@ export const PileDesignAnalysis = () => {
                 }}
               >
                 <TextField
-                  label='Friction Resistance A-S (KN)'
-                  name='frictionResistanceAS'
+                  label='Steel UDL Weight'
+                  name='steelUdlWeight'
                   type='number'
-                  value={inputs.frictionResistanceAS}
+                  value={inputs.steelUdlWeight}
                   onChange={handleChange}
                   onFocus={handleFocus}
                   fullWidth
-                  InputProps={{ readOnly: true }}
+                  inputProps={{ min: 0 }}
                   sx={textFieldStyle}
                 />
 
-                <Tooltip title='Select the pile diameter in mm. This impacts strength and spacing.'>
-                  <IconButton size='small' sx={{ color: '#0288d1' }}>
-                    <InfoOutlinedIcon fontSize='small' />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 1
-                }}
-              >
-                <TextField
-                  label='Friction Resistance M-H (KN)'
-                  name='frictionResistanceMH'
-                  type='number'
-                  value={inputs.frictionResistanceMH}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-
-                <Tooltip title='Select the pile diameter in mm. This impacts strength and spacing.'>
-                  <IconButton size='small' sx={{ color: '#0288d1' }}>
-                    <InfoOutlinedIcon fontSize='small' />
-                  </IconButton>
-                </Tooltip>
-              </Box>
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 1
-                }}
-              >
-                <TextField
-                  label='Weight (KN)'
-                  name='weight'
-                  type='number'
-                  value={inputs.weight}
-                  onChange={handleChange}
-                  onFocus={handleFocus}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                  sx={textFieldStyle}
-                />
-
-                <Tooltip title='Select the pile diameter in mm. This impacts strength and spacing.'>
+                <Tooltip title='Select the nail diameter in mm. This impacts strength and spacing.'>
                   <IconButton size='small' sx={{ color: '#0288d1' }}>
                     <InfoOutlinedIcon fontSize='small' />
                   </IconButton>
@@ -399,14 +360,26 @@ export const PileDesignAnalysis = () => {
               </Box>
 
               <TextField
-                label='End Bearing Capacity'
-                name='endBearing'
+                label='Steel Point Weight'
+                name='steelPointWeight'
                 type='number'
-                value={inputs.endBearing}
+                value={inputs.steelPointWeight}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
-                InputProps={{ readOnly: true }}
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Deflection Limit'
+                name='deflectionLimit'
+                type='number'
+                value={inputs.deflectionLimit}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
                 sx={textFieldStyle}
               />
             </Paper>
@@ -423,30 +396,73 @@ export const PileDesignAnalysis = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>
-                  Friction Angle
-                </InputLabel>
-                <Select
-                  name='frictionAngle'
-                  label='Friction Angle'
-                  value={inputs.frictionAngle}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {frictionAngleOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                label='Point Floor Load Area'
+                name='pointFloorLoadArea'
+                type='number'
+                value={inputs.pointFloorLoadArea}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
 
               <TextField
-                label='Factor'
-                name='factor'
+                label='Point Roof Load Area'
+                name='pointRoofLoadArea'
                 type='number'
-                value={inputs.factor}
+                value={inputs.pointRoofLoadArea}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label=' Floor Dead Load '
+                name='floorDeadLoad'
+                type='number'
+                value={inputs.floorDeadLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Roof Dead Load'
+                name='roofDeadLoad'
+                type='number'
+                value={inputs.roofDeadLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Floor Live Load'
+                name='floorLiveLoad'
+                type='number'
+                value={inputs.floorLiveLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='UDL Dead Load'
+                name='udlDeadLoad'
+                type='number'
+                value={inputs.udlDeadLoad}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
@@ -455,10 +471,10 @@ export const PileDesignAnalysis = () => {
               />
 
               <TextField
-                label='Nq'
-                name='nq'
+                label='UDL Live Load'
+                name='udlLiveLoad'
                 type='number'
-                value={inputs.nq}
+                value={inputs.udlLiveLoad}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
@@ -467,10 +483,48 @@ export const PileDesignAnalysis = () => {
               />
 
               <TextField
-                label='Nc'
-                name='nc'
+                label='UDL Service Load'
+                name='udlServiceLoad'
                 type='number'
-                value={inputs.nc}
+                value={inputs.udlServiceLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='Point Dead Load'
+                name='pointDeadLoad'
+                type='number'
+                value={inputs.pointDeadLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Point Live Load'
+                name='pointLiveLoad'
+                type='number'
+                value={inputs.pointLiveLoad}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle}
+              />
+
+              <TextField
+                label='Point Service Load'
+                name='pointServiceLoad'
+                type='number'
+                value={inputs.pointServiceLoad}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
@@ -491,17 +545,10 @@ export const PileDesignAnalysis = () => {
           }}
         >
           {[
+            { label: 'Moment of Inertia', value: results.momentOfInertia },
             {
-              label: 'Total Uplift Resistance',
-              value: results.totalUpliftResistance
-            },
-            {
-              label: 'Total Pile Capacity (A-S)',
-              value: results.totalPileCapacityAS
-            },
-            {
-              label: 'Total Pile Capacity (M-H-E)',
-              value: results.totalPileCapacityMH
+              label: 'Moment',
+              value: results.moment
             }
           ].map(({ label, value }) => (
             <TextField
@@ -589,10 +636,12 @@ export const PileDesignAnalysis = () => {
 
       <ConfirmationDialog
         open={dialogOpen}
-        title='Pile Calculations'
+        title='Nail Calculations'
         onClose={() => setDialogOpen(false)}
         onConfirm={handleConfirmSave}
       />
     </>
   )
 }
+
+export default SpanBeam

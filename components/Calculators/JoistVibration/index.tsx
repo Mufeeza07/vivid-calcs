@@ -1,52 +1,42 @@
+'use client'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
 import {
-  buttonsBarStyle,
-  calculateButtonStyle,
-  cardStyle,
-  dropDownStyle,
-  resultFieldStyle,
-  saveButtonStyle,
-  textFieldStyle
+    buttonsBarStyle,
+    calculateButtonStyle,
+    cardStyle,
+    dropDownStyle,
+    resultFieldStyle,
+    saveButtonStyle,
+    textFieldStyle
 } from '@/styles/moduleStyle'
-import { calculateBoltStrength } from '@/utils/calculateBolt'
+import { typeOptions } from '@/utils/dropdownValues'
 import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Typography
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    TextField,
+    Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
+import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
-import ConfirmationDialog from '../ConfirmationBox'
-import {
-  boltSizeOptions,
-  categoryOptions,
-  jdTypeOptions,
-  loadDirectionOptions,
-  loadTypeOptions,
-  timberThicknessOptions,
-  typeOptions
-} from '@/utils/dropdownValues'
 
-const BoltCalculator = () => {
+const JoistVibrationCalculator = () => {
   const dispatch = useDispatch<AppDispatch>()
   const allJobs = useSelector(selectRecentJobs)
+  const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   useEffect(() => {
     dispatch(fetchJobs({}))
   }, [dispatch])
-
-  // console.log('all jobs', allJobs)
 
   const jobOptions = allJobs?.jobs?.map((job: Job) => ({
     id: job.jobId,
@@ -54,48 +44,35 @@ const BoltCalculator = () => {
   }))
 
   const [inputs, setInputs] = useState({
-    phi: 0,
-    k1: 0,
-    k16: 1,
-    k17: 1,
-    qsk: 0,
     type: '',
     jobId: '',
+    maxFrequence: 0,
+    eb: 0,
+    ib: 0,
+    s: 0,
+    kx: 0,
+    ef: '',
+    tf: '',
     category: '',
-    load: '',
-    loadType: '',
-    jdType: '',
-    boltSize: '',
-    timberThickness: '',
+    ky: '',
+    span: '',
+    floorWidth: '',
+    floorMass: '',
+    cb: '',
     note: ''
   })
 
   const [results, setResults] = useState({
-    designStrength: null as number | null
+    Frequency: null as number | null
   })
 
-  const handleChange = (
-    event:
-      | React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-      | SelectChangeEvent<string>
-  ) => {
-    const { name, value } = event.target
-
-    setInputs(prev => {
-      let updatedState = { ...prev, [name as keyof typeof inputs]: value }
-      updatedState = calculateBoltStrength(updatedState)
-      return updatedState
-    })
-  }
+  const handleChange = () => {}
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     e.target.select()
   }
 
-  const calculateResults = () => {
-    const updatedResults = calculateBoltStrength(inputs)
-    setResults(updatedResults)
-  }
+  const calculateResults = () => {}
 
   const handleSave = () => {
     const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
@@ -109,37 +86,6 @@ const BoltCalculator = () => {
     }
     calculateResults()
     setDialogOpen(true)
-  }
-
-  const handleConfirmSave = async () => {
-    const token = localStorage.getItem('token')
-
-    try {
-      const response = await fetch(
-        `/api/modules/bolt/create-bolt-details?jobId=${inputs.jobId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            ...inputs,
-            designStrength: results.designStrength
-          })
-        }
-      )
-
-      const responseData = await response.json()
-      if (!response.ok) {
-        toast.error(`Error: ${responseData.message}`)
-        return
-      }
-      toast.success(responseData.message)
-      setDialogOpen(false)
-    } catch (error) {
-      toast.error('Failed to save data')
-    }
   }
 
   return (
@@ -158,7 +104,7 @@ const BoltCalculator = () => {
             mb: 2
           }}
         >
-          Bolt Strength Calculator
+          Joist Vibration Calculator
         </Typography>
 
         <Box
@@ -188,7 +134,7 @@ const BoltCalculator = () => {
                   onChange={handleChange}
                   sx={dropDownStyle()}
                 >
-                  {jobOptions?.map(job => (
+                  {jobOptions?.map((job: any) => (
                     <MenuItem key={job.id} value={job.id}>
                       {job.name}
                     </MenuItem>
@@ -215,91 +161,77 @@ const BoltCalculator = () => {
             </Paper>
 
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Load</InputLabel>
-                <Select
-                  name='load'
-                  label='load'
-                  value={inputs.load}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {loadDirectionOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>
-                  Timber Thickness (mm)
-                </InputLabel>
-                <Select
-                  name='timberThickness'
-                  label='Timber Thickness (mm)'
-                  value={inputs.timberThickness}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {timberThicknessOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Bolt Size</InputLabel>
-                <Select
-                  name='boltSize'
-                  label='Bolt Size '
-                  value={inputs.boltSize}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {boltSizeOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>JD Type</InputLabel>
-                <Select
-                  name='jdType'
-                  label='jdType'
-                  value={inputs.jdType}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {jdTypeOptions
-                    .filter(
-                      opt =>
-                        opt.value !== 'JD6' ||
-                        inputs.load === 'PARALLEL_TO_GRAINS'
-                    )
-                    .map(opt => (
-                      <MenuItem key={opt.value} value={opt.value}>
-                        {opt.label}
-                      </MenuItem>
-                    ))}
-                </Select>
-              </FormControl>
+              <TextField
+                label='Max Frequency'
+                name='maxFrequence'
+                type='number'
+                value={inputs.maxFrequence}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
 
               <TextField
-                label='Qsk'
-                name='qsk'
+                label='S'
+                name='s'
                 type='number'
-                value={inputs.qsk}
+                value={inputs.s}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
+
+              <TextField
+                label='Kx'
+                name='kx'
+                type='number'
+                value={inputs.kx}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
+                sx={textFieldStyle()}
+              />
+            </Paper>
+
+            <Paper sx={cardStyle}>
+              <TextField
+                label='Span'
+                name='span'
+                type='number'
+                value={inputs.span}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
+
+              <TextField
+                label='Floor Width'
+                name='floorWidth'
+                type='number'
+                value={inputs.floorWidth}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
+
+              <TextField
+                label='Floor Mass'
+                name='floorMass'
+                type='number'
+                value={inputs.floorMass}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
                 sx={textFieldStyle()}
               />
             </Paper>
@@ -315,7 +247,7 @@ const BoltCalculator = () => {
               width: { xs: '100%', sm: 'auto' }
             }}
           >
-            <Paper sx={cardStyle}>
+            {/* <Paper sx={cardStyle}>
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Category</InputLabel>
                 <Select
@@ -344,61 +276,68 @@ const BoltCalculator = () => {
                 InputProps={{ readOnly: true }}
                 sx={textFieldStyle()}
               />
-            </Paper>
+            </Paper> */}
 
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Load Type</InputLabel>
-                <Select
-                  name='loadType'
-                  label='load type'
-                  value={inputs.loadType}
-                  onChange={handleChange}
-                  sx={dropDownStyle}
-                >
-                  {loadTypeOptions.map(option => (
-                    <MenuItem key={option.value} value={option.value}>
-                      {option.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-
               <TextField
-                label='K1'
-                name='k1'
+                label='Eb'
+                name='eb'
                 type='number'
-                value={inputs.k1}
+                value={inputs.eb}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
                 InputProps={{ readOnly: true }}
                 sx={textFieldStyle()}
               />
+
+              <TextField
+                label='Ib'
+                name='ib'
+                type='number'
+                value={inputs.ib}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
+
+              <TextField
+                label='Ef'
+                name='ef'
+                type='number'
+                value={inputs.ef}
+                onChange={handleChange}
+                onFocus={handleFocus}
+                fullWidth
+                inputProps={{ min: 0 }}
+                sx={textFieldStyle()}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>
               <TextField
-                label='K16'
-                name='k16'
+                label='Tf'
+                name='tf'
                 type='number'
-                value={inputs.k16}
+                value={inputs.tf}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
-                inputProps={{ min: 0 }}
-                sx={textFieldStyle}
+                InputProps={{ readOnly: true }}
+                sx={textFieldStyle()}
               />
 
               <TextField
-                label='K17'
-                name='k17'
+                label='Ky'
+                name='ky'
                 type='number'
-                value={inputs.k17}
+                value={inputs.ky}
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
-                inputProps={{ min: 0 }}
+                InputProps={{ readOnly: true }}
                 sx={textFieldStyle()}
               />
             </Paper>
@@ -415,11 +354,9 @@ const BoltCalculator = () => {
           }}
         >
           <TextField
-            label='Design Strength'
+            label='Frequency'
             value={
-              results.designStrength !== null
-                ? results.designStrength.toFixed(2)
-                : ''
+              results.Frequency !== null ? results.Frequency.toFixed(2) : ''
             }
             InputProps={{
               readOnly: true
@@ -491,15 +428,8 @@ const BoltCalculator = () => {
           </Button>
         </Box>
       </Box>
-
-      <ConfirmationDialog
-        open={dialogOpen}
-        title='Bolt Strength'
-        onClose={() => setDialogOpen(false)}
-        onConfirm={handleConfirmSave}
-      />
     </>
   )
 }
 
-export default BoltCalculator
+export default JoistVibrationCalculator
