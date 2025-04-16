@@ -52,7 +52,8 @@ const JobForm = ({
     windCategory: '',
     windSpeed: '',
     locationFromCoastline: '',
-    councilName: ''
+    councilName: '',
+    area: ''
   })
 
   const [errors, setErrors] = useState({
@@ -60,7 +61,8 @@ const JobForm = ({
     windCategory: false,
     windSpeed: false,
     locationFromCoastline: false,
-    councilName: false
+    councilName: false,
+    area: false
   })
 
   const handleWindCategoryChange = (event: SelectChangeEvent) => {
@@ -100,6 +102,7 @@ const JobForm = ({
     formErrors.windSpeed = !jobData.windSpeed
     formErrors.locationFromCoastline = !jobData.locationFromCoastline
     formErrors.councilName = !jobData.councilName
+    formErrors.area = !jobData.area
 
     setErrors(formErrors)
 
@@ -116,7 +119,8 @@ const JobForm = ({
         windCategory: jobData.windCategory,
         windSpeed: jobData.windSpeed,
         locationFromCoastline: jobData.locationFromCoastline,
-        councilName: jobData.councilName
+        councilName: jobData.councilName,
+        area: jobData.area
       }
 
       try {
@@ -282,6 +286,23 @@ const JobForm = ({
           </Typography>
         )}
       </FormControl>
+
+      <TextField
+        label='Area'
+        name='area'
+        value={jobData.area}
+        onChange={handleInputChange}
+        fullWidth
+        required
+        sx={{ marginBottom: 2 }}
+        error={errors.area}
+        helperText={errors.area && 'Area is required'}
+        FormHelperTextProps={{
+          sx: {
+            marginLeft: '0px'
+          }
+        }}
+      />
 
       <TextField
         label='Council Name'
