@@ -8,34 +8,40 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  jobs      Job[]    @relation("UserJobs")
+  id            String            @id @default(uuid())
+  email         String            @unique
+  password      String
+  name          String
+  role          Role              @default(USER)
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+  jobs          Job[]             @relation("UserJobs")
+  collaborators JobCollaborator[]
 }
 
 enum Role {
   USER
+  STAFF
   ADMIN
 }
 
 model Job {
-  jobId                 String       @id @default(uuid())
+  jobId                 String            @id @default(uuid())
   address               String
-  windCategory          WindCategory @default(N1_W28N)
+  windCategory          WindCategory      @default(N1_W28N)
   windSpeed             String
   locationFromCoastline String
+  area                  String?
   councilName           String
-  status                JobStatus    @default(PENDING)
+  status                JobStatus         @default(PENDING)
   userId                String
+  jobCollaborators      JobCollaborator[]
   comments              String?
-  createdAt             DateTime     @default(now())
-  updatedAt             DateTime     @updatedAt
-  user                  User         @relation("UserJobs", fields: [userId], references: [id])
+  createdBy             String?
+  lastEditedBy          String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  user                  User              @relation("UserJobs", fields: [userId], references: [id])
 
   nails            Nails[]
   boltStrength     BoltStrength[]
@@ -66,9 +72,28 @@ enum WindCategory {
   C4_W70N
 }
 
+model JobCollaborator {
+  id         String      @id @default(uuid())
+  userId     String
+  jobId      String
+  permission Permission? @default(VIEWER)
+  addedBy    String?
+
+  user User @relation(fields: [userId], references: [id])
+  job  Job  @relation(fields: [jobId], references: [jobId])
+
+  @@unique([userId, jobId])
+}
+
+enum Permission {
+  VIEWER
+  EDITOR
+}
+
 model Nails {
   id                   String    @id @default(uuid())
   jobId                String
+  title                String
   type                 Type
   category             Category?
   jdType               JDType?
@@ -102,6 +127,7 @@ enum Type {
 model BoltStrength {
   id              String           @id @default(uuid())
   jobId           String
+  title           String
   type            Type
   phi             Float
   k1              Float
@@ -148,6 +174,7 @@ enum TimberThickness {
 model Weld {
   id        String   @id @default(uuid())
   jobId     String
+  title     String
   type      Type
   phi       Float
   vw        Float
@@ -165,6 +192,7 @@ model Weld {
 model SoilAnalysis {
   id               String   @id @default(uuid())
   jobId            String
+  title            String
   type             Type
   shrinkageIndex   Float
   lateralRestraint Float
@@ -182,6 +210,7 @@ model SoilAnalysis {
 model BeamSlabAnalysis {
   id             String       @id @default(uuid())
   jobId          String
+  title          String
   type           Type
   analysisType   AnalysisType
   span           Float?
@@ -215,6 +244,7 @@ enum AnalysisType {
 model ScrewStrength {
   id                   String     @id @default(uuid())
   jobId                String
+  title                String
   type                 Type
   screwType            ScrewType
   category             Category?
@@ -294,6 +324,7 @@ enum LoadType {
 model PileAnalysis {
   id                    String  @id @default(uuid())
   jobId                 String
+  title                 String
   type                  Type
   frictionAngle         Float
   safetyFactor          Float

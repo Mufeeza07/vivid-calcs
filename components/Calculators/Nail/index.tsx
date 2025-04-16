@@ -56,6 +56,7 @@ const NailCalculator = () => {
   const [inputs, setInputs] = useState({
     category: '',
     jdType: '',
+    title: '',
     load: '',
     loadType: '',
     nailDiameter: '',
@@ -88,6 +89,7 @@ const NailCalculator = () => {
       const updatedValue = [
         'jobId',
         'type',
+        'title',
         'category',
         'jdType',
         'load',
@@ -146,6 +148,7 @@ const NailCalculator = () => {
           },
           body: JSON.stringify({
             type: inputs.type,
+            title: inputs.title,
             k13: inputs.k13,
             category: inputs.category,
             load: inputs.load,
@@ -183,7 +186,7 @@ const NailCalculator = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         <Typography
           variant='h5'
@@ -251,6 +254,15 @@ const NailCalculator = () => {
                   ))}
                 </Select>
               </FormControl>
+
+              <TextField
+                name='title'
+                label='Title'
+                value={inputs.title}
+                onChange={handleChange}
+                fullWidth
+                sx={textFieldStyle}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -304,7 +316,7 @@ const NailCalculator = () => {
               </Box>
 
               <TextField
-                label='14g Screw'
+                label='14g Screw (KN)'
                 name='screwJD'
                 type='number'
                 value={inputs.screwJD}
@@ -470,13 +482,13 @@ const NailCalculator = () => {
           }}
         >
           {[
-            { label: 'Design Load', value: results.designLoad },
+            { label: 'Design Load (KN)', value: results.designLoad },
             {
-              label: 'Screw Penetration in Second Timber',
+              label: 'Screw Penetration in Second Timber (mm)',
               value: results.screwPenetration
             },
             {
-              label: 'First Timber Thickness',
+              label: 'First Timber Thickness (mm)',
               value: results.firstTimberThickness
             }
           ].map(({ label, value }) => (

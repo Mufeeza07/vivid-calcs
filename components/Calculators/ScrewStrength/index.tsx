@@ -42,6 +42,7 @@ import {
   typeOptions
 } from '@/utils/dropdownValues'
 import ConfirmationDialog from '@/components/ConfirmationBox'
+import { title } from 'process'
 
 interface CalculatorProps {
   screwType: string
@@ -63,6 +64,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
 
   const [inputs, setInputs] = useState({
     jobId: '',
+    title: '',
     type: '',
     category: '',
     screwSize: '',
@@ -100,6 +102,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
     const updatedValue =
       name === 'jobId' ||
       name === 'type' ||
+      name === 'title' ||
       name === 'category' ||
       name === 'screwSize' ||
       name === 'jdType' ||
@@ -158,6 +161,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
           },
           body: JSON.stringify({
             type: inputs.type,
+            title: inputs.title,
             k13: inputs.k13,
             category: inputs.category,
             screwType,
@@ -194,7 +198,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         {/* <Typography
           variant='h5'
@@ -262,6 +266,15 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
                   ))}
                 </Select>
               </FormControl>
+
+              <TextField
+                name='title'
+                label='Title'
+                value={inputs.title}
+                onChange={handleChange}
+                fullWidth
+                sx={textFieldStyle}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -317,7 +330,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
               </Box>
 
               <TextField
-                label='14g Screw'
+                label='14g Screw (KN)'
                 name='screwJD'
                 type='number'
                 value={inputs.screwJD}
@@ -722,7 +735,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
 
       <Box>
         {/* <Typography

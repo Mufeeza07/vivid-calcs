@@ -1,5 +1,6 @@
 'use client'
 
+import { useUser } from '@/context/UserContext'
 import { isLoggedIn } from '@/utils/session'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
@@ -13,11 +14,20 @@ import {
 } from '@mui/material'
 import AOS from 'aos'
 import 'aos/dist/aos.css'
+import { jwtDecode } from 'jwt-decode'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
+interface DecodedToken {
+  userId: string
+  name: string
+  email: string
+  role: string
+}
+
 const SignUp = () => {
   const router = useRouter()
+  const { setUser } = useUser()
   const [loadingAuth, setLoadingAuth] = useState(true)
 
   useEffect(() => {
@@ -89,7 +99,9 @@ const SignUp = () => {
 
         if (response.ok) {
           localStorage.setItem('token', data.token)
-          localStorage.setItem('user', JSON.stringify(data.user))
+          const decoded = jwtDecode<DecodedToken>(data.token)
+          setUser(decoded)
+
           router.push('/home')
         } else {
           alert(data.error || 'Something went wrong')

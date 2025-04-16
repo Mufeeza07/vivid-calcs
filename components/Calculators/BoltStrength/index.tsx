@@ -64,6 +64,7 @@ const BoltCalculator = () => {
     k17: 1,
     qsk: 0,
     type: '',
+    title: '',
     jobId: '',
     category: '',
     load: '',
@@ -148,7 +149,7 @@ const BoltCalculator = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         <Typography
           variant='h5'
@@ -216,6 +217,15 @@ const BoltCalculator = () => {
                   ))}
                 </Select>
               </FormControl>
+
+              <TextField
+                name='title'
+                label='Title'
+                value={inputs.title}
+                onChange={handleChange}
+                fullWidth
+                sx={textFieldStyle}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>

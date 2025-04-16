@@ -6,6 +6,7 @@ import { AppProps } from 'next/app'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Box } from '@mui/material'
 import { store } from '@/redux/store'
+import { UserProvider } from '@/context/UserContext'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -21,11 +22,14 @@ const MyApp: React.FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <Provider store={store}>
-        <Box
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <Component {...pageProps} />
-        </Box>
+        <UserProvider>
+          {' '}
+          <Box
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <Component {...pageProps} />
+          </Box>
+        </UserProvider>
       </Provider>
     </>
   )

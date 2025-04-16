@@ -18,6 +18,7 @@ import {
   timberThicknessOptions,
   typeOptions
 } from '@/utils/dropdownValues'
+import { fieldUnits } from '@/utils/fieldUnits'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -201,9 +202,9 @@ const JobDetailsPage = () => {
     else setEditableEntryData(updated)
   }
 
-  const renderField = (label: string, value: any) => (
+  const renderField = (label: string, value: any, unit?: string) => (
     <Typography variant='subtitle2' sx={{ mt: 1 }}>
-      <strong>{label}:</strong> {value ?? '-'}
+      <strong>{label}:</strong> {value ?? '-'} {unit || ''}
     </Typography>
   )
 
@@ -212,7 +213,7 @@ const JobDetailsPage = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Container maxWidth='md' sx={{ mt: 4 }}>
         <Button
           startIcon={<ArrowBackIcon />}
@@ -420,7 +421,7 @@ const JobDetailsPage = () => {
                                     val === '')
                                 )
                                   return null
-                                return renderField(label, val)
+                                return renderField(label, val, fieldUnits[key])
                               }
 
                               if (
@@ -463,7 +464,7 @@ const JobDetailsPage = () => {
                                 ) : (
                                   <TextField
                                     key={key}
-                                    label={label}
+                                    label={`${label}${fieldUnits[key] ? ` (${fieldUnits[key]})` : ''}`}
                                     fullWidth
                                     value={editableEntryData[key] ?? ''}
                                     onChange={e =>
@@ -481,7 +482,7 @@ const JobDetailsPage = () => {
                               return (
                                 <TextField
                                   key={key}
-                                  label={label}
+                                  label={`${label}${fieldUnits[key] ? ` (${fieldUnits[key]})` : ''}`}
                                   fullWidth
                                   value={val ?? ''}
                                   disabled

@@ -31,6 +31,7 @@ export default async function handler(
     }
     const {
       type,
+      title,
       phi,
       k1,
       k16,
@@ -57,6 +58,7 @@ export default async function handler(
       data: {
         jobId,
         type,
+        title,
         phi,
         k1,
         k16,

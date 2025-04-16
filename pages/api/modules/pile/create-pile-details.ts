@@ -33,6 +33,7 @@ export default async function handler(
 
     const {
       type,
+      title,
       frictionAngle,
       safetyFactor,
       ks,
@@ -50,7 +51,8 @@ export default async function handler(
       endBearing,
       totalUpliftResistance,
       totalPileCapacityAS,
-      totalPileCapacityMH
+      totalPileCapacityMH,
+      note
     } = req.body
 
     if (
@@ -81,6 +83,7 @@ export default async function handler(
       data: {
         jobId,
         type,
+        title,
         frictionAngle: parseFloat(frictionAngle),
         safetyFactor,
         ks,
@@ -98,7 +101,8 @@ export default async function handler(
         endBearing,
         totalUpliftResistance,
         totalPileCapacityAS,
-        totalPileCapacityMH
+        totalPileCapacityMH,
+        ...(note && { note })
       }
     })
 

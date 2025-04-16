@@ -1,5 +1,6 @@
 'use client'
 
+import { useUser } from '@/context/UserContext'
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration'
 import ContactMailIcon from '@mui/icons-material/ContactMail'
 import DashboardIcon from '@mui/icons-material/Dashboard'
@@ -33,9 +34,11 @@ import { SetStateAction, useEffect, useState } from 'react'
 const Navbar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [userName, setUserName] = useState('')
   const [anchorEl, setAnchorEl] = useState(null)
   const router = useRouter()
+
+  const { user } = useUser()
+  console.log('user name', user?.name)
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen)
@@ -43,19 +46,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    const user = JSON.parse(localStorage.getItem('user'))
     setIsLoggedIn(!!token)
-
-    if (user) {
-      setUserName(user.name)
-    }
   }, [])
 
   const handleLogout = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('user')
     setIsLoggedIn(false)
-    setUserName('')
     router.push('/')
   }
 
@@ -75,7 +71,7 @@ const Navbar = () => {
     return firstInitial + secondInitial
   }
 
-  const initials = getInitials(userName)
+  const initials = getInitials(user?.name || '')
 
   const buttonStyles = {
     marginRight: 2,

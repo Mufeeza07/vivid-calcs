@@ -33,6 +33,7 @@ export default async function handler(
 
     const {
       type,
+      title,
       screwType,
       category,
       screwSize,
@@ -66,6 +67,7 @@ export default async function handler(
       data: {
         jobId,
         type,
+        title,
         screwType,
         category,
         screwSize,

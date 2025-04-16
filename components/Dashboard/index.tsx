@@ -1,3 +1,4 @@
+import { useUser } from '@/context/UserContext'
 import {
   fetchJobs,
   selectCompletedJobs,
@@ -55,7 +56,7 @@ const UserDashboard = () => {
   const recentJobs = useSelector(selectRecentJobs)
   const loading = useSelector(selectJobsLoading)
 
-  const [userName, setUserName] = useState('')
+  const { user } = useUser()
 
   useEffect(() => {
     dispatch(fetchJobs({ status: 'PENDING' }))
@@ -63,12 +64,6 @@ const UserDashboard = () => {
     dispatch(fetchJobs({ status: 'IN_PROGRESS' }))
     dispatch(fetchJobs({ status: 'ON_HOLD' }))
     dispatch(fetchJobs({}))
-
-    const user = JSON.parse(localStorage.getItem('user') ?? '{}')
-
-    if (user) {
-      setUserName(user.name)
-    }
   }, [dispatch])
 
   //console.log('completedJobs', completedJobs)
@@ -96,7 +91,7 @@ const UserDashboard = () => {
   return (
     <Container maxWidth='lg' sx={{ mt: 2 }}>
       <Typography variant='h4' gutterBottom>
-        Welcome {userName}
+        Welcome {user?.name}
       </Typography>
 
       <Grid container spacing={3}>
