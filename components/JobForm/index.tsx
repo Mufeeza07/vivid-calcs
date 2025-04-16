@@ -11,6 +11,7 @@ import {
   Typography,
   SelectChangeEvent
 } from '@mui/material'
+import { toast, ToastContainer } from 'react-toastify'
 
 const windCategoryOptions = [
   { label: 'N1 (W28N)', value: 'N1_W28N', windSpeed: '34.0 m/sec' },
@@ -134,16 +135,19 @@ const JobForm = ({
         })
 
         if (!response.ok) {
-          throw new Error('Failed to create job')
+          const errorData = await response.json().catch(() => null)
+          const errorMessage = errorData?.message || 'Failed to create job'
+          toast.error(errorMessage)
+          return
         }
 
         const result = await response.json()
-        console.log('Job Created:', result)
+        toast.success('Job created successfully')
         onJobAdded(result.job)
         closeModal()
       } catch (error) {
         console.error('Error creating job:', error)
-        alert('Failed to create job')
+        toast.error('Failed to create job')
       }
     }
   }
@@ -339,6 +343,7 @@ const JobForm = ({
       >
         Submit
       </Button>
+      <ToastContainer autoClose={3000} />
     </Box>
   )
 }
