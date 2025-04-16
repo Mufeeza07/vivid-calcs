@@ -142,6 +142,7 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
       )
       if (response.ok) {
         const data = await response.json()
+        console.log('getting data', data)
         setCollaborators(data.data)
       } else {
         const errorData = await response.json()
