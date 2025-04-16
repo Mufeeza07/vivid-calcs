@@ -137,6 +137,7 @@ const JobForm = ({
         if (!response.ok) {
           const errorData = await response.json().catch(() => null)
           const errorMessage = errorData?.message || 'Failed to create job'
+          console.log('error message', errorMessage)
           toast.error(errorMessage)
           return
         }

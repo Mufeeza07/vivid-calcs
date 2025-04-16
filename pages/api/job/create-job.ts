@@ -49,7 +49,7 @@ export default async function handler(
         windSpeed,
         locationFromCoastline,
         councilName,
-        area: area || null,
+        area,
         createdBy: user.name,
         lastEditedBy: null,
         userId: user.userId

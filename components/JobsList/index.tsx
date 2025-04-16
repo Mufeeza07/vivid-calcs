@@ -73,6 +73,7 @@ const JobList = () => {
   })
 
   const [statusFilter, setStatusFilter] = useState(initialStatus)
+  const [activeJobId, setActiveJobId] = useState<string | null>(null)
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
@@ -438,7 +439,7 @@ const JobList = () => {
                     variant='outlined'
                     color='secondary'
                     size='small'
-                    onClick={() => setOpenModal(true)}
+                    onClick={() => setActiveJobId(job.jobId)}
                     startIcon={
                       <>
                         <AddIcon fontSize='small' />
@@ -451,11 +452,15 @@ const JobList = () => {
                     }}
                   ></Button>
 
-                  <AddCollaboratorModal
-                    open={openModal}
-                    onClose={() => setOpenModal(false)}
-                    jobId={job.jobId}
-                  />
+                  {jobs.map(job => (
+                    <Box key={job.jobId}>
+                      <AddCollaboratorModal
+                        open={activeJobId === job.jobId}
+                        onClose={() => setActiveJobId(null)}
+                        jobId={job.jobId}
+                      />
+                    </Box>
+                  ))}
 
                   <Button
                     variant='outlined'
