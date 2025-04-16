@@ -31,7 +31,7 @@ model Job {
   windCategory          WindCategory      @default(N1_W28N)
   windSpeed             String
   locationFromCoastline String
-  area                  String?
+  area                  String
   councilName           String
   status                JobStatus         @default(PENDING)
   userId                String
