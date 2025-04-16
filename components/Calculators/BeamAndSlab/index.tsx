@@ -202,7 +202,7 @@ export const BeamAnalysis = ({ analysisType }: CalculatorProps) => {
   }
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         {/* <Typography
           variant='h5'
@@ -660,7 +660,7 @@ export const SlabAnalysis = ({ analysisType }: CalculatorProps) => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         {/* <Typography
           variant='h5'

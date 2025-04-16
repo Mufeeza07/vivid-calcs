@@ -1,8 +1,18 @@
 import { parallelLoadTable, perpendicularLoadTable } from '@/data/boltTables'
 
 export const calculateBoltStrength = (inputs: any) => {
-  const { phi, k1, k16, k17, qsk, load, jdType, timberThickness, boltSize } =
-    inputs
+  const {
+    phi,
+    k1,
+    k16,
+    k17,
+    qsk,
+    load,
+    jdType,
+    timberThickness,
+    boltSize,
+    title
+  } = inputs
 
   let updatedState = { ...inputs }
 

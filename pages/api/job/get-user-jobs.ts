@@ -30,9 +30,11 @@ export default async function handler(
 
     const skip = (pageNumber - 1) * limitNumber
 
-
     const filter: any = {
-      userId: user.userId
+      OR: [
+        { userId: user.userId },
+        { jobCollaborators: { some: { userId: user.userId } } }
+      ]
     }
 
     if (status) {

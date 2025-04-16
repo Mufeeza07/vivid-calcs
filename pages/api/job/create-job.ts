@@ -28,7 +28,8 @@ export default async function handler(
       windCategory,
       windSpeed,
       locationFromCoastline,
-      councilName
+      councilName,
+      area
     } = req.body
 
     if (
@@ -48,6 +49,9 @@ export default async function handler(
         windSpeed,
         locationFromCoastline,
         councilName,
+        area: area || null,
+        createdBy: user.name,
+        lastEditedBy: null,
         userId: user.userId
       }
     })

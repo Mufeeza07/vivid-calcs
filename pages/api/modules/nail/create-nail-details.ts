@@ -35,6 +35,7 @@ export default async function handler(
 
     const {
       type,
+      title,
       category,
       jdType,
       load,
@@ -80,6 +81,7 @@ export default async function handler(
     const nail = await prisma.nails.create({
       data: {
         jobId,
+        title,
         type,
         category,
         jdType,

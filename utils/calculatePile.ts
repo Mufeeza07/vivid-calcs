@@ -52,7 +52,7 @@ export const calculatePileStrength = (inputs: any) => {
         pileHeight) /
       1_000_000_000
 
-    const effectivePileHeight = Math.max(0, pileHeight - 1500)
+    const effectivePileHeight =  pileHeight - 1500
     const frictionResistanceMH =
       (safetyFactor *
         soilDensity *

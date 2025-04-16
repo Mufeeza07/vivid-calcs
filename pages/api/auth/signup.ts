@@ -25,19 +25,22 @@ export default async function handler(
 
       const hashedPassword = await bcrypt.hash(password, 12)
 
-
       const newUser = await prisma.user.create({
         data: {
           name,
           email,
           password: hashedPassword,
-          role: 'USER',
+          role: 'USER'
         }
       })
 
-
       const token = jwt.sign(
-        { userId: newUser.id, name: newUser.name, email: newUser.email },
+        {
+          userId: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role
+        },
         process.env.JWT_SECRET!
       )
 
@@ -46,7 +49,7 @@ export default async function handler(
         user: {
           userId: newUser.id,
           name: newUser.name,
-          email: newUser.email,
+          email: newUser.email
         },
         token
       })

@@ -10,6 +10,8 @@ import {
 import { AppDispatch } from '@/redux/store'
 import DeleteIcon from '@mui/icons-material/Delete'
 import DescriptionIcon from '@mui/icons-material/Description'
+import AddIcon from '@mui/icons-material/Add'
+import PersonIcon from '@mui/icons-material/Person'
 import {
   Backdrop,
   Box,
@@ -41,6 +43,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import JobDetailsDrawer from '../JobDetails'
 import JobForm from '../JobForm'
 import { useSearchParams } from 'next/navigation'
+import AddCollaboratorModal from '../AddCollaborator'
 
 const JobList = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -63,6 +66,7 @@ const JobList = () => {
   const [currentJobDetails, setCurrentJobDetails] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [editableJobDetails, setEditableJobDetails] = useState<any>(null)
+  const [openModal, setOpenModal] = useState(false)
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 1
@@ -77,7 +81,7 @@ const JobList = () => {
 
   useEffect(() => {
     const jobsMapping = {
-      '':  allJobs ,
+      '': allJobs,
       PENDING: pendingJobs,
       IN_PROGRESS: inProgressJobs,
       ON_HOLD: onHoldJobs,
@@ -430,6 +434,29 @@ const JobList = () => {
                     flexWrap: 'wrap'
                   }}
                 >
+                  <Button
+                    variant='outlined'
+                    color='secondary'
+                    size='small'
+                    onClick={() => setOpenModal(true)}
+                    startIcon={
+                      <>
+                        <AddIcon fontSize='small' />
+                        <PersonIcon fontSize='small' />
+                      </>
+                    }
+                    sx={{
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}
+                  ></Button>
+
+                  <AddCollaboratorModal
+                    open={openModal}
+                    onClose={() => setOpenModal(false)}
+                    jobId={job.jobId}
+                  />
+
                   <Button
                     variant='outlined'
                     size='small'

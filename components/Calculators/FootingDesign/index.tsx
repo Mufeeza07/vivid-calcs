@@ -27,6 +27,7 @@ import {
   Typography
 } from '@mui/material'
 import { Job } from '@prisma/client'
+import { title } from 'process'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
@@ -48,6 +49,7 @@ export const PileDesignAnalysis = () => {
   const [inputs, setInputs] = useState({
     jobId: '',
     type: '',
+    title: '',
     frictionAngle: '',
     safetyFactor: 0.55,
     ks: 1.5,
@@ -81,7 +83,10 @@ export const PileDesignAnalysis = () => {
 
     setInputs(prev => {
       const updatedValue =
-        name === 'jobId' || name === 'type' || name === 'frictionAngle'
+        name === 'jobId' ||
+        name === 'title' ||
+        name === 'type' ||
+        name === 'frictionAngle'
           ? value
           : value === ''
             ? ''
@@ -134,6 +139,7 @@ export const PileDesignAnalysis = () => {
           },
           body: JSON.stringify({
             type: inputs.type,
+            title: inputs.title,
             frictionAngle: inputs.frictionAngle,
             safetyFactor: inputs.safetyFactor,
             ks: inputs.ks,
@@ -171,7 +177,7 @@ export const PileDesignAnalysis = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         <Box
           sx={{
@@ -225,6 +231,15 @@ export const PileDesignAnalysis = () => {
                   ))}
                 </Select>
               </FormControl>
+
+              <TextField
+                name='title'
+                label='Title'
+                value={inputs.title}
+                onChange={handleChange}
+                fullWidth
+                sx={textFieldStyle}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -256,7 +271,7 @@ export const PileDesignAnalysis = () => {
               </Box>
 
               <TextField
-                label='Soil Density'
+                label='Soil Density (KN/m³)'
                 name='soilDensity'
                 type='number'
                 value={inputs.soilDensity}
@@ -492,15 +507,15 @@ export const PileDesignAnalysis = () => {
         >
           {[
             {
-              label: 'Total Uplift Resistance',
+              label: 'Total Uplift Resistance (KN)',
               value: results.totalUpliftResistance
             },
             {
-              label: 'Total Pile Capacity (A-S)',
+              label: 'Total Pile Capacity (A-S) (KN)',
               value: results.totalPileCapacityAS
             },
             {
-              label: 'Total Pile Capacity (M-H-E)',
+              label: 'Total Pile Capacity (M-H-E) (KN)',
               value: results.totalPileCapacityMH
             }
           ].map(({ label, value }) => (

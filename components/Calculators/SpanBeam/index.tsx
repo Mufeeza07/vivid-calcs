@@ -184,7 +184,7 @@ const SpanBeam = () => {
 
   return (
     <>
-      <ToastContainer />
+      <ToastContainer autoClose={3000} />
       <Box>
         <Typography
           variant='h5'
