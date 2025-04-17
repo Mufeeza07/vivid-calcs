@@ -39,26 +39,26 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
   const [visibleCount, setVisibleCount] = useState(5)
   const [searchInput, setSearchInput] = useState('')
   const [selectedUsers, setSelectedUsers] = useState<any[]>([])
-
+  const [permissionChanges, setPermissionChanges] = useState<
+    Record<string, string>
+  >({})
   console.log('user role', user?.role)
 
   useEffect(() => {
-    setVisibleCount(5)
-  }, [collaborators, open])
-
-  useEffect(() => {
-    if (open && jobId) {
+    if (open) {
       fetchCollaborators()
-    }
-  }, [open, jobId])
-
-  useEffect(() => {
-    if (searchInput) {
       fetchUsers()
-    } else {
-      setUsers([])
+      setVisibleCount(5)
     }
-  }, [searchInput])
+  }, [open])
+
+  // useEffect(() => {
+  //   if (searchInput) {
+  //     fetchUsers()
+  //   } else {
+  //     setUsers([])
+  //   }
+  // }, [searchInput])
   //   useEffect(() => {
   //     if (user?.role === 'ADMIN') {
   //       fetchUsers([])
@@ -166,7 +166,6 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
     }
 
     const collaboratorIds = selectedUsers.map(user => user.id)
-    console.log('Sending collaborators:', collaboratorIds)
 
     try {
       const response = await fetch('/api/collaborator/create-collaborator', {
@@ -175,10 +174,7 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        // body: JSON.stringify({
-        //   jobId,
-        //   collaborators: selectedUsers.map(user => user.id)
-        // })
+
         body: JSON.stringify({
           jobId,
           collaborators: collaboratorIds
@@ -201,8 +197,52 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
     }
   }
 
+  const updatePermissions = async () => {
+    const token = localStorage.getItem('token')
+
+    if (!token) {
+      toast.error('Unauthorized')
+      return
+    }
+
+    const updatingCollaborators = Object.entries(permissionChanges).map(
+      ([collaboratorId, permission]) => ({
+        collaboratorId,
+        permission
+      })
+    )
+
+    if (updatingCollaborators.length === 0) {
+      onClose()
+      return
+    }
+
+    const response = await fetch('api/collaborator/update-collaborator', {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ jobId, updatingCollaborators })
+    })
+
+    const data = await response.json()
+    if (response.ok) {
+      toast.success('Permissions updated')
+      setPermissionChanges({})
+      fetchCollaborators()
+    } else {
+      toast.error(data.message || 'Failed to update permissions')
+    }
+  }
+
+  const handleClose = () => {
+    setPermissionChanges({})
+    onClose()
+  }
+
   return (
-    <Dialog open={open} onClose={onClose} maxWidth='sm' fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth='sm' fullWidth>
       <DialogTitle sx={{}}>Share Job</DialogTitle>
       <DialogContent>
         <Box display='flex' gap={2} alignItems='center' mb={2} width={1}>
@@ -285,7 +325,8 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
 
         <List>
           {collaborators.slice(0, visibleCount).map(collaborator => {
-            const currentPermission = collaborator.permission
+            const currentPermission =
+              permissionChanges[collaborator.id] || collaborator.permission
             const alternatePermission =
               currentPermission === 'VIEWER' ? 'EDITOR' : 'VIEWER'
 
@@ -311,10 +352,12 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
                     select
                     size='small'
                     value={currentPermission}
-                    onChange={e => {
-                      // Handle permission change here
-                      // Example: updateCollaboratorPermission(collaborator.id, e.target.value);
-                    }}
+                    onChange={e =>
+                      setPermissionChanges(prev => ({
+                        ...prev,
+                        [collaborator.id]: e.target.value
+                      }))
+                    }
                     sx={{ minWidth: 120 }}
                   >
                     <MenuItem value={currentPermission}>
@@ -339,11 +382,17 @@ const AddCollaboratorModal: React.FC<AddCollaboratorProps> = ({
           )}
         </List>
       </DialogContent>
-      {/* <DialogActions>
-        <Button onClick={() => {}} variant='contained' color='primary'>
-          Done
-        </Button>
-      </DialogActions> */}
+      {collaborators.length > 0 && (
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button
+            onClick={updatePermissions}
+            variant='contained'
+            color='primary'
+          >
+            Done
+          </Button>
+        </DialogActions>
+      )}
 
       <ToastContainer autoClose={3000} />
     </Dialog>

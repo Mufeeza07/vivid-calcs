@@ -31,6 +31,7 @@ export default async function handler(
 
     const collaborators = await prisma.jobCollaborator.findMany({
       where: { jobId },
+      orderBy: { createdAt: 'desc' },
       include: {
         user: {
           select: {
