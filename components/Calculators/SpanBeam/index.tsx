@@ -55,7 +55,7 @@ const SpanBeam = () => {
 
   const [inputs, setInputs] = useState({
     jobId: '',
-    type: '',
+    title: '',
     beamSpan: '',
     floorLoadWidth: '',
     roofLoadWidth: '',
@@ -91,7 +91,7 @@ const SpanBeam = () => {
     const { name, value } = event.target
 
     const updatedValue =
-      name === 'jobId' || name === 'type'
+      name === 'jobId' || name === 'title'
         ? value
         : value === ''
           ? ''
@@ -236,22 +236,14 @@ const SpanBeam = () => {
                 </Select>
               </FormControl>
 
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
-                <Select
-                  name='type'
-                  label='type'
-                  value={inputs.type}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {typeOptions.map(opt => (
-                    <MenuItem key={opt.value} value={opt.value}>
-                      {opt.label}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <TextField
+                name='title'
+                label='Title'
+                value={inputs.title}
+                onChange={handleChange}
+                fullWidth
+                sx={textFieldStyle}
+              />
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -264,7 +256,7 @@ const SpanBeam = () => {
                 }}
               >
                 <TextField
-                  label='Beam Span'
+                  label='Beam Span (mm)'
                   name='beamSpan'
                   type='number'
                   value={inputs.beamSpan}
@@ -283,7 +275,7 @@ const SpanBeam = () => {
               </Box>
 
               <TextField
-                label='Floor Load Width'
+                label='Floor Load Width (mm)'
                 name='floorLoadWidth'
                 type='number'
                 value={inputs.floorLoadWidth}
@@ -295,7 +287,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Roof Load Width'
+                label='Roof Load Width (mm)'
                 name='roofLoadWidth'
                 type='number'
                 value={inputs.roofLoadWidth}
@@ -309,7 +301,7 @@ const SpanBeam = () => {
 
             <Paper sx={cardStyle}>
               <TextField
-                label='Wall Height'
+                label='Wall Height (mm)'
                 name='wallHeight'
                 type='number'
                 value={inputs.wallHeight}
@@ -321,7 +313,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Wall Load'
+                label='Wall Load (kPa)'
                 name='wallLoad'
                 type='number'
                 value={inputs.wallLoad}
@@ -341,7 +333,7 @@ const SpanBeam = () => {
                 }}
               >
                 <TextField
-                  label='Steel UDL Weight'
+                  label='Steel UDL Weight (kN/m)'
                   name='steelUdlWeight'
                   type='number'
                   value={inputs.steelUdlWeight}
@@ -360,7 +352,7 @@ const SpanBeam = () => {
               </Box>
 
               <TextField
-                label='Steel Point Weight'
+                label='Steel Point Weight (kN)'
                 name='steelPointWeight'
                 type='number'
                 value={inputs.steelPointWeight}
@@ -372,7 +364,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Deflection Limit'
+                label='Deflection Limit (mm)'
                 name='deflectionLimit'
                 type='number'
                 value={inputs.deflectionLimit}
@@ -397,7 +389,7 @@ const SpanBeam = () => {
           >
             <Paper sx={cardStyle}>
               <TextField
-                label='Point Floor Load Area'
+                label='Point Floor Load Area (m²)'
                 name='pointFloorLoadArea'
                 type='number'
                 value={inputs.pointFloorLoadArea}
@@ -409,7 +401,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Point Roof Load Area'
+                label='Point Roof Load Area (m²)'
                 name='pointRoofLoadArea'
                 type='number'
                 value={inputs.pointRoofLoadArea}
@@ -421,7 +413,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label=' Floor Dead Load '
+                label=' Floor Dead Load (kPa) '
                 name='floorDeadLoad'
                 type='number'
                 value={inputs.floorDeadLoad}
@@ -433,7 +425,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Roof Dead Load'
+                label='Roof Dead Load (kPa)'
                 name='roofDeadLoad'
                 type='number'
                 value={inputs.roofDeadLoad}
@@ -445,7 +437,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Floor Live Load'
+                label='Floor Live Load (kPa)'
                 name='floorLiveLoad'
                 type='number'
                 value={inputs.floorLiveLoad}
@@ -459,7 +451,7 @@ const SpanBeam = () => {
 
             <Paper sx={cardStyle}>
               <TextField
-                label='UDL Dead Load'
+                label='UDL Dead Load (kN/m)'
                 name='udlDeadLoad'
                 type='number'
                 value={inputs.udlDeadLoad}
@@ -471,7 +463,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='UDL Live Load'
+                label='UDL Live Load (kN/m)'
                 name='udlLiveLoad'
                 type='number'
                 value={inputs.udlLiveLoad}
@@ -483,7 +475,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='UDL Service Load'
+                label='UDL Service Load (kN/m)'
                 name='udlServiceLoad'
                 type='number'
                 value={inputs.udlServiceLoad}
@@ -497,7 +489,7 @@ const SpanBeam = () => {
 
             <Paper sx={cardStyle}>
               <TextField
-                label='Point Dead Load'
+                label='Point Dead Load (kN)'
                 name='pointDeadLoad'
                 type='number'
                 value={inputs.pointDeadLoad}
@@ -509,7 +501,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Point Live Load'
+                label='Point Live Load (kN)'
                 name='pointLiveLoad'
                 type='number'
                 value={inputs.pointLiveLoad}
@@ -521,7 +513,7 @@ const SpanBeam = () => {
               />
 
               <TextField
-                label='Point Service Load'
+                label='Point Service Load (kN)'
                 name='pointServiceLoad'
                 type='number'
                 value={inputs.pointServiceLoad}
@@ -545,9 +537,12 @@ const SpanBeam = () => {
           }}
         >
           {[
-            { label: 'Moment of Inertia', value: results.momentOfInertia },
             {
-              label: 'Moment',
+              label: 'Moment of Inertia (mm⁴)',
+              value: results.momentOfInertia
+            },
+            {
+              label: 'Moment (kN-m)',
               value: results.moment
             }
           ].map(({ label, value }) => (

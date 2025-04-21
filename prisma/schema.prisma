@@ -50,6 +50,7 @@ model Job {
   screwStrength    ScrewStrength[]
   beamSlabAnalysis BeamSlabAnalysis[]
   pileAnalysis     PileAnalysis[]
+  SteelBeam        SteelBeam[]
 }
 
 enum JobStatus {
@@ -349,6 +350,39 @@ model PileAnalysis {
   totalPileCapacityMH   Float
   note                  String?
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [jobId], onDelete: Cascade)
+}
+
+model SteelBeam {
+  id                 String @id @default(uuid())
+  jobId              String
+  title              String
+  beamSpan           Float
+  floorLoadWidth     Float
+  roofLoadWidth      Float
+  wallHeight         Float
+  pointFloorLoadArea Float
+  pointRoofLoadArea  Float
+  floorDeadLoad      Float
+  roofDeadLoad       Float
+  floorLiveLoad      Float
+  wallLoad           Float
+  steelUDLWeight     Float
+  steelPointWeight   Float
+  udlDeadLoad        Float
+  udlLiveLoad        Float
+  udlServiceLoad     Float
+  pointDeadLoad      Float
+  pointLiveLoad      Float
+  pointServiceLoad   Float
+  deflectionLimit    Float
+  momentOfInertia    Float
+  moment             Float
+
+  note      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

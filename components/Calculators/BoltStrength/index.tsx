@@ -306,7 +306,7 @@ const BoltCalculator = () => {
               </FormControl>
 
               <TextField
-                label='Qsk'
+                label='Qsk (kN)'
                 name='qsk'
                 type='number'
                 value={inputs.qsk}
@@ -444,7 +444,7 @@ const BoltCalculator = () => {
           }}
         >
           <TextField
-            label='Design Strength'
+            label='Design Strength (kN)'
             value={
               results.designStrength !== null
                 ? results.designStrength.toFixed(2)

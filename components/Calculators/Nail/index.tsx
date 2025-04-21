@@ -316,7 +316,7 @@ const NailCalculator = () => {
               </Box>
 
               <TextField
-                label='14g Screw (KN)'
+                label='14g Screw (kN)'
                 name='screwJD'
                 type='number'
                 value={inputs.screwJD}
@@ -482,7 +482,7 @@ const NailCalculator = () => {
           }}
         >
           {[
-            { label: 'Design Load (KN)', value: results.designLoad },
+            { label: 'Design Load (kN)', value: results.designLoad },
             {
               label: 'Screw Penetration in Second Timber (mm)',
               value: results.screwPenetration

@@ -271,7 +271,7 @@ export const PileDesignAnalysis = () => {
               </Box>
 
               <TextField
-                label='Soil Density (KN/m³)'
+                label='Soil Density (kN/m³)'
                 name='soilDensity'
                 type='number'
                 value={inputs.soilDensity}
