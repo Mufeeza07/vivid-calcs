@@ -1,47 +1,33 @@
 'use client'
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import { AppDispatch } from '@/redux/store'
+import JobSelector from '@/components/JobSelector'
 import {
-    buttonsBarStyle,
-    calculateButtonStyle,
-    cardStyle,
-    dropDownStyle,
-    resultFieldStyle,
-    saveButtonStyle,
-    textFieldStyle
+  buttonsBarStyle,
+  calculateButtonStyle,
+  cardStyle,
+  dropDownStyle,
+  resultFieldStyle,
+  saveButtonStyle,
+  textFieldStyle
 } from '@/styles/moduleStyle'
 import { typeOptions } from '@/utils/dropdownValues'
 import {
-    Box,
-    Button,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Paper,
-    Select,
-    TextField,
-    Typography
+  Box,
+  Button,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
+  TextField,
+  Typography
 } from '@mui/material'
-import { Job } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 
 const JoistVibrationCalculator = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const router = useRouter()
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     type: '',
@@ -125,22 +111,12 @@ const JoistVibrationCalculator = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>

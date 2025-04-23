@@ -44,6 +44,7 @@ import JobDetailsDrawer from '../JobDetails'
 import JobForm from '../JobForm'
 import { useSearchParams } from 'next/navigation'
 import AddCollaboratorModal from '../AddCollaborator'
+import { toast, ToastContainer } from 'react-toastify'
 
 const JobList = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -77,7 +78,13 @@ const JobList = () => {
 
   useEffect(() => {
     AOS.init({ duration: 1000, once: true })
-    dispatch(fetchJobs({ page: pagination.currentPage, status: statusFilter }))
+    dispatch(
+      fetchJobs({
+        page: pagination.currentPage,
+        status: statusFilter,
+        sortBy: 'createdAt'
+      })
+    )
   }, [dispatch, statusFilter, pagination.currentPage])
 
   useEffect(() => {
@@ -208,10 +215,30 @@ const JobList = () => {
     }))
   }
 
+  const getChangedFields = (original: any, updated: any) => {
+    const changed: Record<string, any> = {}
+    for (const key in updated) {
+      if (updated[key] !== original[key]) {
+        changed[key] = updated[key]
+      }
+    }
+    return changed
+  }
+
   const handleSaveJobDetails = async () => {
     const token = localStorage.getItem('token')
     if (!token || !editableJobDetails || !editableJobDetails.jobId) {
-      alert('Authorization token is missing or invalid job details.')
+      toast.error('Invalid details.')
+      return
+    }
+
+    const changedFields = getChangedFields(
+      currentJobDetails,
+      editableJobDetails
+    )
+
+    if (Object.keys(changedFields).length === 0) {
+      toast.info('No changes detected.')
       return
     }
 
@@ -224,7 +251,7 @@ const JobList = () => {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`
           },
-          body: JSON.stringify(editableJobDetails)
+          body: JSON.stringify(changedFields)
         }
       )
 
@@ -239,11 +266,11 @@ const JobList = () => {
         setCurrentJobDetails(updatedJob.job)
       } else {
         const errorData = await response.json()
-        alert(errorData.message || 'Failed to update job details')
+        toast.error(errorData.message || 'Failed to update job details')
       }
     } catch (error) {
       console.error('Error updating job details:', error)
-      alert('Error updating job details')
+      toast.error('Error updating job details')
     }
   }
 
@@ -452,15 +479,13 @@ const JobList = () => {
                     }}
                   ></Button>
 
-                  {jobs.map(job => (
-                    <Box key={job.jobId}>
-                      <AddCollaboratorModal
-                        open={activeJobId === job.jobId}
-                        onClose={() => setActiveJobId(null)}
-                        jobId={job.jobId}
-                      />
-                    </Box>
-                  ))}
+                  {activeJobId && (
+                    <AddCollaboratorModal
+                      open={true}
+                      onClose={() => setActiveJobId(null)}
+                      jobId={activeJobId}
+                    />
+                  )}
 
                   <Button
                     variant='outlined'
@@ -693,6 +718,8 @@ const JobList = () => {
           handleSaveJobDetails={handleSaveJobDetails}
         />
       </Drawer>
+
+      <ToastContainer />
     </Container>
   )
 }

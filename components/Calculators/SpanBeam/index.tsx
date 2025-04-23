@@ -38,20 +38,10 @@ import {
 } from '@/utils/dropdownValues'
 import { calculateNailStrength } from '@/utils/calculateNail'
 import ConfirmationDialog from '@/components/ConfirmationBox'
+import JobSelector from '@/components/JobSelector'
 
 const SpanBeam = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     jobId: '',
@@ -219,22 +209,12 @@ const SpanBeam = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <TextField
                 name='title'

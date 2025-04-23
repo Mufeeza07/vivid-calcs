@@ -1,5 +1,3 @@
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import { AppDispatch } from '@/redux/store'
 import {
   buttonsBarStyle,
   calculateButtonStyle,
@@ -24,11 +22,11 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import { Job } from '@prisma/client'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
+import JobSelector from '@/components/JobSelector'
 import {
   calculateShearScrewStrength,
   calculateUpliftScrewStrength
@@ -41,26 +39,13 @@ import {
   screwSizeOptions,
   typeOptions
 } from '@/utils/dropdownValues'
-import ConfirmationDialog from '@/components/ConfirmationBox'
-import { title } from 'process'
 
 interface CalculatorProps {
   screwType: string
 }
 
 export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     jobId: '',
@@ -200,21 +185,6 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
     <>
       <ToastContainer autoClose={3000} />
       <Box>
-        {/* <Typography
-          variant='h5'
-          sx={{
-            color: '#0288d1',
-            backgroundColor: '#1e1e1e',
-            textAlign: 'center',
-            p: 2,
-            border: '1px solid #0288d1',
-            borderRadius: 1,
-            mb: 2
-          }}
-        >
-          Shear Screw Strength
-        </Typography> */}
-
         <Box
           sx={{
             display: 'flex',
@@ -233,22 +203,12 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
@@ -605,18 +565,7 @@ export const ShearScrewCalculator = ({ screwType }: CalculatorProps) => {
 }
 
 export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     jobId: '',
@@ -736,23 +685,7 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
   return (
     <>
       <ToastContainer autoClose={3000} />
-
       <Box>
-        {/* <Typography
-          variant='h5'
-          sx={{
-            color: '#0288d1',
-            backgroundColor: '#1e1e1e',
-            textAlign: 'center',
-            p: 2,
-            border: '1px solid #0288d1',
-            borderRadius: 1,
-            mb: 2
-          }}
-        >
-          Pullout Screw Strength
-        </Typography> */}
-
         <Box
           sx={{
             display: 'flex',
@@ -771,22 +704,12 @@ export const UpliftScrewCalculator = ({ screwType }: CalculatorProps) => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>

@@ -1,5 +1,3 @@
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import { AppDispatch } from '@/redux/store'
 import {
   buttonsBarStyle,
   calculateButtonStyle,
@@ -10,6 +8,7 @@ import {
   textFieldStyle
 } from '@/styles/moduleStyle'
 import { calculateBoltStrength } from '@/utils/calculateBolt'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
   Button,
@@ -24,12 +23,11 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import { Job } from '@prisma/client'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
+import JobSelector from '@/components/JobSelector'
 import {
   boltSizeOptions,
   categoryOptions,
@@ -39,23 +37,9 @@ import {
   timberThicknessOptions,
   typeOptions
 } from '@/utils/dropdownValues'
-import ConfirmationDialog from '@/components/ConfirmationBox'
 
 const BoltCalculator = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  // console.log('all jobs', allJobs)
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     phi: 0,
@@ -184,22 +168,12 @@ const BoltCalculator = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>
@@ -217,7 +191,6 @@ const BoltCalculator = () => {
                   ))}
                 </Select>
               </FormControl>
-
               <TextField
                 name='title'
                 label='Title'
