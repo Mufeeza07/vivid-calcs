@@ -39,6 +39,7 @@ import {
 import { calculateNailStrength } from '@/utils/calculateNail'
 import ConfirmationDialog from '@/components/ConfirmationBox'
 import JobSelector from '@/components/JobSelector'
+import { calculateSteelBeam } from '@/utils/calculateSteelBeam'
 
 const SpanBeam = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -80,19 +81,17 @@ const SpanBeam = () => {
   ) => {
     const { name, value } = event.target
 
-    const updatedValue =
-      name === 'jobId' || name === 'title'
-        ? value
-        : value === ''
-          ? ''
-          : Math.max(0, parseFloat(value) || 0)
+    setInputs(prev => {
+      const updatedValue =
+        name === 'jobId' || name === 'title'
+          ? value
+          : value === ''
+            ? ''
+            : Math.max(0, parseFloat(value) || 0)
 
-    const updatedInputs = {
-      ...inputs,
-      [name]: updatedValue
-    }
-
-    setInputs(updatedInputs)
+      let updatedState = { ...prev, [name!]: updatedValue }
+      return calculateSteelBeam(updatedState)
+    })
   }
 
   const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -100,12 +99,12 @@ const SpanBeam = () => {
   }
 
   const calculateResults = () => {
-    // const updated = calculateNailStrength(inputs)
-    // setInputs(updated)
-    // setResults({
-    //   momentOfInertia: updated.momentOfInertia ?? null,
-    //   moment: updated.moment ?? null
-    // })
+    const updated = calculateSteelBeam(inputs)
+    setInputs(updated)
+    setResults({
+      momentOfInertia: updated.momentOfInertia ?? null,
+      moment: updated.moment ?? null
+    })
   }
 
   const handleSave = () => {
@@ -128,7 +127,7 @@ const SpanBeam = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/nail/create-nail-details?jobId=${inputs.jobId}`
+        `/api/modules/nail/create-span-beam-details?jobId=${inputs.jobId}`
         // {
         //   method: 'POST',
         //   headers: {
@@ -351,7 +350,7 @@ const SpanBeam = () => {
                 onChange={handleChange}
                 onFocus={handleFocus}
                 fullWidth
-                inputProps={{ min: 0 }}
+                InputProps={{ readOnly: true }}
                 sx={textFieldStyle}
               />
             </Paper>
