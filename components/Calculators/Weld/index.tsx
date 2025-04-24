@@ -1,6 +1,7 @@
 'use client'
 
 import ConfirmationDialog from '@/components/ConfirmationBox'
+import JobSelector from '@/components/JobSelector'
 import Navbar from '@/components/Navbar'
 import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
 import { AppDispatch } from '@/redux/store'
@@ -33,18 +34,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { toast, ToastContainer } from 'react-toastify'
 
 const WeldStrengthCalculator = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
-
   const [inputs, setInputs] = useState({
     vw: 0.6,
     phi: 0,
@@ -145,7 +134,7 @@ const WeldStrengthCalculator = () => {
 
   return (
     <>
-      <ToastContainer autoClose={3000}/>
+      <ToastContainer autoClose={3000} />
       <Box>
         <Typography
           variant='h5'
@@ -180,22 +169,12 @@ const WeldStrengthCalculator = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>

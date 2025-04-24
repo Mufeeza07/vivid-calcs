@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import prisma from '@/prisma/client'
+import { getUserFromToken } from '@/utils/auth'
 
 export default async function handler(
   req: NextApiRequest,
@@ -19,6 +20,14 @@ export default async function handler(
       return res.status(401).json({
         message: 'Unauthorized',
         status: 401
+      })
+    }
+
+    const user = getUserFromToken(token)
+
+    if (!user || !user.userId) {
+      return res.status(401).json({
+        message: 'Unauthorized'
       })
     }
 
@@ -44,6 +53,13 @@ export default async function handler(
 
     await prisma.nails.delete({
       where: { id }
+    })
+
+    await prisma.job.update({
+      where: { jobId: existingDetails.jobId },
+      data: {
+        lastEditedBy: user.name
+      }
     })
 
     res.status(200).json({

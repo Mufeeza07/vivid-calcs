@@ -27,6 +27,34 @@ export const textFieldStyle = () => ({
   }
 })
 
+export const selectJobStyle = () => ({
+  backgroundColor: '#282828',
+  color: 'white',
+
+  '& .MuiOutlinedInput-root': {
+    backgroundColor: '#282828',
+    color: 'white',
+    '& fieldset': {
+      borderColor: '#0288d1'
+    },
+    '&:hover fieldset': {
+      borderColor: '#0288d1'
+    }
+  },
+
+  '& .MuiInputBase-input': {
+    color: 'white'
+  },
+
+  '& .MuiInputLabel-root': {
+    color: '#0288d1'
+  },
+
+  '& .MuiAutocomplete-endAdornment svg': {
+    color: '#0288d1'
+  }
+})
+
 export const resultFieldStyle = () => ({
   mt: 2,
   '& .MuiFilledInput-root': {

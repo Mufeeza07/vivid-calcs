@@ -1,5 +1,3 @@
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import { AppDispatch } from '@/redux/store'
 import {
   buttonsBarStyle,
   calculateButtonStyle,
@@ -23,11 +21,12 @@ import {
   Tooltip,
   Typography
 } from '@mui/material'
-import { Job } from '@prisma/client'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 
+import ConfirmationDialog from '@/components/ConfirmationBox'
+import JobSelector from '@/components/JobSelector'
+import { calculateNailStrength } from '@/utils/calculateNail'
 import {
   categoryOptions,
   jdTypeOptions,
@@ -36,22 +35,9 @@ import {
   nailDiameterOptions,
   typeOptions
 } from '@/utils/dropdownValues'
-import { calculateNailStrength } from '@/utils/calculateNail'
-import ConfirmationDialog from '@/components/ConfirmationBox'
 
 const NailCalculator = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const allJobs = useSelector(selectRecentJobs)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    dispatch(fetchJobs({}))
-  }, [dispatch])
-
-  const jobOptions = allJobs?.jobs?.map((job: Job) => ({
-    id: job.jobId,
-    name: job.address
-  }))
 
   const [inputs, setInputs] = useState({
     category: '',
@@ -221,22 +207,12 @@ const NailCalculator = () => {
             }}
           >
             <Paper sx={cardStyle}>
-              <FormControl fullWidth>
-                <InputLabel sx={{ color: '#0288d1' }}>Job</InputLabel>
-                <Select
-                  name='jobId'
-                  label='job'
-                  value={inputs.jobId}
-                  onChange={handleChange}
-                  sx={dropDownStyle()}
-                >
-                  {jobOptions?.map((job: any) => (
-                    <MenuItem key={job.id} value={job.id}>
-                      {job.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <JobSelector
+                jobId={inputs.jobId}
+                onChange={newJobId =>
+                  setInputs(prev => ({ ...prev, jobId: newJobId }))
+                }
+              />
 
               <FormControl fullWidth>
                 <InputLabel sx={{ color: '#0288d1' }}>Type</InputLabel>

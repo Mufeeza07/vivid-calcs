@@ -1,4 +1,5 @@
 import prisma from '@/prisma/client'
+import { getUserFromToken } from '@/utils/auth'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
@@ -16,17 +17,23 @@ export default async function handler(
       return res.status(401).json({ message: 'Unauthorized' })
     }
 
-    console.log('Incoming request query:', req.query)
+    const user = getUserFromToken(token)
+
+    if (!user || !user.userId) {
+      return res.status(401).json({ message: 'Invalid or expired token' })
+    }
 
     const { jobId } = req.query
-
-    console.log('coming jobId', jobId)
 
     if (!jobId || typeof jobId !== 'string') {
       return res.status(400).json({ message: 'Job ID is required' })
     }
 
-    const updateData = req.body
+    const updateData = {
+      ...req.body,
+      lastEditedBy: user.name
+    }
+
     const updatedJob = await prisma.job.update({
       where: { jobId },
       data: updateData

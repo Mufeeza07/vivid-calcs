@@ -1,4 +1,5 @@
 import prisma from '@/prisma/client'
+import { getUserFromToken } from '@/utils/auth'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
@@ -19,6 +20,14 @@ export default async function handler(
       return res.status(401).json({
         message: 'Unauthorized',
         status: 401
+      })
+    }
+
+    const user = getUserFromToken(token)
+
+    if (!user || !user.userId) {
+      return res.status(401).json({
+        message: 'Unauthorized'
       })
     }
 
@@ -88,6 +97,13 @@ export default async function handler(
         ...(note && { note }),
         ...(lp && { lp }),
         ...(qk && { qk })
+      }
+    })
+
+    await prisma.job.update({
+      where: { jobId },
+      data: {
+        lastEditedBy: user.name
       }
     })
 

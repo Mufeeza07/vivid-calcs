@@ -1,4 +1,5 @@
 import prisma from '@/prisma/client'
+import { getUserFromToken } from '@/utils/auth'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export default async function handler(
@@ -22,6 +23,13 @@ export default async function handler(
       })
     }
 
+    const user = getUserFromToken(token)
+    if (!user || !user.userId) {
+      return res.status(401).json({
+        message: 'Unauthorized'
+      })
+    }
+
     const { id } = req.query
 
     if (!id || typeof id !== 'string') {
@@ -35,6 +43,13 @@ export default async function handler(
     const updatedScrewDetails = await prisma.screwStrength.update({
       where: { id },
       data: updateData
+    })
+
+    await prisma.job.update({
+      where: { jobId: updatedScrewDetails.jobId },
+      data: {
+        lastEditedBy: user.name
+      }
     })
 
     res.status(200).json({

@@ -25,21 +25,31 @@ const initialState: JobsState = {
 interface FetchJobsParams {
   status?: string
   page?: number
+  sortBy?: 'createdAt' | 'updatedAt'
+  noPagination?: boolean
 }
 
 export const fetchJobs = createAsyncThunk(
   'jobs/fetchJobs',
-  async ({ status, page }: FetchJobsParams = {}) => {
+  async ({ status, page, sortBy, noPagination }: FetchJobsParams = {}) => {
     try {
       const token = localStorage.getItem('token')
       if (!token) {
         throw new Error('Authorization token is missing')
       }
 
+      // const query = new URLSearchParams({
+      //   limit: '10',
+      //   page: page ? page.toString() : '1',
+      //   ...(status ? { status } : {})
+      // }).toString()
+
       const query = new URLSearchParams({
+        ...(status ? { status } : {}),
+        ...(page ? { page: page.toString() } : {}),
         limit: '10',
-        page: page ? page.toString() : '1',
-        ...(status ? { status } : {})
+        ...(sortBy ? { sortBy } : {}),
+        ...(noPagination ? { noPagination: 'true' } : {})
       }).toString()
 
       const response = await fetch(`/api/job/get-user-jobs?${query}`, {

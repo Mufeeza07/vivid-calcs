@@ -65,6 +65,11 @@ const JobDetailsDrawer: React.FC<JobDetailsProps> = ({
 }) => {
   const router = useRouter()
 
+  console.log(
+    'currentJobDetails.locationFromCoastline',
+    currentJobDetails?.locationFromCoastline
+  )
+
   const handleViewMore = () => {
     console.log('current job id', currentJobDetails.jobId)
     if (currentJobDetails?.jobId) {
