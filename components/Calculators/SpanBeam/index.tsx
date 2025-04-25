@@ -111,7 +111,10 @@ const SpanBeam = () => {
     const requiredFields = Object.keys(inputs) as (keyof typeof inputs)[]
     const missingFields = requiredFields
       .filter(field => field !== 'note')
-      .filter(field => !inputs[field])
+      .filter(field => {
+        const value = inputs[field]
+        return value === '' || value === null || value === undefined
+      })
 
     if (missingFields.length > 0) {
       toast.error('Please fill in all required fields')
@@ -127,33 +130,19 @@ const SpanBeam = () => {
 
     try {
       const response = await fetch(
-        `/api/modules/nail/create-span-beam-details?jobId=${inputs.jobId}`
-        // {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //     Authorization: `Bearer ${token}`
-        //   },
-        //   body: JSON.stringify({
-        //     type: inputs.type,
-        //     k13: inputs.k13,
-        //     category: inputs.category,
-        //     load: inputs.load,
-        //     loadType: inputs.loadType,
-        //     jdType: inputs.jdType,
-        //     nailDiameter: inputs.nailDiameter,
-        //     screwJD: inputs.screwJD,
-        //     phi: inputs.phi,
-        //     k1: inputs.k1,
-        //     k14: inputs.k14,
-        //     k16: inputs.k16,
-        //     k17: inputs.k17,
-        //     note: inputs.note,
-        //     designLoad: results.designLoad,
-        //     screwPenetration: results.screwPenetration,
-        //     firstTimberThickness: results.firstTimberThickness
-        //   })
-        // }
+        `/api/modules/steelBeam/create-steelBeam-details?jobId=${inputs.jobId}`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            ...inputs,
+            momentOfInertia: results.momentOfInertia,
+            moment: results.moment
+          })
+        }
       )
 
       const responseData = await response.json()
@@ -166,7 +155,7 @@ const SpanBeam = () => {
       toast.success(responseData.message)
       setDialogOpen(false)
     } catch (error) {
-      console.error('Error saving 9calculations:', error)
+      console.error('Error saving calculations:', error)
       toast.error('Failed to save data.')
     }
   }

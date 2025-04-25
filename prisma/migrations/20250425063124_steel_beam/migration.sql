@@ -13,7 +13,7 @@ CREATE TABLE "SteelBeam" (
     "roofDeadLoad" DOUBLE PRECISION NOT NULL,
     "floorLiveLoad" DOUBLE PRECISION NOT NULL,
     "wallLoad" DOUBLE PRECISION NOT NULL,
-    "steelUDLWeight" DOUBLE PRECISION NOT NULL,
+    "steelUdlWeight" DOUBLE PRECISION NOT NULL,
     "steelPointWeight" DOUBLE PRECISION NOT NULL,
     "udlDeadLoad" DOUBLE PRECISION NOT NULL,
     "udlLiveLoad" DOUBLE PRECISION NOT NULL,
