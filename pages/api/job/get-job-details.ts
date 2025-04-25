@@ -31,7 +31,8 @@ export default async function handler(
         soilAnalysis: true,
         beamSlabAnalysis: true,
         screwStrength: true,
-        pileAnalysis: true
+        pileAnalysis: true,
+        SteelBeam: true
       }
     })
 

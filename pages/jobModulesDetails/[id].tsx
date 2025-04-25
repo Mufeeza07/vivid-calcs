@@ -6,6 +6,7 @@ import {
   calculateShearScrewStrength,
   calculateUpliftScrewStrength
 } from '@/utils/calculateScrew'
+import { calculateSteelBeam } from '@/utils/calculateSteelBeam'
 import {
   boltSizeOptions,
   categoryOptions,
@@ -60,7 +61,8 @@ const JobDetailsPage = () => {
     nails: 'nail',
     boltStrength: 'bolt',
     screwStrength: 'screw',
-    pileAnalysis: 'pile'
+    pileAnalysis: 'pile',
+    SteelBeam: 'steelBeam'
   }
 
   const dropdownOptions: Record<string, { value: any; label: string }[]> = {
@@ -164,6 +166,7 @@ const JobDetailsPage = () => {
     const apiModule = moduleApiMap[module]
     if (!apiModule) return
     const endpoint = `/api/modules/${apiModule}/delete-${apiModule}-details?id=${entryId}`
+
     try {
       const response = await fetch(endpoint, {
         method: 'DELETE',
@@ -182,24 +185,74 @@ const JobDetailsPage = () => {
     }
   }
 
+  // const handleFieldChange = (key: string, value: string, module: string) => {
+  //   const updated = {
+  //     ...editableEntryData,
+  //     [key]: isNaN(Number(value)) || value === '' ? value : parseFloat(value)
+  //   }
+  //   if (module === 'nails') setEditableEntryData(calculateNailStrength(updated))
+  //   else if (module === 'boltStrength')
+  //     setEditableEntryData(calculateBoltStrength(updated))
+  //   else if (module === 'screwStrength') {
+  //     const screwType = editableEntryData?.screwType
+  //     setEditableEntryData(
+  //       screwType === 'SHEAR'
+  //         ? calculateShearScrewStrength(updated)
+  //         : calculateUpliftScrewStrength(updated)
+  //     )
+  //   } else if (module === 'pileAnalysis') {
+  //     setEditableEntryData(calculatePileStrength(updated))
+  //   } else if (module === 'SteelBeam') {
+  //     setEditableEntryData(calculateSteelBeam(updated))
+  //   } else {
+  //     setEditableEntryData(updated)
+  //   }
+  // }
+
   const handleFieldChange = (key: string, value: string, module: string) => {
+    // Always update the field as raw input
     const updated = {
       ...editableEntryData,
-      [key]: isNaN(Number(value)) || value === '' ? value : parseFloat(value)
+      [key]: value
     }
-    if (module === 'nails') setEditableEntryData(calculateNailStrength(updated))
-    else if (module === 'boltStrength')
-      setEditableEntryData(calculateBoltStrength(updated))
-    else if (module === 'screwStrength') {
-      const screwType = editableEntryData?.screwType
-      setEditableEntryData(
-        screwType === 'SHEAR'
-          ? calculateShearScrewStrength(updated)
-          : calculateUpliftScrewStrength(updated)
-      )
-    } else if (module === 'pileAnalysis')
-      setEditableEntryData(calculatePileStrength(updated))
-    else setEditableEntryData(updated)
+
+    // Delay parseFloat conversion until value is a complete number
+    const isCompleteNumber = /^-?\d*\.?\d+$/.test(value)
+
+    // Create parsed clone for calculation functions
+    const parsed = { ...updated }
+
+    // Convert all valid numeric string fields to numbers
+    Object.keys(parsed).forEach(k => {
+      const val = parsed[k]
+      if (typeof val === 'string' && /^-?\d*\.?\d+$/.test(val)) {
+        parsed[k] = parseFloat(val)
+      }
+    })
+
+    switch (module) {
+      case 'nails':
+        setEditableEntryData(calculateNailStrength(parsed))
+        break
+      case 'boltStrength':
+        setEditableEntryData(calculateBoltStrength(parsed))
+        break
+      case 'screwStrength':
+        setEditableEntryData(
+          editableEntryData?.screwType === 'SHEAR'
+            ? calculateShearScrewStrength(parsed)
+            : calculateUpliftScrewStrength(parsed)
+        )
+        break
+      case 'pileAnalysis':
+        setEditableEntryData(calculatePileStrength(parsed))
+        break
+      case 'SteelBeam':
+        setEditableEntryData(calculateSteelBeam(parsed))
+        break
+      default:
+        setEditableEntryData(updated)
+    }
   }
 
   const renderField = (label: string, value: any, unit?: string) => (
@@ -318,7 +371,8 @@ const JobDetailsPage = () => {
                   'pileAnalysis',
                   'weld',
                   'beamslabAnalysis',
-                  'soilAnalysis'
+                  'soilAnalysis',
+                  'SteelBeam'
                 ].map(
                   module =>
                     jobDetails[module]?.length > 0 && (

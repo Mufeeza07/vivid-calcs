@@ -370,7 +370,7 @@ model SteelBeam {
   roofDeadLoad       Float
   floorLiveLoad      Float
   wallLoad           Float
-  steelUDLWeight     Float
+  steelUdlWeight     Float
   steelPointWeight   Float
   udlDeadLoad        Float
   udlLiveLoad        Float
