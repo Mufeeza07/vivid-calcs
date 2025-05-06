@@ -11,7 +11,7 @@ import {
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
-import { typeOptions } from '@/utils/dropdownValues'
+import { typeOptions } from '@/utils/unit-values/dropdownValues'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,

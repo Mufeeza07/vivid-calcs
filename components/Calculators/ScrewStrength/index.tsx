@@ -30,7 +30,7 @@ import JobSelector from '@/components/JobSelector'
 import {
   calculateShearScrewStrength,
   calculateUpliftScrewStrength
-} from '@/utils/calculateScrew'
+} from '@/utils/calculations/calculateScrew'
 import {
   categoryOptions,
   jdTypeOptions,
@@ -38,7 +38,7 @@ import {
   loadTypeOptions,
   screwSizeOptions,
   typeOptions
-} from '@/utils/dropdownValues'
+} from '@/utils/unit-values/dropdownValues'
 
 interface CalculatorProps {
   screwType: string

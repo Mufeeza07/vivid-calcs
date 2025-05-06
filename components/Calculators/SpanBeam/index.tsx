@@ -1,10 +1,7 @@
-import { fetchJobs, selectRecentJobs } from '@/redux/slice/jobSlice'
-import { AppDispatch } from '@/redux/store'
 import {
   buttonsBarStyle,
   calculateButtonStyle,
   cardStyle,
-  dropDownStyle,
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
@@ -12,34 +9,19 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
   Button,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   SelectChangeEvent,
   TextField,
   Tooltip,
   Typography
 } from '@mui/material'
-import { Job } from '@prisma/client'
-import { useEffect, useState } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useState } from 'react'
 import { toast, ToastContainer } from 'react-toastify'
 
-import {
-  categoryOptions,
-  jdTypeOptions,
-  loadDirectionOptions,
-  loadTypeOptions,
-  nailDiameterOptions,
-  typeOptions
-} from '@/utils/dropdownValues'
-import { calculateNailStrength } from '@/utils/calculateNail'
 import ConfirmationDialog from '@/components/ConfirmationBox'
 import JobSelector from '@/components/JobSelector'
-import { calculateSteelBeam } from '@/utils/calculateSteelBeam'
+import { calculateSteelBeam } from '@/utils/calculations/calculateSteelBeam'
 
 const SpanBeam = () => {
   const [dialogOpen, setDialogOpen] = useState(false)

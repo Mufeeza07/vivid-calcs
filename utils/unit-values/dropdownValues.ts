@@ -103,3 +103,46 @@ export const frictionAngleOptions = [
   value: value.toString(),
   label: value.toString()
 }))
+
+export const sectionOptions = [
+  {
+    value: '70x41x0.75_unlipped_combining',
+    label: '70x41x0.75 unlipped combining compression and bending'
+  },
+  {
+    value: '70x41x0.75_lipped_combining',
+    label: '70x41x0.75 lipped combining compression and bending'
+  },
+  {
+    value: '70x41x0.75_lipped_tension',
+    label: '70x41x0.75 lipped members in bending weaker axis C in tension'
+  },
+  {
+    value: '70x41x0.75_lipped_compression',
+    label: '70x41x0.75 lipped members in bending weaker axis C in compression'
+  },
+  {
+    value: '70x41x0.95_unlipped_combining',
+    label: '70x41x0.95 unlipped combining compression and bending'
+  },
+  {
+    value: '90x41x0.75_lipped_combining',
+    label: '90x41x0.75 lipped combining compression and bending'
+  },
+  {
+    value: '90x41x0.75_unlipped_tension',
+    label: '90x41x0.75 unlipped members in bending weaker axis C in tension'
+  },
+  {
+    value: '90x41x0.95_lipped_tension',
+    label: '90x41x0.95 lipped members in bending weaker axis C in tension'
+  },
+  {
+    value: '90x41x0.95_lipped_compression',
+    label: '90x41x0.95 lipped members in bending weaker axis C in compression'
+  },
+  {
+    value: '90x41x0.95_lipped_combining',
+    label: '90x41x0.95 lipped combining compression and bending'
+  }
+]

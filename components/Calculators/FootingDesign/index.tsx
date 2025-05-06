@@ -8,8 +8,8 @@ import {
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
-import { calculatePileStrength } from '@/utils/calculatePile'
-import { frictionAngleOptions, typeOptions } from '@/utils/dropdownValues'
+import { calculatePileStrength } from '@/utils/calculations/calculatePile'
+import { frictionAngleOptions, typeOptions } from '@/utils/unit-values/dropdownValues'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,

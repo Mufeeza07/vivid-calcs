@@ -1,7 +1,7 @@
 'use client'
 
 import { useUser } from '@/context/UserContext'
-import { isLoggedIn } from '@/utils/session'
+import { isLoggedIn } from '@/utils/auth/session'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 import {
   Box,

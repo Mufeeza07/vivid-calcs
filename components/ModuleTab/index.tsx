@@ -9,7 +9,8 @@ import {
   GridOn,
   Home,
   PrecisionManufacturing,
-  Speed
+  Speed,
+  Straighten
 } from '@mui/icons-material'
 import {
   Box,
@@ -23,7 +24,6 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import AgricultureIcon from '@mui/icons-material/Agriculture'
 import Schema from '@mui/icons-material/Schema'
-
 
 const ModuleTabs = () => {
   const router = useRouter()
@@ -86,6 +86,12 @@ const ModuleTabs = () => {
       description: 'Design and analyze pile foundations',
       path: 'pile',
       icon: <Foundation fontSize='large' />
+    },
+    {
+      label: 'Stud Design',
+      description: 'Design and analyze stud',
+      path: 'stud',
+      icon: <Straighten fontSize='large' />
     }
     // {
     //   label: 'Retaining Wall',
