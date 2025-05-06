@@ -7,7 +7,7 @@ import {
   saveButtonStyle,
   textFieldStyle
 } from '@/styles/moduleStyle'
-import { calculateBoltStrength } from '@/utils/calculateBolt'
+import { calculateBoltStrength } from '@/utils/calculations/calculateBolt'
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import {
   Box,
@@ -36,7 +36,7 @@ import {
   loadTypeOptions,
   timberThicknessOptions,
   typeOptions
-} from '@/utils/dropdownValues'
+} from '@/utils/unit-values/dropdownValues'
 
 const BoltCalculator = () => {
   const [dialogOpen, setDialogOpen] = useState(false)

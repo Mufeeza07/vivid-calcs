@@ -1,12 +1,12 @@
 'use client'
-import { calculateBoltStrength } from '@/utils/calculateBolt'
-import { calculateNailStrength } from '@/utils/calculateNail'
-import { calculatePileStrength } from '@/utils/calculatePile'
+import { calculateBoltStrength } from '@/utils/calculations/calculateBolt'
+import { calculateNailStrength } from '@/utils/calculations/calculateNail'
+import { calculatePileStrength } from '@/utils/calculations/calculatePile'
 import {
   calculateShearScrewStrength,
   calculateUpliftScrewStrength
-} from '@/utils/calculateScrew'
-import { calculateSteelBeam } from '@/utils/calculateSteelBeam'
+} from '@/utils/calculations/calculateScrew'
+import { calculateSteelBeam } from '@/utils/calculations/calculateSteelBeam'
 import {
   boltSizeOptions,
   categoryOptions,
@@ -18,8 +18,8 @@ import {
   screwSizeOptions,
   timberThicknessOptions,
   typeOptions
-} from '@/utils/dropdownValues'
-import { fieldUnits } from '@/utils/fieldUnits'
+} from '@/utils/unit-values/dropdownValues'
+import { fieldUnits } from '@/utils/unit-values/fieldUnits'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import CheckIcon from '@mui/icons-material/Check'
 import CloseIcon from '@mui/icons-material/Close'
@@ -210,19 +210,15 @@ const JobDetailsPage = () => {
   // }
 
   const handleFieldChange = (key: string, value: string, module: string) => {
-    // Always update the field as raw input
     const updated = {
       ...editableEntryData,
       [key]: value
     }
 
-    // Delay parseFloat conversion until value is a complete number
     const isCompleteNumber = /^-?\d*\.?\d+$/.test(value)
 
-    // Create parsed clone for calculation functions
     const parsed = { ...updated }
 
-    // Convert all valid numeric string fields to numbers
     Object.keys(parsed).forEach(k => {
       const val = parsed[k]
       if (typeof val === 'string' && /^-?\d*\.?\d+$/.test(val)) {

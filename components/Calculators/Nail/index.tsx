@@ -26,7 +26,7 @@ import { toast, ToastContainer } from 'react-toastify'
 
 import ConfirmationDialog from '@/components/ConfirmationBox'
 import JobSelector from '@/components/JobSelector'
-import { calculateNailStrength } from '@/utils/calculateNail'
+import { calculateNailStrength } from '@/utils/calculations/calculateNail'
 import {
   categoryOptions,
   jdTypeOptions,
@@ -34,7 +34,7 @@ import {
   loadTypeOptions,
   nailDiameterOptions,
   typeOptions
-} from '@/utils/dropdownValues'
+} from '@/utils/unit-values/dropdownValues'
 
 const NailCalculator = () => {
   const [dialogOpen, setDialogOpen] = useState(false)

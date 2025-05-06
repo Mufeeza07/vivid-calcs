@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import prisma from '@/prisma/client'
-import { getUserFromToken } from '@/utils/auth'
+import { getUserFromToken } from '@/utils/auth/auth'
 
 export default async function handler(
   req: NextApiRequest,

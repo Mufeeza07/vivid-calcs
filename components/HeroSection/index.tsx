@@ -1,6 +1,6 @@
 'use client'
 
-import { isLoggedIn } from '@/utils/session'
+import { isLoggedIn } from '@/utils/auth/session'
 import { Box, Button, Container, Typography } from '@mui/material'
 import { useRouter } from 'next/navigation'
 
