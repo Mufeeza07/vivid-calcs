@@ -1,17 +1,27 @@
+import { sectionOptions } from '../unit-values/dropdownValues'
+
 const safeNumber = (value: number): number => {
   return isFinite(value) && !isNaN(value) ? value : 0
+}
+
+export const checkIsCombining = (sectionName: string): boolean => {
+  return sectionOptions.some(
+    opt =>
+      opt.value === sectionName &&
+      opt.label.toLowerCase().includes('combining compression and bending')
+  )
 }
 
 export const calculateStudDesign = (inputs: any) => {
   const {
     ag,
-    e,
     g,
     ixx,
     iyy,
     lex,
     ley,
     j,
+    cb,
     yr,
     iw,
     lez,
@@ -21,12 +31,24 @@ export const calculateStudDesign = (inputs: any) => {
     fol,
     fod,
     cs,
-    ctf
+    ctf,
+    isCombining,
+    c,
+    cr,
+    cl,
+    cw,
+    phi,
+    ri,
+    lb,
+    dl,
+    tw
   } = inputs
 
   const updated = { ...inputs }
 
   //   updated.rx = parseFloat(Math.sqrt(ixx / ag).toFixed(8))
+
+  updated.e = isCombining ? 200000 : 203000
 
   updated.rx = safeNumber(Math.sqrt(ixx / ag))
   updated.ry = safeNumber(Math.sqrt(iyy / ag))
@@ -40,16 +62,16 @@ export const calculateStudDesign = (inputs: any) => {
   updated.beta = safeNumber(1 - Math.pow(yr / updated.r01, 2))
 
   updated.fox = safeNumber(
-    (Math.pow(3.14, 2) * e) / Math.pow(lex / updated.rx, 2)
+    (Math.pow(3.14, 2) * updated.e) / Math.pow(lex / updated.rx, 2)
   )
 
   updated.foy = safeNumber(
-    (Math.pow(3.14, 2) * e) / Math.pow(ley / updated.ry, 2)
+    (Math.pow(3.14, 2) * updated.e) / Math.pow(ley / updated.ry, 2)
   )
 
   updated.foz = safeNumber(
     ((g * j) / (ag * Math.pow(updated.r01, 2))) *
-      (1 + (Math.pow(3.14, 2) * e * iw) / (g * j * Math.pow(lez, 2)))
+      (1 + (Math.pow(3.14, 2) * updated.e * iw) / (g * j * Math.pow(lez, 2)))
   )
 
   updated.foxz = safeNumber(
@@ -67,17 +89,32 @@ export const calculateStudDesign = (inputs: any) => {
   updated.lemda = safeNumber(Math.sqrt(fy / updated.foc))
 
   updated.mo = safeNumber(
-    ((cs *
-      Math.sqrt(
-        Math.pow(by * 0.5, 2) +
-          (Math.pow(updated.r01, 2) * updated.foz) / updated.fox
-      ) +
-      by * 0.5) *
-      updated.fox *
-      ag *
-      cs) /
-      ctf
+    isCombining
+      ? cb * ag * updated.r01 * Math.sqrt(updated.foy * updated.foz)
+      : ((cs *
+          Math.sqrt(
+            Math.pow(by * 0.5, 2) +
+              (Math.pow(updated.r01, 2) * updated.foz) / updated.fox
+          ) +
+          by * 0.5) *
+          updated.fox *
+          ag *
+          cs) /
+          ctf
   )
+
+  // updated.mo = safeNumber(
+  //   ((cs *
+  //     Math.sqrt(
+  //       Math.pow(by * 0.5, 2) +
+  //         (Math.pow(updated.r01, 2) * updated.foz) / updated.fox
+  //     ) +
+  //     by * 0.5) *
+  //     updated.fox *
+  //     ag *
+  //     cs) /
+  //     ctf
+  // )
 
   updated.fn1 = safeNumber(Math.pow(Math.pow(0.658, updated.lemda), 2) * fy)
 
@@ -139,14 +176,32 @@ export const calculateStudDesign = (inputs: any) => {
           updated.my
   )
 
-  updated.iox = safeNumber(3.14 * updated.rx * Math.sqrt(e / updated.fn))
-  updated.ioy = safeNumber(3.14 * updated.ry * Math.sqrt(e / updated.fn))
+  updated.iox = safeNumber(
+    3.14 * updated.rx * Math.sqrt(updated.e / updated.fn)
+  )
+  updated.ioy = safeNumber(
+    3.14 * updated.ry * Math.sqrt(updated.e / updated.fn)
+  )
 
   updated.checkX = safeNumber(lex / (1.1 * updated.iox))
   updated.checkY = safeNumber(ley / (1.1 * updated.ioy))
 
   updated.gammaX = safeNumber(0.65 + (0.35 * lex) / (1.1 * updated.iox))
   updated.gammaY = safeNumber(0.65 + (0.35 * ley) / (1.1 * updated.ioy))
+
+  updated.phixM = safeNumber(
+    (0.9 * Math.min(updated.mbe, updated.mbl, updated.mbd)) / 1000000
+  )
+
+  updated.phixRb = safeNumber(
+    (phi *
+      Math.pow(tw, 2) *
+      fy *
+      (1 - cr * Math.sqrt(ri / tw)) *
+      (1 + cl * Math.sqrt(lb / tw)) *
+      (1 - cw * Math.sqrt(dl / tw))) /
+      1000
+  )
 
   return updated
 }
