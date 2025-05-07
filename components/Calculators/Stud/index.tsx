@@ -1,9 +1,21 @@
 import JobSelector from '@/components/JobSelector'
-import { cardStyle, dropDownStyle, textFieldStyle } from '@/styles/moduleStyle'
+import {
+  buttonsBarStyle,
+  calculateButtonStyle,
+  cardStyle,
+  dropDownStyle,
+  resultFieldStyle,
+  saveButtonStyle,
+  textFieldStyle
+} from '@/styles/moduleStyle'
 import { sectionOptions } from '@/utils/unit-values/dropdownValues'
-import { calculateStudDesign } from '@/utils/calculations/calculateStud'
+import {
+  calculateStudDesign,
+  checkIsCombining
+} from '@/utils/calculations/calculateStud'
 import {
   Box,
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -13,15 +25,17 @@ import {
   TextField,
   Typography
 } from '@mui/material'
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { ToastContainer } from 'react-toastify'
+import ConfirmationDialog from '@/components/ConfirmationBox'
 
 const StudCalculator = () => {
+  const [dialogOpen, setDialogOpen] = useState(false)
   const [inputs, setInputs] = useState({
     jobId: '',
     title: '',
     sectionName: '',
-    e: 203000,
+    e: 0,
     g: 80000,
     ag: 0,
     fy: 0,
@@ -33,6 +47,7 @@ const StudCalculator = () => {
     iw: 0,
     yr: 0,
     by: 0,
+    cb: 0,
     lex: 0,
     ley: 0,
     lez: 0,
@@ -88,8 +103,20 @@ const StudCalculator = () => {
     lb: 0,
     dl: 0,
     tw: 0,
-    phixRb: ''
+    note: 0
   })
+
+  const [results, setResults] = useState({
+    phixM: null as number | null,
+    phixRb: null as number | null,
+    phixNc: null as number | null
+  })
+  const isCombining = useMemo(
+    () => checkIsCombining(inputs.sectionName),
+    [inputs.sectionName]
+  )
+
+  // console.log('isCombig in main ', isCombining)
 
   const handleChange = (
     event:
@@ -106,8 +133,15 @@ const StudCalculator = () => {
             ? ''
             : parseFloat(value) || 0
 
-      let updatedState = { ...prev, [name!]: updatedValue }
-      return calculateStudDesign(updatedState)
+      const updatedInputs = { ...prev, [name!]: updatedValue }
+
+      const sectionToCheck =
+        name === 'sectionName' ? value : updatedInputs.sectionName
+
+      return calculateStudDesign({
+        ...updatedInputs,
+        isCombining: checkIsCombining(sectionToCheck)
+      })
     })
   }
 
@@ -115,11 +149,16 @@ const StudCalculator = () => {
     e.target.select()
   }
 
-  const isCombining = sectionOptions.find(
-    opt =>
-      opt.value === inputs.sectionName &&
-      opt.label.toLowerCase().includes('combining compression and bending')
-  )
+  const calculateResults = () => {
+    const updated = calculateStudDesign(inputs)
+    setInputs(updated)
+    setResults({
+      phixM: updated.phixM ?? null,
+      phixRb: updated.phixRb ?? null,
+      phixNc: updated.phixNc ?? null
+    })
+  }
+  const handleConfirmSave = () => {}
 
   return (
     <>
@@ -277,17 +316,31 @@ const StudCalculator = () => {
                 sx={textFieldStyle}
               />
 
-              <TextField
-                type='number'
-                name='by'
-                label='By (mm)'
-                value={inputs.by}
-                onChange={handleChange}
-                onFocus={handleFocus}
-                fullWidth
-                inputProps={{ min: 0 }}
-                sx={textFieldStyle}
-              />
+              {isCombining ? (
+                <TextField
+                  type='number'
+                  name='cb'
+                  label='Cb (mm)'
+                  value={inputs.cb}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  inputProps={{ min: 0 }}
+                  sx={textFieldStyle}
+                />
+              ) : (
+                <TextField
+                  type='number'
+                  name='by'
+                  label='By (mm)'
+                  value={inputs.by}
+                  onChange={handleChange}
+                  onFocus={handleFocus}
+                  fullWidth
+                  inputProps={{ min: 0 }}
+                  sx={textFieldStyle}
+                />
+              )}
             </Paper>
 
             <Paper sx={cardStyle}>
@@ -390,25 +443,24 @@ const StudCalculator = () => {
                 >
                   Compression
                 </Typography>
-                {['t', 'nce', 'nol', 'ncl', 'ny', 'nod', 'ncd', 'phixNc'].map(
-                  field => (
-                    <TextField
-                      key={field}
-                      name={field}
-                      label={field.toUpperCase()}
-                      value={inputs[field as keyof typeof inputs]}
-                      onChange={handleChange}
-                      onFocus={handleFocus}
-                      fullWidth
-                      sx={textFieldStyle}
-                    />
-                  )
-                )}
+                {['t', 'nce', 'nol', 'ncl', 'ny', 'nod', 'ncd'].map(field => (
+                  <TextField
+                    key={field}
+                    name={field}
+                    label={field.toUpperCase()}
+                    value={inputs[field as keyof typeof inputs]}
+                    onChange={handleChange}
+                    onFocus={handleFocus}
+                    fullWidth
+                    sx={textFieldStyle}
+                  />
+                ))}
               </Paper>
             )}
 
             <Paper sx={cardStyle}>
               <TextField
+                type='number'
                 name='depth'
                 label='Depth (mm)'
                 value={inputs.depth}
@@ -420,6 +472,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='fol'
                 label='Fol (mpa)'
                 value={inputs.fol}
@@ -431,6 +484,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='fod'
                 label='Fod (mpa)'
                 value={inputs.fod}
@@ -458,6 +512,7 @@ const StudCalculator = () => {
               </Typography>
 
               <TextField
+                type='number'
                 name='c'
                 label='C '
                 value={inputs.c}
@@ -469,6 +524,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='cr'
                 label='Cr '
                 value={inputs.cr}
@@ -480,6 +536,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='cl'
                 label='Cl '
                 value={inputs.cl}
@@ -491,6 +548,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='cw'
                 label='Cw '
                 value={inputs.cw}
@@ -502,6 +560,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='phi'
                 label='Phi '
                 value={inputs.phi}
@@ -513,6 +572,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='ri'
                 label='ri'
                 value={inputs.ri}
@@ -524,6 +584,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='lb'
                 label='lb (mm)'
                 value={inputs.lb}
@@ -535,6 +596,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='dl'
                 label='dl (mm)'
                 value={inputs.dl}
@@ -546,6 +608,7 @@ const StudCalculator = () => {
               />
 
               <TextField
+                type='number'
                 name='tw'
                 label='tw (mm)'
                 value={inputs.tw}
@@ -871,7 +934,103 @@ const StudCalculator = () => {
             </Paper>
           </Box>
         </Box>
+
+        <Box
+          sx={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            gap: 2
+          }}
+        >
+          {[
+            { label: 'Phix-M (kN-M)', value: results.phixM },
+            {
+              label: 'Phix-Rb (kN)',
+              value: results.phixRb
+            },
+            ...(isCombining
+              ? [{ label: 'Phix-Nc (kN)', value: results.phixNc }]
+              : [])
+          ].map(({ label, value }) => (
+            <TextField
+              key={label}
+              label={label}
+              value={value !== null ? value : ''}
+              InputProps={{
+                readOnly: true
+              }}
+              variant='filled'
+              fullWidth
+              sx={resultFieldStyle}
+            />
+          ))}
+        </Box>
+
+        <Box sx={{ mt: 4 }}>
+          <Paper
+            elevation={2}
+            sx={{
+              backgroundColor: '#1e1e1e',
+              border: '1px solid #0288d1',
+              borderRadius: 1,
+              p: 2
+            }}
+          >
+            <Typography
+              variant='subtitle1'
+              sx={{
+                mb: 2,
+                fontWeight: 600,
+                color: '#0288d1'
+              }}
+            >
+              Notes
+            </Typography>
+
+            <TextField
+              name='note'
+              multiline
+              minRows={3}
+              maxRows={6}
+              fullWidth
+              variant='outlined'
+              placeholder='Write your notes here...'
+              sx={textFieldStyle}
+              onChange={handleChange}
+              value={inputs.note || ''}
+            />
+          </Paper>
+        </Box>
+
+        <Box sx={buttonsBarStyle}>
+          <Button
+            variant='contained'
+            color='primary'
+            onClick={calculateResults}
+            sx={calculateButtonStyle}
+          >
+            Calculate
+          </Button>
+
+          <Button
+            variant='contained'
+            color='secondary'
+            // onClick={handleSave}
+            sx={saveButtonStyle}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
+
+      <ConfirmationDialog
+        open={dialogOpen}
+        title='Stud Calculations'
+        onClose={() => setDialogOpen(false)}
+        onConfirm={handleConfirmSave}
+      />
     </>
   )
 }
